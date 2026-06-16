@@ -1286,4 +1286,4 @@ def update_catalogue():
 if __name__ == "__main__":
     if not db.db_exists():
         print("⚠ data/database.json absent. Lance d'abord :  python seed.py")
-    app.run(debug=True, port=int(os.environ.get("PORT", 5001)))
+    app.run(host="0.0.0.0", debug=False, port=int(os.environ.get("PORT", 10000)))
