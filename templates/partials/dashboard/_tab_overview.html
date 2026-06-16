@@ -1,0 +1,298 @@
+  <!-- ============================
+       PANEL: VUE D'ENSEMBLE
+       ============================ -->
+  <div class="dash-panel" id="panel-overview">
+    <div class="pip-widget">
+      <div class="pip-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <h2>Performances du Flux d'Intervention</h2>
+          <span id="pip-last-updated" style="font-size:10px;font-weight:500;color:var(--light-slate);white-space:nowrap;"></span>
+        </div>
+        <div class="pip-controls">
+          <div class="pip-metric-toggle" id="pip-metric-toggle">
+            <button class="active" data-metric="mean">Moyenne</button>
+            <button data-metric="median">Médiane</button>
+            <button data-metric="trimmed">Moy. Tronquée</button>
+          </div>
+          <div id="pip-trim-wrapper" class="pip-trim-wrapper pip-hidden">
+            <label for="pip-trim-input">Exclure :</label>
+            <input type="number" id="pip-trim-input" value="10" min="0" max="49">
+            <span style="font-size:11px;color:var(--grey);">%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pip-wrapper">
+        <div class="pip-flow" id="pip-flow">
+
+          <!-- 1. ENVOYÉ -->
+          <div class="pip-node pip-envoye" id="pip-envoye">
+            <div class="pip-n-header">
+              <span class="pip-n-title">Envoyé</span>
+              <div class="pip-live"></div>
+            </div>
+            <div class="pip-stat-row">
+              <span class="pip-val-main pip-val-current">0</span>
+              <span class="pip-val-label">actuels</span>
+            </div>
+            <span class="pip-subtext"><span class="pip-val-passed">0</span> passés</span>
+          </div>
+
+          <!-- Transition: Envoyé → Assigné -->
+          <div class="pip-connector" style="width:96px;">
+            <div class="pip-line"></div>
+            <div class="pip-trans-card" id="pip-trans-assignation">
+              <span class="pip-tc-title">Assignation</span>
+              <div class="pip-tc-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span class="pip-tc-time pip-val-time">0m</span>
+              </div>
+              <span class="pip-tc-sub pip-label-type">Moyenne</span>
+            </div>
+          </div>
+
+          <!-- 2. ASSIGNÉ -->
+          <div class="pip-node pip-assigne" id="pip-assigne">
+            <div class="pip-n-header">
+              <span class="pip-n-title">Assigné</span>
+              <div class="pip-live"></div>
+            </div>
+            <div class="pip-stat-row">
+              <span class="pip-val-main pip-val-current">0</span>
+              <span class="pip-val-label">actuels</span>
+            </div>
+            <div class="pip-time-block">
+              <div class="pip-time-val">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span class="pip-val-time">0h</span>
+              </div>
+              <span class="pip-subtext pip-label-type">Moyenne • <span class="pip-val-passed">0</span> passés</span>
+            </div>
+          </div>
+
+          <!-- FORK -->
+          <div class="pip-fork"><div class="pip-fork-top"></div><div class="pip-fork-bot"></div></div>
+
+          <!-- BRANCHES -->
+          <div class="pip-branch-col">
+
+            <!-- TOP: Terrain -->
+            <div class="pip-branch-row" style="margin-bottom:8px;">
+              <div class="pip-connector" style="width:24px;"><div class="pip-line short"></div></div>
+
+              <div class="pip-node pip-attente" id="pip-attente">
+                <div class="pip-n-header"><span class="pip-n-title">Attente pièce</span><div class="pip-live"></div></div>
+                <div class="pip-stat-row"><span class="pip-val-main pip-val-current">0</span><span class="pip-val-label">actuels</span></div>
+                <div class="pip-time-block">
+                  <div class="pip-time-val"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="pip-val-time">0h</span></div>
+                  <span class="pip-subtext pip-label-type">Moyenne • <span class="pip-val-passed">0</span> passés</span>
+                </div>
+              </div>
+
+              <div class="pip-connector" style="width:24px;"><div class="pip-line short"></div></div>
+
+              <div class="pip-node pip-route" id="pip-route">
+                <div class="pip-n-header"><span class="pip-n-title">En route</span><div class="pip-live"></div></div>
+                <div class="pip-stat-row"><span class="pip-val-main pip-val-current">0</span><span class="pip-val-label">actuels</span></div>
+                <div class="pip-time-block">
+                  <div class="pip-time-val"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="pip-val-time">0h</span></div>
+                  <span class="pip-subtext pip-label-type">Moyenne • <span class="pip-val-passed">0</span> passés</span>
+                </div>
+              </div>
+
+              <div class="pip-connector" style="width:24px;"><div class="pip-line short"></div></div>
+
+              <div class="pip-node pip-repa" id="pip-reparation">
+                <div class="pip-n-header"><span class="pip-n-title">En réparation</span><div class="pip-live"></div></div>
+                <div class="pip-stat-row"><span class="pip-val-main pip-val-current">0</span><span class="pip-val-label">actuels</span></div>
+                <div class="pip-time-block">
+                  <div class="pip-time-val"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="pip-val-time">0h</span></div>
+                  <span class="pip-subtext pip-label-type">Moyenne • <span class="pip-val-passed">0</span> passés</span>
+                </div>
+              </div>
+
+              <div class="pip-connector" style="width:24px;"><div class="pip-line short"></div></div>
+
+              <div class="pip-node pip-termine" id="pip-termine-terrain">
+                <div class="pip-n-header"><span class="pip-n-title">Terminé</span></div>
+                <div class="pip-stat-row"><span class="pip-val-main pip-val-current" style="color:#2D8F5E;">0</span><span class="pip-val-label">clôturés</span></div>
+                <div class="pip-time-block">
+                  <div class="pip-time-val" style="color:#2D8F5E;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="pip-val-time">0h</span></div>
+                  <span class="pip-subtext pip-label-type">Total (Moy.) • <span class="pip-val-passed">0</span> passés</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- BOTTOM: Distance -->
+            <div class="pip-branch-row">
+              <div class="pip-connector" style="width:24px;"><div class="pip-line short"></div></div>
+
+              <div class="pip-node pip-distance" id="pip-distance">
+                <div class="pip-n-header"><span class="pip-n-title">Maintenance à distance</span><div class="pip-live"></div></div>
+                <div class="pip-stat-row"><span class="pip-val-main pip-val-current">0</span><span class="pip-val-label">actuels</span></div>
+                <div class="pip-time-block">
+                  <div class="pip-time-val"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="pip-val-time">0h</span></div>
+                  <span class="pip-subtext pip-label-type">Moyenne • <span class="pip-val-passed">0</span> passés</span>
+                </div>
+              </div>
+
+              <div class="pip-connector" style="flex-grow:1;min-width:24px;"><div class="pip-line"></div></div>
+
+              <div class="pip-node pip-termine" id="pip-termine-distance">
+                <div class="pip-n-header"><span class="pip-n-title">Terminé</span></div>
+                <div class="pip-stat-row"><span class="pip-val-main pip-val-current" style="color:#2D8F5E;">0</span><span class="pip-val-label">clôturés</span></div>
+                <div class="pip-time-block">
+                  <div class="pip-time-val" style="color:#2D8F5E;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="pip-val-time">0h</span></div>
+                  <span class="pip-subtext pip-label-type">Total (Moy.) • <span class="pip-val-passed">0</span> passés</span>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- end branch-col -->
+        </div><!-- end pip-flow -->
+      </div><!-- end pip-wrapper -->
+
+      <!-- Post-clôture -->
+      <div class="pip-post-card">
+        <div class="pip-post-section" id="pip-rapport">
+          <div class="pip-post-title">Rapports d'intervention</div>
+          <div class="pip-post-val-row">
+            <span class="pip-post-val pip-val-time">0h</span>
+            <span class="pip-post-sub pip-label-type">Saisie après clôture</span>
+          </div>
+          <span class="pip-post-footer">Sur <span class="pip-val-passed">0</span> rapports</span>
+        </div>
+        <div class="pip-post-divider"></div>
+        <div class="pip-post-section" id="pip-evaluation">
+          <div class="pip-post-title">Évaluations Clients</div>
+          <div class="pip-post-val-row">
+            <span class="pip-post-val pip-val-rating" style="letter-spacing:-0.5px;">—</span>
+            <span class="pip-post-sub" style="align-self:flex-end;padding-bottom:2px;">/ 5</span>
+          </div>
+          <span class="pip-post-footer">Sur <span class="pip-val-passed">0</span> évaluations</span>
+        </div>
+        <div class="pip-post-divider"></div>
+        <div class="pip-post-section" id="pip-annule">
+          <div class="pip-post-title" style="color:#F04438;">Tickets Annulés</div>
+          <div class="pip-post-val-row">
+            <span class="pip-post-val pip-val-time" style="color:#F04438;">0h</span>
+            <span class="pip-post-sub pip-label-type" style="color:#F04438;opacity:0.8;">Avant annulation</span>
+          </div>
+          <span class="pip-post-footer"><span class="pip-val-passed">0</span> tickets perdus</span>
+        </div>
+      </div>
+    </div><!-- end pip-widget -->
+
+    <!-- ==========================================
+         Section 4: État des techniciens en direct
+         ========================================== -->
+    <div class="ov-card ov-card-full">
+      <div class="ov-card-header">
+        <div class="ov-card-hgroup">
+          <span class="ov-card-title">État des techniciens</span>
+          <span class="ov-live-pill"><span class="dot"></span>LIVE</span>
+          <button class="ov-voir-tous-btn" onclick="ovOpenModal('shifts')">Voir tous</button>
+        </div>
+        <div class="tech-stat-chips" id="tech-stat-chips"></div>
+      </div>
+      <div class="tech-section-body">
+        <div class="tech-roster-wrap">
+          <table class="tech-table">
+            <thead><tr>
+              <th>Nom</th><th>Disponibilité</th><th>Tickets actifs</th>
+            </tr></thead>
+            <tbody id="tech-roster-tbody"></tbody>
+          </table>
+        </div>
+        <div class="tech-section-divider"></div>
+        <div class="tech-shifts-wrap">
+          <div class="tech-shifts-title">Derniers changements de disponibilité <span class="live-dot" style="margin-left:6px;vertical-align:middle;"></span></div>
+          <div id="tech-shifts-feed" class="shift-feed"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         ROW: Sections 2 (Éval/Annul) & 3 (Tickets)
+         ========================================== -->
+    <div class="ov-row">
+
+      <!-- Section 2: Évaluations / Annulations toggle -->
+      <div class="ov-card">
+        <div class="ov-card-header">
+          <div class="ov-card-hgroup">
+            <span class="ov-card-title" id="ov-ea-title">Derniers tickets évalué</span>
+            <span class="ov-live-pill"><span class="dot"></span>LIVE</span>
+            <button class="ov-voir-tous-btn" onclick="ovOpenModal('eval')">Voir tous</button>
+          </div>
+          <div class="pill-toggle" id="toggle-ea">
+            <button class="active" data-mode="eval">Évaluations</button>
+            <button data-mode="annul">Annulations</button>
+          </div>
+        </div>
+        <div class="ov-table-wrap">
+          <table class="ov-table" id="ov-eval-table">
+            <thead><tr>
+              <th>ID</th><th>Client</th>
+              <th>Note</th><th>Commentaire</th><th></th>
+            </tr></thead>
+            <tbody id="ov-eval-tbody"><tr><td colspan="5" class="ov-empty">Chargement…</td></tr></tbody>
+          </table>
+          <table class="ov-table" id="ov-annul-table" style="display:none">
+            <thead><tr>
+              <th>ID</th><th>Date d'annulation</th><th>Annulé par</th>
+              <th>Raison</th><th></th>
+            </tr></thead>
+            <tbody id="ov-annul-tbody"><tr><td colspan="5" class="ov-empty">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section 3: Tickets résolus / créés toggle -->
+      <div class="ov-card">
+        <div class="ov-card-header">
+          <div class="ov-card-hgroup">
+            <span class="ov-card-title" id="ov-tickets-title">Derniers tickets résolus</span>
+            <span class="ov-live-pill"><span class="dot"></span>LIVE</span>
+            <button class="ov-voir-tous-btn" onclick="ovOpenModal('tickets')">Voir tous</button>
+          </div>
+          <div class="pill-toggle" id="toggle-tickets">
+            <button class="active" data-mode="resolus">Résolus</button>
+            <button data-mode="crees">Créés</button>
+          </div>
+        </div>
+        <div class="ov-table-wrap">
+          <table class="ov-table">
+            <thead><tr>
+              <th>ID</th><th id="ov-tickets-date-th">Date de résolution</th><th>Client</th>
+              <th>Réf. machine</th><th></th>
+            </tr></thead>
+            <tbody id="ov-tickets-tbody"><tr><td colspan="5" class="ov-empty">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- end ov-row -->
+
+  </div><!-- end panel-overview -->
+
+<!-- ============================================================
+     MODAL HISTORIQUE COMPLET
+     ============================================================ -->
+<div class="ov-modal-overlay" id="ov-modal-overlay">
+  <div class="ov-modal">
+    <div class="ov-modal-head">
+      <h3 id="ov-modal-title">Historique complet</h3>
+      <button class="ov-modal-close" id="ov-modal-close" title="Fermer">&#x2715;</button>
+    </div>
+    <div class="ov-modal-tabs" id="ov-modal-tabs"></div>
+    <div class="ov-modal-filters" id="ov-modal-filters"></div>
+    <div class="ov-modal-body">
+      <table class="ov-table" style="min-width:600px">
+        <thead id="ov-modal-thead"></thead>
+        <tbody id="ov-modal-tbody"><tr><td class="ov-empty">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="ov-modal-footer" id="ov-modal-footer"></div>
+  </div>
+</div>

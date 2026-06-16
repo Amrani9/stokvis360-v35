@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes Tickets — Stokvis Technicien</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/variables.css">
+<link rel="stylesheet" href="/static/css/sidebar.css">
+<link rel="stylesheet" href="/static/css/base.css">
+<style>
+:root {
+  /* Overrides locaux — le canon vit dans /static/css/variables.css */
+  --rapport-color: #D97706;
+  --rapport-bg: #FEF3C7;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--grey);background-color:var(--off-white);overflow-x:hidden;line-height:1.6;}
+ul{list-style:none;}
+button{font-family:inherit;cursor:pointer;outline:none;}
+input,select,textarea{font-family:inherit;outline:none;}
+
+/* LAYOUT */
+
+.topbar{position:fixed;top:0;left:var(--sidebar-width);right:0;height:var(--topbar-height);background-color:var(--white);border-bottom:1px solid var(--light-grey);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:90;}
+.topbar-title{font-size:18px;font-weight:600;color:var(--dark-charcoal);}
+.topbar-right{display:flex;align-items:center;gap:16px;}
+
+/* SHIFT WIDGET */
+.shift-widget{position:relative;}
+.shift-btn{display:inline-flex;align-items:center;gap:8px;padding:0 14px;height:38px;border-radius:20px;border:1.5px solid var(--light-grey);background:var(--white);cursor:pointer;font-size:13px;font-weight:600;color:var(--dark-charcoal);transition:all var(--transition);}
+.shift-btn:hover{border-color:var(--steel-blue);}
+.shift-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;position:relative;}
+.shift-dot.service{background:var(--status-success);}
+.shift-dot.service::after{content:'';position:absolute;inset:-3px;border-radius:50%;background:rgba(45,143,94,0.25);animation:pulse 2s infinite;}
+.shift-dot.pause{background:var(--steel-blue);}
+.shift-dot.hors{background:var(--light-slate);}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:0.6;}}
+.shift-label{font-size:13px;font-weight:600;}
+.shift-chevron{width:14px;height:14px;stroke:var(--light-slate);fill:none;stroke-width:2;transition:transform var(--transition);}
+.shift-btn.open .shift-chevron{transform:rotate(180deg);}
+
+.shift-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:220px;background:var(--white);border:1px solid var(--light-grey);border-radius:10px;box-shadow:var(--shadow-popup);z-index:5000;display:none;flex-direction:column;overflow:hidden;}
+.shift-dropdown.open{display:flex;}
+.shift-dropdown-header{padding:12px 16px;background:var(--off-white);border-bottom:1px solid var(--light-grey);}
+.shift-dropdown-title{font-size:11px;font-weight:700;color:var(--light-slate);text-transform:uppercase;letter-spacing:0.5px;}
+.shift-timer{font-size:18px;font-weight:700;color:var(--primary);margin-top:2px;font-variant-numeric:tabular-nums;}
+.shift-action{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;font-size:13px;font-weight:500;color:var(--dark-charcoal);transition:background var(--transition);border-bottom:1px solid var(--off-white);}
+.shift-action:last-child{border-bottom:none;}
+.shift-action:hover{background:var(--off-white);}
+.shift-action svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0;}
+.shift-action.danger{color:var(--danger);}
+.shift-action.danger svg{stroke:var(--danger);}
+
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background-color:var(--primary);color:var(--white);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+
+.content{margin-left:var(--sidebar-width);margin-top:var(--topbar-height);padding:32px;max-width:1600px;min-height:calc(100vh - var(--topbar-height));}
+.page-header{margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.page-title{font-size:24px;font-weight:700;color:var(--dark-charcoal);}
+.page-subcount{font-size:13px;color:var(--light-slate);margin-bottom:20px;font-weight:500;}
+.page-subcount strong{color:var(--steel-blue);font-weight:600;}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:16px;margin-bottom:12px;flex-wrap:wrap;}
+.search-bar{position:relative;width:100%;max-width:360px;}
+.search-bar input{width:100%;height:40px;border:1.5px solid var(--light-grey);border-radius:6px;padding:0 12px 0 36px;font-size:14px;color:var(--dark-charcoal);background:var(--white);transition:border-color var(--transition);}
+.search-bar input:focus{border-color:var(--steel-blue);}
+.search-bar svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--light-slate);fill:none;stroke-width:1.5;}
+
+/* FILTERS */
+.filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.searchable-filter-wrap{position:relative;min-width:140px;}
+.searchable-filter-input{width:100%;height:36px;border:1.5px solid var(--light-grey);border-radius:6px;padding:0 30px 0 12px;font-size:13px;color:var(--dark-charcoal);background:var(--white);cursor:text;transition:border-color var(--transition);}
+.searchable-filter-input:focus{border-color:var(--steel-blue);}
+.searchable-filter-chevron{position:absolute;right:9px;top:10px;width:16px;height:16px;pointer-events:none;color:var(--light-slate);stroke:currentColor;fill:none;stroke-width:2;}
+.searchable-filter-dropdown{position:absolute;top:100%;left:0;min-width:100%;background:var(--white);border:1px solid var(--light-grey);border-radius:6px;box-shadow:var(--shadow-popup);margin-top:4px;max-height:200px;overflow-y:auto;z-index:1000;display:none;}
+.searchable-filter-dropdown.open{display:block;}
+.filter-opt{padding:8px 12px;font-size:13px;cursor:pointer;transition:background var(--transition);white-space:nowrap;}
+.filter-opt:hover{background-color:var(--off-white);color:var(--primary);}
+.filter-opt.empty{color:var(--light-slate);cursor:default;pointer-events:none;}
+.tags-container{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+.filter-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background-color:var(--off-white);border:1px solid var(--light-grey);border-radius:4px;font-size:12px;font-weight:500;color:var(--dark-charcoal);}
+.filter-tag strong{color:var(--steel-blue);font-weight:600;}
+.filter-tag .tag-close{cursor:pointer;color:var(--light-slate);display:flex;transition:color var(--transition);}
+.filter-tag .tag-close:hover{color:var(--danger);}
+.filter-tag .tag-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;}
+.btn-clear-filters{background:none;border:none;color:var(--steel-blue);font-size:12px;font-weight:600;cursor:pointer;padding:4px 8px;display:none;}
+.btn-clear-filters.vis{display:inline-block;}
+
+/* PILLS (status filter) */
+.status-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.pill{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--light-grey);background:var(--white);color:var(--grey);transition:all var(--transition);display:inline-flex;align-items:center;gap:6px;}
+.pill:hover{border-color:var(--steel-blue);color:var(--steel-blue);}
+.pill.active{background:var(--primary);color:var(--white);border-color:var(--primary);}
+.pill-count{background:rgba(0,0,0,0.1);padding:2px 6px;border-radius:10px;font-size:11px;}
+.pill.active .pill-count{background:rgba(255,255,255,0.2);}
+
+/* TABLE */
+.table-container{background-color:var(--white);border-radius:8px;box-shadow:var(--shadow-card);overflow-x:auto;-webkit-overflow-scrolling:touch;min-height:300px;margin-top:14px;}
+.data-table{width:100%;min-width:1100px;border-collapse:collapse;}
+.data-table th{background-color:var(--off-white);font-size:12px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:0.5px;padding:14px 16px;text-align:left;border-bottom:1px solid var(--light-grey);white-space:nowrap;cursor:pointer;user-select:none;}
+.data-table th:hover{color:var(--primary);}
+.data-table th.no-sort{cursor:default;}
+.data-table th.no-sort:hover{color:var(--grey);}
+.data-table th .sort-icon{display:inline-block;margin-left:4px;opacity:0.4;font-size:10px;}
+.data-table th.sorted .sort-icon{opacity:1;color:var(--primary);}
+.data-table td{padding:13px 16px;font-size:13px;color:var(--dark-charcoal);border-bottom:1px solid var(--light-grey);vertical-align:middle;}
+.data-table tbody tr{cursor:pointer;}
+.data-table tbody tr:hover{background-color:rgba(74,127,181,0.09);}
+.data-table tbody tr.row-annule{opacity:0.55;}
+.data-table tbody tr.row-annule:hover{opacity:0.75;}
+@keyframes rowStatusFlash{0%{background-color:rgba(74,127,181,0.18);}100%{background-color:transparent;}}
+.data-table tbody tr.row-status-flash{animation:rowStatusFlash 1.2s ease forwards;}
+.data-table tbody tr.row-moving{position:relative;z-index:5;}
+/* Désactiver le survol pendant l'animation */
+.data-table tbody.animating tr:hover{background-color:transparent !important;cursor:default;}
+.data-table tbody tr.row-termine{opacity:0.8;}
+
+.col-id{font-weight:700;color:var(--primary);white-space:nowrap;letter-spacing:0.3px;}
+.col-date{white-space:nowrap;}
+.col-date span{display:block;font-size:11px;color:var(--light-slate);margin-top:1px;}
+.col-title{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;}
+.col-machine{vertical-align:middle;}
+.machine-ref{font-family:monospace;font-size:11px;background:var(--off-white);padding:2px 6px;border-radius:4px;border:1px solid var(--light-grey);white-space:nowrap;display:inline-block;}
+.co-assign-badge{font-size:11px;font-weight:600;color:#4A7FB5;background:#F4F6F9;border:1px solid #E2E6EC;padding:1px 7px;border-radius:10px;white-space:nowrap;display:inline-block;margin-left:4px;vertical-align:middle;}
+
+/* STATUS BADGES */
+.status-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;}
+.st-rapport{background:var(--rapport-bg);color:var(--rapport-color);border:1px dashed #F59E0B;}
+.st-rapport-action{background:var(--primary);color:var(--white);cursor:pointer;}
+.st-rapport-action:hover{background:var(--primary-hover);}
+.st-assigne{background:rgba(74,127,181,0.12);color:var(--steel-blue);}
+.st-attente{background:#FFF9E6;color:#D97706;}
+.st-route{background:#FFFBEB;color:#E8A817;}
+.st-reparation{background:#FEF3F2;color:#DC2626;}
+.st-distance{background:#F0FDF4;color:#16A34A;}
+.st-termine{background:rgba(45,143,94,0.12);color:var(--status-success);}
+.st-annule{background:rgba(143,163,191,0.12);color:var(--light-slate);}
+
+/* STATUS CELL INTERACTIVE */
+.status-cell-trigger{display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:2px 4px;border-radius:12px;margin-left:-4px;transition:background var(--transition);}
+.status-cell-trigger:hover{background:var(--light-grey);}
+.status-cell-trigger.terminal{cursor:default;}
+.status-cell-trigger.terminal:hover{background:transparent;}
+.status-cell-trigger .arr{width:12px;height:12px;stroke:var(--grey);fill:none;stroke-width:2;}
+
+/* DUREE */
+.duree-active{font-size:12px;font-weight:600;color:var(--dark-charcoal);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.duree-resolved{font-size:11px;color:var(--light-slate);font-weight:500;line-height:1.4;}
+.duree-rapport{font-size:11px;color:var(--light-slate);font-weight:500;white-space:nowrap;}
+
+/* ACTIONS */
+.actions-cell{display:flex;align-items:center;gap:6px;}
+.btn-rapport{height:32px;padding:0 12px;border:none;border-radius:6px;background:var(--warning);color:#fff;
+  font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background var(--transition);}
+.btn-rapport:hover{background:#B45309;}
+.btn-icon{width:32px;height:32px;border-radius:6px;background:none;border:1px solid var(--light-grey);color:var(--steel-blue);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all var(--transition);}
+.btn-icon:hover{background-color:var(--off-white);border-color:var(--primary);color:var(--primary);}
+.btn-icon.danger{color:var(--danger);border-color:rgba(239,68,68,0.25);}
+.btn-icon.danger:hover{background-color:var(--danger-bg);border-color:var(--danger);color:var(--danger);}
+.btn-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+.empty-state{text-align:center;padding:64px 24px;color:var(--light-slate);font-size:14px;cursor:default;}
+
+/* STATUS DROPDOWN */
+#global-status-dropdown{position:fixed;width:240px;background:var(--white);border:1px solid var(--light-grey);border-radius:10px;box-shadow:var(--shadow-dropdown);z-index:6000;display:none;flex-direction:column;overflow:hidden;}
+#global-status-dropdown.open{display:flex;}
+.status-dd-section{padding:6px 0;}
+.status-dd-label{font-size:10px;font-weight:700;color:var(--light-slate);text-transform:uppercase;letter-spacing:0.5px;padding:6px 14px 3px;}
+.status-opt{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;font-size:12.5px;cursor:pointer;transition:background var(--transition);}
+.status-opt:hover{background:var(--off-white);}
+.status-opt.current{background:rgba(27,58,107,0.04);}
+.status-opt .current-mark{font-size:10px;font-weight:700;color:var(--primary);background:rgba(27,58,107,0.1);padding:1px 6px;border-radius:8px;}
+.status-dd-divider{height:1px;background:var(--light-grey);margin:4px 0;}
+
+/* MODAL BASE */
+.modal-overlay{position:fixed;inset:0;background:rgba(27,58,107,0.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:3000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;padding:24px;}
+.modal-overlay.vis{opacity:1;pointer-events:auto;}
+.modal-content{background:var(--white);border-radius:12px;box-shadow:var(--shadow-popup);width:96%;max-width:480px;max-height:90vh;display:flex;flex-direction:column;transform:scale(0.98);transition:transform 0.3s;overflow:hidden;}
+.modal-overlay.vis .modal-content{transform:scale(1);}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--light-grey);display:flex;align-items:center;justify-content:space-between;background:var(--off-white);}
+.modal-title{font-size:16px;font-weight:700;color:var(--dark-charcoal);}
+.modal-close{background:none;border:none;color:var(--grey);cursor:pointer;padding:4px;border-radius:4px;display:flex;transition:all var(--transition);}
+.modal-close:hover{background:var(--light-grey);color:var(--dark-charcoal);transform:rotate(90deg);}
+.modal-close svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;}
+.modal-body{padding:24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:18px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--light-grey);display:flex;justify-content:flex-end;gap:12px;background:var(--off-white);}
+
+.btn-primary{background-color:var(--primary);color:var(--white);border:none;border-radius:6px;padding:0 20px;height:40px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px;transition:background var(--transition);cursor:pointer;}
+.btn-primary:hover{background-color:var(--primary-hover);}
+.btn-danger{background-color:var(--danger);color:var(--white);border:none;border-radius:6px;padding:0 20px;height:40px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px;transition:background var(--transition);cursor:pointer;}
+.btn-danger:hover{background-color:var(--danger-hover);}
+.btn-secondary{background:var(--white);color:var(--grey);border:1.5px solid var(--light-grey);border-radius:6px;padding:0 20px;height:40px;font-size:14px;font-weight:600;cursor:pointer;transition:all var(--transition);}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary);}
+
+/* TICKET CARD (recap) */
+.ticket-recap{background:var(--off-white);border:1px solid var(--light-grey);border-radius:8px;padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.recap-field{}
+.recap-label{font-size:10px;font-weight:700;color:var(--light-slate);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px;}
+.recap-value{font-size:13px;font-weight:600;color:var(--dark-charcoal);}
+.recap-value.id{color:var(--primary);}
+.recap-value.mono{font-family:monospace;}
+
+/* CANCEL MODAL */
+.reason-group{display:flex;flex-direction:column;gap:10px;}
+.reason-label-main{font-size:13px;font-weight:600;color:var(--dark-charcoal);margin-bottom:4px;}
+.reason-option{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--light-grey);border-radius:8px;cursor:pointer;transition:all var(--transition);}
+.reason-option:hover{border-color:var(--steel-blue);background:rgba(74,127,181,0.04);}
+.reason-option.selected{border-color:var(--primary);background:rgba(27,58,107,0.05);}
+.reason-option input[type="radio"]{accent-color:var(--primary);cursor:pointer;flex-shrink:0;}
+.reason-option-label{font-size:13px;font-weight:500;color:var(--dark-charcoal);}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group label{font-size:13px;font-weight:600;color:var(--dark-charcoal);}
+.form-group label .opt{font-weight:400;color:var(--light-slate);font-size:12px;}
+textarea.form-control{width:100%;border:1.5px solid var(--light-grey);border-radius:6px;padding:10px 14px;font-size:13px;color:var(--dark-charcoal);resize:vertical;min-height:80px;transition:border-color var(--transition);}
+textarea.form-control:focus{border-color:var(--steel-blue);}
+.field-error{font-size:12px;color:var(--danger);display:none;margin-top:2px;}
+.field-error.vis{display:block;}
+
+/* CONFIRM STATUS MODAL */
+.confirm-status-info{font-size:14px;color:var(--dark-charcoal);line-height:1.6;}
+.confirm-status-transition{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.confirm-arrow{color:var(--light-slate);font-size:18px;}
+
+/* SHIFT CONFIRM MODAL */
+.active-tickets-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+.active-ticket-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--off-white);border-radius:6px;font-size:13px;}
+.active-ticket-item .tid{font-weight:700;color:var(--primary);}
+.active-ticket-item .tstatus{color:var(--grey);}
+
+/* TOAST */
+.toast-container{position:fixed;top:20px;right:24px;z-index:9000;display:flex;flex-direction:column;gap:10px;}
+.toast{display:flex;align-items:center;gap:12px;padding:14px 18px;background-color:#fff;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);min-width:280px;max-width:400px;border-left:4px solid var(--status-success);animation:slideIn 0.3s ease;}
+.toast.error{border-left-color:var(--danger);}
+.toast.info{border-left-color:var(--steel-blue);}
+.toast.warning{border-left-color:var(--warning);}
+.toast-icon svg{width:20px;height:20px;stroke:var(--status-success);fill:none;stroke-width:2;}
+.toast.error .toast-icon svg{stroke:var(--danger);}
+.toast.info .toast-icon svg{stroke:var(--steel-blue);}
+.toast.warning .toast-icon svg{stroke:var(--warning);}
+.toast-msg{font-size:14px;font-weight:500;color:var(--dark-charcoal);flex:1;}
+.toast-dismiss{background:none;border:none;color:var(--light-slate);cursor:pointer;font-size:18px;line-height:1;padding:0 0 0 4px;}
+@keyframes slideIn{from{opacity:0;transform:translateX(100%);}to{opacity:1;transform:translateX(0);}}
+
+@media(max-width:768px){
+  .topbar{left:0;}
+  .content{margin-left:0;margin-bottom:60px;padding:20px 16px;}
+}
+</style>
+<link rel="stylesheet" href="/static/css/responsive.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div>
+      <img src="/static/stokvis360.png" alt="Stokvis 360" class="sidebar-logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="sidebar-logo-text" style="display:none">STOKVIS 360</span>
+      <div class="sidebar-logo-sub">Portail Technicien</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="/technicien/mes-tickets" class="active">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+      <span>Mes tickets assignés</span>
+    </a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-name" id="sb-user-name">Technicien</div>
+    <div class="user-role"><a href="#" id="sb-logout" style="color:rgba(255,255,255,0.5);text-decoration:none;">Technicien · Déconnexion</a></div>
+  </div>
+</aside>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-title">Mes Tickets</div>
+  <div class="topbar-right">
+    <!-- SHIFT WIDGET -->
+    <div class="shift-widget" id="shift-widget">
+      <button class="shift-btn" id="shift-btn" onclick="toggleShiftDropdown()">
+        <span class="shift-dot service" id="shift-dot"></span>
+        <span class="shift-label" id="shift-label">En service</span>
+        <svg class="shift-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="shift-dropdown" id="shift-dropdown">
+        <div class="shift-dropdown-header">
+          <div class="shift-dropdown-title">Shift en cours</div>
+          <div class="shift-timer" id="shift-timer">—</div>
+        </div>
+        <div id="shift-actions"></div>
+      </div>
+    </div>
+    <div class="topbar-avatar">YB</div>
+  </div>
+</header>
+
+<main class="content">
+  <div class="page-header">
+    <h1 class="page-title">Mes tickets</h1>
+  </div>
+  <div class="page-subcount" id="global-count"></div>
+
+  <!-- SEARCH -->
+  <div class="toolbar">
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search-input" placeholder="Rechercher dans tous les tickets…">
+    </div>
+  </div>
+
+  <!-- SEARCHABLE FILTERS -->
+  <div class="filter-bar" id="filter-bar">
+    <div class="searchable-filter-wrap" id="wrap-client"><input type="text" class="searchable-filter-input" id="inp-client" placeholder="Client…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><div class="searchable-filter-dropdown" id="drop-client"></div></div>
+    <div class="searchable-filter-wrap" id="wrap-reference"><input type="text" class="searchable-filter-input" id="inp-reference" placeholder="Référence…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><div class="searchable-filter-dropdown" id="drop-reference"></div></div>
+    <div class="searchable-filter-wrap" id="wrap-marque"><input type="text" class="searchable-filter-input" id="inp-marque" placeholder="Marque…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><div class="searchable-filter-dropdown" id="drop-marque"></div></div>
+    <div class="searchable-filter-wrap" id="wrap-categorie"><input type="text" class="searchable-filter-input" id="inp-categorie" placeholder="Catégorie…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><div class="searchable-filter-dropdown" id="drop-categorie"></div></div>
+  </div>
+  <div class="tags-container" id="tags-container">
+    <button class="btn-clear-filters" id="clear-filters" onclick="clearAllFilters()">Tout effacer</button>
+  </div>
+
+  <!-- STATUS PILLS -->
+  <div class="status-pills" id="status-pills"></div>
+
+  <!-- TABLE -->
+  <div class="table-container">
+    <table class="data-table" id="tickets-table">
+      <thead>
+        <tr>
+          <th onclick="sortTable('id')" id="th-id">ID <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('date')" id="th-date">Date <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('title')" id="th-title">Titre <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('client')" id="th-client">Client <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('machine')" id="th-machine">Machine <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('status')" id="th-status">État <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('duree')" id="th-duree">Durée écoulée <span class="sort-icon">↕</span></th>
+          <th class="no-sort">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tickets-tbody"></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- STATUS DROPDOWN -->
+<div id="global-status-dropdown"></div>
+
+<!-- Le modal d'annulation est le composant partagé TicketTable.openCancelModal
+     (voir /static/js/ticket_table.js) : identique sur toutes les pages. -->
+
+<!-- CONFIRM STATUS MODAL -->
+<div class="modal-overlay" id="confirm-status-modal">
+  <div class="modal-content" style="max-width:420px;">
+    <div class="modal-header">
+      <div class="modal-title">Confirmer le changement</div>
+      <button class="modal-close" onclick="closeConfirmStatus()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body" style="gap:14px;">
+      <p class="confirm-status-info" id="confirm-status-msg"></p>
+      <div class="confirm-status-transition" id="confirm-status-transition"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeConfirmStatus()">Annuler</button>
+      <button class="btn-primary" onclick="applyConfirmedStatus()">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHIFT END CONFIRM MODAL -->
+<div class="modal-overlay" id="shift-end-modal">
+  <div class="modal-content" style="max-width:420px;">
+    <div class="modal-header">
+      <div class="modal-title">Terminer le shift</div>
+      <button class="modal-close" onclick="closeShiftEndModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body" style="gap:14px;">
+      <p style="font-size:14px;color:var(--dark-charcoal);line-height:1.6;" id="shift-end-msg"></p>
+      <div id="shift-end-active-list"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeShiftEndModal()">Annuler</button>
+      <button class="btn-danger" onclick="confirmEndShift()">Terminer le shift</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/ticket_table.js"></script>
+<script src="/static/js/ticket_detail.js"></script>
+<script src="/static/js/ui.js"></script>
+<script>
+/* ==================== DATA ==================== */
+let MY_TECH_ID = null; // défini à l'init depuis la session
+const ACTIVE_STATUSES = ['Remplir le rapport','Assigné','Attente pièce','En route','En Réparation','Maintenance à distance'];
+
+function dd(n){return ('0'+n).slice(-2);}
+function mkDate(hoursAgo){
+  const d = new Date(Date.now() - hoursAgo * 3600000);
+  return {
+    date: dd(d.getDate())+'/'+dd(d.getMonth()+1)+'/'+d.getFullYear(),
+    time: dd(d.getHours())+':'+dd(d.getMinutes()),
+    ts: d.getTime()
+  };
+}
+
+// Données alimentées par l'API. mapTicket renvoie la MÊME forme que le
+// prototype d'origine (client/categorie/marque/reference/assignedTechs/status/resolMin)
+// pour ne pas toucher au rendu, au tri, ni aux filtres.
+let TICKETS = [];
+let RAW_TICKETS = {};
+
+function msToMin(ms){ return ms == null ? null : Math.round(ms / 60000); }
+
+function mapTicket(t){
+  RAW_TICKETS[t.id] = t;
+  return {
+    id: t.id, date: t.date, time: t.time, ts: t.timestamp, timestamp: t.timestamp,
+    client: t.client_name, client_name: t.client_name, titre: t.titre,
+    categorie: t.categorie, marque: t.marque, reference: t.reference,
+    usageReadings: t.usage_readings || [],
+    // status_display renvoie déjà "Remplir le rapport" pour le technicien (Terminé sans rapport)
+    status: t.status_display || t.status,
+    termine_via: t.termine_via,
+    assignedTechs: t.technicien_ids,
+    technicien_ids: t.technicien_ids,
+    techs: t.techs || [],
+    checklist: (t.items || []).filter(it => it.type === 'panne' && it.checked && !it.system),
+    resolMin: msToMin(t.resolution_time_ms),
+    resolTs: null
+  };
+}
+
+function usageSubHtml(readings){
+  if(!readings || !readings.length) return '';
+  const parts = readings.map(u => `${xe(u.value)}${u.unit ? ' '+xe(u.unit) : ''}`);
+  return `<div style="font-size:11px;color:#6B7280;font-weight:500;margin-top:2px;white-space:nowrap;">${parts.join(' · ')}</div>`;
+}
+
+async function reload(){
+  const tickets = await API.tickets();
+  RAW_TICKETS = {};
+  TICKETS = tickets.map(mapTicket);
+  buildPills();
+  renderTable();
+}
+
+/* ==================== SHIFT STATE ==================== */
+let shiftStatus = 'service'; // service | pause | hors
+let shiftStartTs = Date.now() - 2 * 3600000; // 2h ago for demo
+
+function shiftLabel(s){return s==='service'?'En service':s==='pause'?'En pause':'Hors service';}
+function updateShiftUI(){
+  const dot = document.getElementById('shift-dot');
+  const lbl = document.getElementById('shift-label');
+  dot.className = 'shift-dot ' + shiftStatus;
+  lbl.textContent = shiftLabel(shiftStatus);
+  renderShiftActions();
+  updateShiftTimer();
+}
+function updateShiftTimer(){
+  const el = document.getElementById('shift-timer');
+  if(shiftStatus === 'hors'){el.textContent='—';return;}
+  const elapsed = Date.now() - shiftStartTs;
+  el.textContent = fmtMs(elapsed);
+}
+setInterval(updateShiftTimer, 30000);
+
+function renderShiftActions(){
+  const c = document.getElementById('shift-actions');
+  let html = '';
+  if(shiftStatus === 'hors'){
+    html += shiftActionHTML('play','Démarrer le shift','startShift()');
+  } else if(shiftStatus === 'service'){
+    html += shiftActionHTML('pause','Prendre une pause','pauseShift()');
+    html += shiftActionHTML('stop','Terminer le shift','askEndShift()', true);
+  } else {
+    html += shiftActionHTML('play','Reprendre le service','resumeShift()');
+    html += shiftActionHTML('stop','Terminer le shift','askEndShift()', true);
+  }
+  c.innerHTML = html;
+}
+function shiftActionHTML(icon, label, fn, danger=false){
+  const icons = {
+    play: '<polygon points="5 3 19 12 5 21 5 3"/>',
+    pause: '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>',
+    stop: '<rect x="3" y="3" width="18" height="18" rx="2"/>'
+  };
+  return `<div class="shift-action${danger?' danger':''}" onclick="${fn}"><svg viewBox="0 0 24 24">${icons[icon]}</svg>${label}</div>`;
+}
+function toggleShiftDropdown(){
+  const btn = document.getElementById('shift-btn');
+  const dd = document.getElementById('shift-dropdown');
+  const isOpen = dd.classList.contains('open');
+  dd.classList.toggle('open');
+  btn.classList.toggle('open', !isOpen);
+  updateShiftTimer();
+}
+function closeShiftDropdown(){
+  document.getElementById('shift-dropdown').classList.remove('open');
+  document.getElementById('shift-btn').classList.remove('open');
+}
+function dispoFromShift(s){ return s==='service'?'En service':s==='pause'?'En pause':'Hors service'; }
+async function setShift(newState, toast){
+  try {
+    await API.shift(MY_TECH_ID, dispoFromShift(newState));
+  } catch(e){ showToast('Échec : '+e.message,'error'); return; }
+  shiftStatus = newState;
+  if(newState==='service' && !shiftStartTs) shiftStartTs = Date.now();
+  if(newState==='hors') shiftStartTs = null;
+  closeShiftDropdown(); updateShiftUI();
+  showToast(toast.msg, toast.type);
+}
+function startShift(){ shiftStartTs = Date.now(); setShift('service', {msg:'Shift démarré — Bonne journée !', type:'success'}); }
+function pauseShift(){ setShift('pause', {msg:'Pause enregistrée', type:'info'}); }
+function resumeShift(){ setShift('service', {msg:'Service repris', type:'success'}); }
+function askEndShift(){
+  closeShiftDropdown();
+  const active = TICKETS.filter(t=>ACTIVE_STATUSES.includes(t.status)&&t.status!=='Remplir le rapport');
+  const msgEl = document.getElementById('shift-end-msg');
+  const listEl = document.getElementById('shift-end-active-list');
+  if(active.length > 0){
+    msgEl.textContent = `Vous avez ${active.length} ticket(s) actif(s) en cours. Êtes-vous sûr de vouloir terminer votre shift ?`;
+    listEl.innerHTML = '<div class="active-tickets-list">'+active.slice(0,5).map(t=>`<div class="active-ticket-item"><span class="tid">${xe(t.id)}</span><span class="tstatus">${xe(t.status)}</span></div>`).join('')+'</div>';
+  } else {
+    msgEl.textContent = 'Êtes-vous sûr de vouloir terminer votre shift ?';
+    listEl.innerHTML = '';
+  }
+  document.getElementById('shift-end-modal').classList.add('vis');
+}
+function closeShiftEndModal(){document.getElementById('shift-end-modal').classList.remove('vis');}
+function confirmEndShift(){
+  closeShiftEndModal();
+  setShift('hors', {msg:'Shift terminé — À bientôt', type:'info'});
+}
+
+/* ==================== HELPERS ==================== */
+function fmtMs(ms){
+  const tot=Math.floor(ms/60000);
+  const d=Math.floor(tot/1440),h=Math.floor((tot%1440)/60),m=tot%60;
+  if(d>0) return `${dd(d)}j ${dd(h)}h ${dd(m)}m`;
+  return `${dd(h)}h ${dd(m)}m`;
+}
+function fmtDuration(ms){return fmtMs(ms);}
+/* genTitle : source unique dans static/js/ui.js (chargé avant ce script). */
+
+const STATUS_CLASS={
+  'Remplir le rapport':'st-rapport',
+  'Assigné':'st-assigne','Attente pièce':'st-attente',
+  'En route':'st-route','En Réparation':'st-reparation',
+  'Maintenance à distance':'st-distance',
+  'Terminé':'st-termine','Annulé':'st-annule'
+};
+const STATUS_BADGE_LABELS={'Maintenance à distance':'À distance'};
+
+// Priorité de statut : déléguée à l'utilitaire partagé (TicketTable).
+function getStatusPriority(s){
+  return TicketTable.getPriority({ status: s, technicien_ids: ['x'] });
+}
+
+const TERRAIN = ['Assigné','Attente pièce','En route','En Réparation','Terminé'];
+const DISTANCE = ['Assigné','Maintenance à distance','Terminé'];
+const ALL_PATHS = ['Assigné','Attente pièce','En route','En Réparation','Maintenance à distance','Terminé'];
+
+function isNormalNext(from, to){
+  const ti = TERRAIN.indexOf(from), tj = TERRAIN.indexOf(to);
+  if(ti>=0 && tj===ti+1) return true;
+  const di = DISTANCE.indexOf(from), dj = DISTANCE.indexOf(to);
+  if(di>=0 && dj===di+1) return true;
+  return false;
+}
+
+/* ==================== FILTERS & SORT ==================== */
+let activeFilters = {client:[],reference:[],marque:[],categorie:[]};
+let currentTab = 'all';
+let sortCol = 'default', sortDir = 'asc';
+const FILTER_KEYS = ['client','reference','marque','categorie'];
+const FILTER_LABELS = {client:'Client',reference:'Référence',marque:'Marque',categorie:'Catégorie'};
+
+function getBaseTickets(){return TICKETS;}
+function getFilteredTickets(){
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  return getBaseTickets().filter(t=>{
+    for(const k of FILTER_KEYS){ if(activeFilters[k].length && !activeFilters[k].includes(t[k])) return false; }
+    if(q){
+      const st = genTitle(t).toLowerCase();
+      const hay = (t.id+' '+t.client+' '+t.reference+' '+t.marque+' '+t.categorie+' '+t.status+' '+st).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    if(currentTab !== 'all' && t.status !== currentTab) return false;
+    return true;
+  });
+}
+function sortedTickets(data){
+  // Tri délégué à l'utilitaire partagé ; seule la colonne "durée" (spécifique
+  // à cette page) garde une logique locale.
+  if(sortCol==='default') return TicketTable.defaultSort(data);
+  if(sortCol!=='duree')   return TicketTable.sortBy(data, sortCol, sortDir);
+  return [...data].sort((a,b)=>{
+    const va=getTicketDurationMs(a), vb=getTicketDurationMs(b);
+    if(va<vb) return sortDir==='asc'?-1:1;
+    if(va>vb) return sortDir==='asc'?1:-1;
+    return a.ts - b.ts;
+  });
+}
+function getTicketDurationMs(t){
+  if(t.status==='Annulé') return Infinity;
+  if(t.status==='Terminé' && t.resolMin) return t.resolMin*60000;
+  return Date.now() - t.ts;
+}
+
+function sortTable(col){
+  if(sortCol===col) sortDir=sortDir==='asc'?'desc':'asc';
+  else{sortCol=col;sortDir='asc';}
+  document.querySelectorAll('#tickets-table th').forEach(th=>{
+    th.classList.remove('sorted');
+    const ic=th.querySelector('.sort-icon');
+    if(ic) ic.textContent='↕';
+  });
+  const th=document.getElementById('th-'+col);
+  if(th){th.classList.add('sorted');th.querySelector('.sort-icon').textContent=sortDir==='asc'?'↑':'↓';}
+  renderTable();
+}
+
+/* ==================== SEARCHABLE FILTERS ==================== */
+function getFilterOptions(key){
+  const base = getBaseTickets();
+  const all=[...new Set(base.map(t=>t[key]))].sort();
+  return all.filter(v=>!activeFilters[key].includes(v));
+}
+function renderFilterDropdown(key){
+  const drop=document.getElementById('drop-'+key);
+  const q=document.getElementById('inp-'+key).value.toLowerCase();
+  const opts=getFilterOptions(key).filter(o=>o.toLowerCase().includes(q));
+  if(!opts.length){drop.innerHTML=`<div class="filter-opt empty">Aucune option</div>`;}
+  else drop.innerHTML=opts.map(o=>`<div class="filter-opt" onclick="addFilter('${key}','${o.replace(/'/g,"\\'")}')">${xe(o)}</div>`).join('');
+}
+FILTER_KEYS.forEach(key=>{
+  const inp=document.getElementById('inp-'+key),drop=document.getElementById('drop-'+key);
+  inp.addEventListener('focus',()=>{renderFilterDropdown(key);drop.classList.add('open');});
+  inp.addEventListener('input',()=>{renderFilterDropdown(key);drop.classList.add('open');});
+});
+document.addEventListener('click',e=>{
+  FILTER_KEYS.forEach(key=>{
+    const wrap=document.getElementById('wrap-'+key);
+    if(wrap&&!wrap.contains(e.target)) document.getElementById('drop-'+key).classList.remove('open');
+  });
+  if(document.getElementById('shift-dropdown').classList.contains('open')){
+    if(!document.getElementById('shift-widget').contains(e.target)) closeShiftDropdown();
+  }
+  if(document.getElementById('global-status-dropdown').classList.contains('open')){
+    if(!document.getElementById('global-status-dropdown').contains(e.target)&&!e.target.closest('.status-cell-trigger')) closeStatusDropdown();
+  }
+});
+function addFilter(key,val){
+  if(!activeFilters[key].includes(val)) activeFilters[key].push(val);
+  document.getElementById('inp-'+key).value='';
+  document.getElementById('drop-'+key).classList.remove('open');
+  renderTags();buildPills();renderTable();
+}
+function removeFilter(key,val){
+  activeFilters[key]=activeFilters[key].filter(v=>v!==val);
+  renderTags();buildPills();renderTable();
+}
+function clearAllFilters(){
+  FILTER_KEYS.forEach(k=>activeFilters[k]=[]);
+  renderTags();buildPills();renderTable();
+}
+function renderTags(){
+  const cont=document.getElementById('tags-container');
+  let tags='';let total=0;
+  FILTER_KEYS.forEach(k=>{
+    activeFilters[k].forEach(v=>{
+      total++;
+      tags+=`<span class="filter-tag"><strong>${FILTER_LABELS[k]}:</strong> ${xe(v)} <span class="tag-close" onclick="removeFilter('${k}','${v.replace(/'/g,"\\'")}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></span>`;
+    });
+  });
+  const clearBtn=`<button class="btn-clear-filters${total>0?' vis':''}" onclick="clearAllFilters()">Tout effacer</button>`;
+  cont.innerHTML=tags+clearBtn;
+}
+
+/* ==================== PILLS ==================== */
+function buildPills(){
+  const base=getBaseTickets().filter(t=>{
+    for(const k of FILTER_KEYS){ if(activeFilters[k].length && !activeFilters[k].includes(t[k])) return false; }
+    const q=document.getElementById('search-input').value.toLowerCase().trim();
+    if(q){const hay=(t.id+' '+t.client+' '+t.reference+' '+t.marque+' '+t.categorie+' '+t.status+' '+genTitle(t)).toLowerCase();if(!hay.includes(q))return false;}
+    return true;
+  });
+  const counts={};base.forEach(t=>counts[t.status]=(counts[t.status]||0)+1);
+  const statuses=Object.keys(counts);
+  const pillsEl=document.getElementById('status-pills');
+  if(statuses.length<=1){pillsEl.innerHTML='';pillsEl.style.display='none';if(currentTab!=='all')currentTab='all';return;}
+  pillsEl.style.display='flex';
+  const order=['Remplir le rapport','Assigné','Attente pièce','En route','En Réparation','Maintenance à distance','Terminé','Annulé'];
+  const PILL_LABELS={'Maintenance à distance':'À distance'};
+  let html=`<div class="pill${currentTab==='all'?' active':''}" onclick="setTab('all')">Tous<span class="pill-count">${base.length}</span></div>`;
+  order.filter(s=>counts[s]).forEach(s=>{
+    const lbl=PILL_LABELS[s]||s;
+    html+=`<div class="pill${currentTab===s?' active':''}" onclick="setTab('${s}')">${xe(lbl)}<span class="pill-count">${counts[s]}</span></div>`;
+  });
+  pillsEl.innerHTML=html;
+}
+function setTab(s){currentTab=s;buildPills();renderTable();}
+
+/* ==================== GLOBAL COUNT ==================== */
+function updateCount(){
+  const active=TICKETS.filter(t=>ACTIVE_STATUSES.includes(t.status)).length;
+  document.getElementById('global-count').innerHTML=`<strong>${active}</strong> ticket(s) actif(s)`;
+}
+
+/* ==================== RENDER TABLE ==================== */
+function renderTable(){
+  updateCount();
+  const data=sortedTickets(getFilteredTickets());
+  const tb=document.getElementById('tickets-tbody');
+
+  // FLIP step 1 — snapshot positions avant reconstruction
+  const prevTops=new Map();
+  tb.querySelectorAll('tr[data-ticket-id]').forEach(tr=>{
+    prevTops.set(tr.dataset.ticketId, tr.getBoundingClientRect().top);
+  });
+
+  if(!data.length){
+    tb.innerHTML=`<tr><td colspan="8" class="empty-state">Aucun ticket trouvé</td></tr>`;
+    return;
+  }
+  tb.innerHTML=data.map(t=>{
+    const title=genTitle(t);
+    const isActive=ACTIVE_STATUSES.includes(t.status);
+    const isTerminal=t.status==='Terminé'||t.status==='Annulé';
+    const rowClass=t.status==='Annulé'?'row-annule':t.status==='Terminé'?'row-termine':'';
+
+    let dureeCell='<span style="color:var(--light-slate);">—</span>';
+    if(t.status==='Annulé'){
+      dureeCell='<span style="color:var(--light-slate);">—</span>';
+    } else if(t.status==='Terminé'&&t.resolMin){
+      const parts=fmtMs(t.resolMin*60000).split(' ');
+      const line2=parts.slice(1).join(' ')||'';
+      dureeCell=`<span class="duree-resolved">Résolu en<br>${parts[0]}${line2?' '+line2:''}</span>`;
+    } else if(t.status==='Remplir le rapport'){
+      const elapsed=Date.now()-t.ts;
+      dureeCell=`<span class="duree-rapport">${fmtMs(elapsed)}</span>`;
+    } else if(isActive){
+      const elapsed=Date.now()-t.ts;
+      dureeCell=`<span class="duree-active">${fmtMs(elapsed)}</span>`;
+    }
+
+    // Status cell — les deux Terminé sont différenciés (Terrain / à Distance).
+    const badgeLbl=STATUS_BADGE_LABELS[t.status]||TicketTable.displayStatus(t);
+    const isRapport = t.status === 'Remplir le rapport';
+    const badgeHTML = isRapport
+      ? `<span class="status-badge st-rapport-action">${xe(badgeLbl)}</span>`
+      : `<span class="status-badge ${STATUS_CLASS[t.status]||''}">${xe(badgeLbl)}</span>`;
+    const statusCell = isTerminal
+      ? `<div class="status-cell-trigger terminal">${badgeHTML}</div>`
+      : (isRapport
+          ? `<div class="status-cell-trigger" onclick="event.stopPropagation();openDetails('${t.id}')" style="cursor:pointer;">${badgeHTML}</div>`
+          : `<div class="status-cell-trigger" onclick="event.stopPropagation();openStatusDropdown(event,'${t.id}')">${badgeHTML}<svg class="arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>`
+        );
+
+    // co-assign badge
+    const coCount=t.assignedTechs.filter(id=>id!==MY_TECH_ID).length;
+    const coAssignHtml=coCount>0?`<span class="co-assign-badge">+${coCount} tech</span>`:'';
+
+    // L'annulation n'est plus possible une fois le ticket réellement Terminé
+    // ("Remplir le rapport" = Terminé sans rapport : terminal côté serveur).
+    const showCancel=!isTerminal && t.status!=='Remplir le rapport';
+
+    return `<tr class="${rowClass}" data-ticket-id="${t.id}" onclick="openDetails('${t.id}')">
+      <td class="col-id">${xe(t.id)}</td>
+      <td class="col-date">${xe(t.date)}<span>${xe(t.time)}</span></td>
+      <td class="col-title" title="${xe(title)}">${xe(title)}</td>
+      <td>${xe(t.client)}</td>
+      <td class="col-machine"><span class="machine-ref">${xe(t.reference)}</span>${coAssignHtml?` ${coAssignHtml}`:''}${usageSubHtml(t.usageReadings)}</td>
+      <td onclick="event.stopPropagation()">${statusCell}</td>
+      <td>${dureeCell}</td>
+      <td onclick="event.stopPropagation()">
+        <div class="actions-cell">
+          <button class="btn-icon" title="Détails du ticket" onclick="openDetails('${t.id}')">
+            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          ${showCancel?`<button class="btn-icon danger" title="Annuler le ticket" onclick="openCancelModal('${t.id}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`:''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // FLIP step 2 — animer les lignes qui ont changé de position
+  if(prevTops.size > 0){
+    const savedId = lastSavedTicketId;
+    lastSavedTicketId = null;
+    let flashTarget=null, flashDeltaY=0, flashFinalTopDoc=0, animCount=0;
+
+    tb.querySelectorAll('tr[data-ticket-id]').forEach(tr=>{
+      const id=tr.dataset.ticketId;
+      if(!prevTops.has(id)) return;
+      const newTop=tr.getBoundingClientRect().top;
+      const deltaY=prevTops.get(id) - newTop;
+      if(id===savedId) flashFinalTopDoc=newTop+window.scrollY;
+      if(Math.abs(deltaY)<4) return;
+
+      animCount++;
+      tr.classList.add('row-moving');
+      tr.style.transition='none';
+      tr.style.transform=`translateY(${deltaY}px)`;
+      void tr.offsetHeight;
+      tr.style.transition='transform 1.5s cubic-bezier(0.25,0.46,0.45,0.94)';
+      tr.style.transform='translateY(0)';
+      setTimeout(()=>{
+        tr.style.transition='';tr.style.transform='';tr.classList.remove('row-moving');
+      },1550);
+
+      if(id===savedId){flashTarget=tr;flashDeltaY=deltaY;}
+    });
+
+    if(savedId || animCount>0) tb.classList.add('animating');
+
+    if(flashTarget){
+      const rowH=flashTarget.offsetHeight;
+      const topbarH=(document.querySelector('.topbar')||{offsetHeight:60}).offsetHeight;
+      // 1. Scroll dès le début du mouvement
+      setTimeout(()=>{
+        const vph=window.innerHeight;
+        const finalTopVp=flashFinalTopDoc-window.scrollY;
+        const finalBotVp=finalTopVp+rowH;
+        if(finalTopVp>=topbarH+rowH && finalBotVp<=vph-rowH) return;
+        const target=flashDeltaY>0
+          ? flashFinalTopDoc-topbarH-rowH
+          : flashFinalTopDoc+2*rowH-vph;
+        window.scrollTo({top:Math.max(0,target),behavior:'smooth'});
+      },200);
+      // 2. Flash après fin d'animation
+      setTimeout(()=>{
+        flashTarget.classList.add('row-status-flash');
+        // 3. Réactiver hover après flash
+        setTimeout(()=>{
+          flashTarget.classList.remove('row-status-flash');
+          tb.classList.remove('animating');
+        },1300);
+      },1600);
+    } else if(savedId){
+      // Ligne restée en place — séquence : scroll → flash → réactiver hover
+      const stillTr=tb.querySelector(`tr[data-ticket-id="${savedId}"]`);
+      if(stillTr){
+        setTimeout(()=>stillTr.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+        setTimeout(()=>{
+          stillTr.classList.add('row-status-flash');
+          setTimeout(()=>{
+            stillTr.classList.remove('row-status-flash');
+            tb.classList.remove('animating');
+          },1300);
+        },300);
+      } else {
+        tb.classList.remove('animating');
+      }
+    } else if(animCount>0){
+      setTimeout(()=>tb.classList.remove('animating'),1600);
+    }
+  }
+}
+document.getElementById('search-input').addEventListener('input',()=>{buildPills();renderTable();});
+
+/* ==================== STATUS DROPDOWN ==================== */
+const statusDropdown=document.getElementById('global-status-dropdown');
+let statusTicketId=null,statusTriggerEl=null;
+
+function positionStatusDropdown(){
+  if(!statusTriggerEl)return;
+  const rect=statusTriggerEl.getBoundingClientRect();
+  const dw=240;
+  let left=rect.left;
+  if(left+dw>window.innerWidth-10) left=window.innerWidth-dw-10;
+  if(left<10) left=10;
+  const spaceBelow=window.innerHeight-rect.bottom-12;
+  const spaceAbove=rect.top-12;
+  const dh=statusDropdown.offsetHeight||200;
+  if(spaceBelow<dh&&spaceAbove>spaceBelow){
+    statusDropdown.style.top='auto';
+    statusDropdown.style.bottom=(window.innerHeight-rect.top+4)+'px';
+  }else{
+    statusDropdown.style.bottom='auto';
+    statusDropdown.style.top=(rect.bottom+4)+'px';
+  }
+  statusDropdown.style.left=left+'px';
+}
+
+function openStatusDropdown(e,ticketId){
+  e.stopPropagation();
+  statusTicketId=ticketId;
+  statusTriggerEl=e.currentTarget;
+  const ticket=TICKETS.find(t=>t.id===ticketId);
+  const cur=ticket.status;
+
+  // Chemin dans lequel le ticket est engagé : le Terminé de l'AUTRE chemin
+  // est bloqué (notice) — la différenciation alimente le dashboard à venir.
+  const engaged=['Attente pièce','En route','En Réparation'].includes(cur)?'terrain'
+    :(cur==='Maintenance à distance'?'distance':null);
+
+  function statusOpt(s, via){
+    const isCurrent=s===cur;
+    let lbl=STATUS_BADGE_LABELS[s]||s;
+    let blocked=false;
+    if(s==='Terminé'&&via){
+      lbl=via==='distance'?'Terminé (à Distance)':'Terminé (Terrain)';
+      blocked=!!(engaged&&via!==engaged);
+    }
+    const click=blocked
+      ? `showToast('Ce ticket suit le chemin ${engaged==='terrain'?'Terrain':'Distance'} — utilisez le Terminé de ce chemin.','error');event.stopPropagation();`
+      : `handleStatusChange('${ticketId}','${s}',${via?`'${via}'`:'null'})`;
+    return `<div class="status-opt${isCurrent?' current':''}"${blocked?' style="opacity:0.45;cursor:not-allowed;"':''} onclick="${click}">
+      <span class="status-badge ${STATUS_CLASS[s]}">${xe(lbl)}</span>
+      ${isCurrent?'<span class="current-mark">Actuel</span>':''}
+    </div>`;
+  }
+
+  let html=`<div class="status-dd-section">
+    <div class="status-dd-label">Chemin Terrain</div>`;
+  TERRAIN.forEach(s=>{
+    if(s==='Assigné') return;
+    html+=statusOpt(s, s==='Terminé'?'terrain':null);
+  });
+  html+=`</div><div class="status-dd-divider"></div><div class="status-dd-section">
+    <div class="status-dd-label">Chemin Distance</div>`;
+  DISTANCE.forEach(s=>{
+    if(s==='Assigné') return;
+    html+=statusOpt(s, s==='Terminé'?'distance':null);
+  });
+  html+=`</div>`;
+  statusDropdown.innerHTML=html;
+  statusDropdown.classList.add('open');
+  setTimeout(positionStatusDropdown,0);
+}
+function closeStatusDropdown(){
+  statusDropdown.classList.remove('open');
+  statusTicketId=null;statusTriggerEl=null;
+}
+
+/* ==================== STATUS CHANGE LOGIC ==================== */
+let pendingStatusTicketId=null,pendingStatusNew=null,pendingStatusVia=null;
+let lastSavedTicketId=null;
+
+function handleStatusChange(ticketId,newStatus,via){
+  const ticket=TICKETS.find(t=>t.id===ticketId);
+  const cur=ticket.status;
+  if(cur===newStatus){closeStatusDropdown();return;}
+  const normal=isNormalNext(cur,newStatus);
+  if(normal){
+    closeStatusDropdown();
+    applyStatusChange(ticketId,newStatus,via);
+  } else {
+    pendingStatusTicketId=ticketId;
+    pendingStatusNew=newStatus;
+    pendingStatusVia=via||null;
+    closeStatusDropdown();
+    const msgEl=document.getElementById('confirm-status-msg');
+    const transEl=document.getElementById('confirm-status-transition');
+    const newLbl=(newStatus==='Terminé'&&via)
+      ? (via==='distance'?'Terminé (à Distance)':'Terminé (Terrain)')
+      : (STATUS_BADGE_LABELS[pendingStatusNew]||pendingStatusNew);
+    msgEl.textContent=`Vous allez effectuer un changement inhabituel. Êtes-vous sûr ?`;
+    transEl.innerHTML=`<span class="status-badge ${STATUS_CLASS[cur]}">${xe(STATUS_BADGE_LABELS[cur]||cur)}</span><span class="confirm-arrow">→</span><span class="status-badge ${STATUS_CLASS[pendingStatusNew]}">${xe(newLbl)}</span>`;
+    document.getElementById('confirm-status-modal').classList.add('vis');
+  }
+}
+function closeConfirmStatus(){
+  document.getElementById('confirm-status-modal').classList.remove('vis');
+  pendingStatusTicketId=null;pendingStatusNew=null;pendingStatusVia=null;
+}
+function applyConfirmedStatus(){
+  if(pendingStatusTicketId&&pendingStatusNew){
+    applyStatusChange(pendingStatusTicketId,pendingStatusNew,pendingStatusVia);
+  }
+  closeConfirmStatus();
+}
+async function applyStatusChange(ticketId,newStatus,via){
+  try {
+    // Sélectionner "Terminé" envoie bien "Terminé" au serveur (qui gèle le temps de
+    // résolution + enregistre termine_via). Au rechargement, status_display redevient
+    // "Remplir le rapport" tant que le rapport n'est pas soumis depuis le popup.
+    await API.changeStatus(ticketId, newStatus, null, 'technicien', via);
+    if(newStatus==='Terminé'){
+      showToast(`Ticket ${ticketId} — Ouvrez les détails pour remplir le rapport`,'warning');
+    } else {
+      showToast(`Statut mis à jour : ${STATUS_BADGE_LABELS[newStatus]||newStatus}`,'success');
+    }
+  } catch(e){ showToast('Échec : '+e.message,'error'); return; }
+  lastSavedTicketId = ticketId;
+  await reload();
+}
+
+/* ==================== DÉTAILS DU TICKET (popup partagé) ==================== */
+function openDetails(ticketId){
+  const t=TICKETS.find(tk=>tk.id===ticketId);
+  const scrollTo=t&&t.status==='Remplir le rapport'?'rapport':null;
+  TicketDetail.open(ticketId, { role: 'technicien', onChange: reload, scrollTo: scrollTo });
+}
+
+/* ==================== CANCEL — composant partagé ==================== */
+function openCancelModal(ticketId){
+  const t=TICKETS.find(tk=>tk.id===ticketId);
+  TicketTable.openCancelModal(ticketId, t ? {
+    titre: genTitle(t), client_name: t.client, reference: t.reference
+  } : null, reload, {
+    byRole: 'technicien',
+    byName: Session.userName() || 'Technicien',
+    byId: MY_TECH_ID
+  });
+}
+
+/* ==================== TOAST ==================== */
+function showToast(msg,type='success'){
+  const c=document.getElementById('toast-container');
+  const t=document.createElement('div');t.className='toast '+type;
+  const icons={success:'<polyline points="20 6 9 17 4 12"/>',error:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',info:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',warning:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'};
+  t.innerHTML=`<div class="toast-icon"><svg viewBox="0 0 24 24">${icons[type]||icons.info}</svg></div><div class="toast-msg">${xe(msg)}</div><button class="toast-dismiss" onclick="this.parentElement.remove()">×</button>`;
+  c.appendChild(t);setTimeout(()=>t.remove(),4000);
+}
+
+/* ==================== ESC ==================== */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(document.getElementById('confirm-status-modal').classList.contains('vis')) closeConfirmStatus();
+    else if(document.getElementById('shift-end-modal').classList.contains('vis')) closeShiftEndModal();
+    else if(statusDropdown.classList.contains('open')) closeStatusDropdown();
+    else closeShiftDropdown();
+  }
+});
+document.getElementById('confirm-status-modal').addEventListener('mousedown',e=>{if(e.target.id==='confirm-status-modal')closeConfirmStatus();});
+document.getElementById('shift-end-modal').addEventListener('mousedown',e=>{if(e.target.id==='shift-end-modal')closeShiftEndModal();});
+window.addEventListener('scroll',()=>{if(statusDropdown.classList.contains('open'))positionStatusDropdown();},true);
+window.addEventListener('resize',()=>{if(statusDropdown.classList.contains('open'))positionStatusDropdown();});
+
+/* ==================== INIT ==================== */
+(function init(){
+  const s = Session.require('technicien');   // renvoie vers /login si pas technicien
+  if(!s) return;
+  MY_TECH_ID = s.user_id;
+  document.getElementById('sb-user-name').textContent = s.user_name || 'Technicien';
+  document.getElementById('sb-logout').textContent = (s.user_name || 'Technicien') + ' · Déconnexion';
+  document.getElementById('sb-logout').addEventListener('click', e => { e.preventDefault(); Session.clear(); window.location.href='/'; });
+
+  API.bootstrap().then(data => {
+    // État du shift depuis la disponibilité du technicien connecté
+    const dispo = data.current_user ? data.current_user.disponibilite : 'Hors service';
+    shiftStatus = dispo === 'En service' ? 'service' : dispo === 'En pause' ? 'pause' : 'hors';
+    if(shiftStatus === 'hors') shiftStartTs = null;
+    RAW_TICKETS = {};
+    TICKETS = data.tickets.map(mapTicket);
+    updateShiftUI();
+    buildPills();
+    renderTable();
+  }).catch(err => showToast('Erreur de chargement : ' + err.message, 'error'));
+
+  // Temps réel : ne pas rafraîchir si une modale/dropdown/popup est ouverte
+  API.poll(function(tickets){
+    const busy = document.querySelector('.modal-overlay.vis, .tt-cancel-overlay.vis')
+              || (document.getElementById('shift-dropdown') && document.getElementById('shift-dropdown').classList.contains('open'))
+              || (statusDropdown && statusDropdown.classList.contains('open'))
+              || (window.TicketDetail && TicketDetail.isOpen && TicketDetail.isOpen());
+    if(busy) return;
+    RAW_TICKETS = {};
+    TICKETS = tickets.map(mapTicket);
+    buildPills();
+    renderTable();
+  }, 4000);
+})();
+</script>
+<script src="/static/js/responsive.js"></script>
+</body>
+</html>

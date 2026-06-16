@@ -1,0 +1,161 @@
+/* =========================================================================
+ * responsive.css — Règles responsive GLOBALES (tous portails).
+ *
+ * Inclure ce fichier APRÈS le <style> de la page : il complète et corrige les
+ * règles locales (d'où quelques !important ciblés — certains templates avaient
+ * leur propre traitement mobile divergent qu'on uniformise ici).
+ *
+ * Points de rupture : 1024px (petit desktop), 768px (tablette/mobile),
+ * 480px (petit mobile).
+ * Le tiroir latéral (drawer) est piloté par /static/js/responsive.js qui
+ * injecte le bouton ☰ dans la topbar et le backdrop dans le body.
+ * ====================================================================== */
+
+/* ── Sidebar : libellés sur UNE ligne quelle que soit la largeur (évite le
+   retour à la ligne de "Gestion des Techniciens") ── */
+.sidebar-nav a {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Bouton hamburger : masqué sur desktop, affiché < 768px (cf. media query). */
+#sidebar-toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--light-grey);
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  font-size: 20px;
+  line-height: 1;
+  color: var(--primary);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+  transition: background-color var(--transition), border-color var(--transition);
+}
+#sidebar-toggle:hover { background: var(--off-white); border-color: var(--steel-blue); }
+#sidebar-toggle:active { transform: scale(0.95); }
+
+/* Backdrop du tiroir (injecté par responsive.js). */
+#sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 1100;
+}
+#sidebar-backdrop.vis { display: block; }
+
+/* ── PETIT DESKTOP : on resserre les paddings avant de basculer en mobile ── */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .content { padding: 24px !important; }
+  .topbar { padding-left: 24px !important; padding-right: 24px !important; }
+}
+
+/* ── TABLETTE / MOBILE ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* Sidebar = tiroir : cachée par défaut, glisse depuis la gauche.
+     On neutralise les variantes locales (barre du bas, sidebar 80px…). */
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: auto !important;
+    width: 100vw !important;
+    max-width: 280px !important;
+    height: 100vh !important;
+    flex-direction: column !important;
+    display: flex !important;
+    transform: translateX(-105%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1200 !important;
+    box-shadow: 4px 0 32px rgba(15, 23, 42, 0.35);
+  }
+  .sidebar.drawer-open { transform: translateX(0); }
+
+  /* Restaure la mise en page verticale dans le tiroir (certaines pages la
+     masquaient ou la passaient en rangée pour la barre du bas). */
+  .sidebar-logo, .sidebar-user { display: flex !important; }
+  .sidebar-logo-sub { display: block !important; }
+  .sidebar-nav {
+    display: block !important;
+    width: auto !important;
+    padding: 18px 0 !important;
+  }
+  .sidebar-nav a {
+    flex-direction: row !important;
+    font-size: 14px !important;
+    padding: 12px 24px !important;
+    border-top: none !important;
+    border-left: 3px solid transparent !important;
+  }
+  /* L'accent de l'onglet actif doit rester visible dans le tiroir. */
+  .sidebar-nav a.active {
+    border-left-color: var(--sidebar-accent) !important;
+    background: rgba(255, 255, 255, 0.10) !important;
+  }
+  .sidebar-nav a span:not(.nav-icon) { display: inline !important; }
+
+  #sidebar-toggle { display: inline-flex !important; }
+
+  .topbar { left: 0 !important; padding: 0 16px !important; }
+  .topbar-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .content {
+    margin-left: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 16px !important;
+  }
+
+  /* Tableaux : défilement horizontal plutôt que compression des colonnes
+     (les min-width des tables sont conservés). */
+  .table-container, .popup-table-wrapper, .fiche-table-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Modales / popups : plein écran. */
+  .modal-overlay, .popup-overlay, .detail-overlay { padding: 0 !important; }
+  .modal-content, .modal-box, .popup-modal, .detail-modal,
+  .detail-modal-ticket, .fiche-content {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+  }
+  .modal-footer { flex-direction: column-reverse !important; }
+  .modal-footer button { width: 100% !important; }
+
+  /* Barres de filtres : dropdowns pleine largeur ; les pills passent déjà à
+     la ligne (flex-wrap). */
+  .searchable-filter-wrap { min-width: 100% !important; flex: 1 1 100% !important; max-width: none !important; }
+  .search-bar, .search-bar-small { max-width: 100% !important; }
+
+  /* En-tête de page : le bouton d'action passe pleine largeur sous le titre. */
+  .toolbar { align-items: stretch !important; }
+  .toolbar .btn-primary { width: 100% !important; justify-content: center !important; }
+}
+
+/* ── Formulaires : grilles 2 colonnes -> 1 colonne ── */
+@media (max-width: 600px) {
+  .form-row, .grid-2, .info-grid, .info-grid-2, .machine-info-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .fiche-stats { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* ── PETIT MOBILE ── */
+@media (max-width: 480px) {
+  .content { padding: 12px !important; }
+  .page-title { font-size: 20px !important; }
+  .topbar-title { font-size: 15px !important; }
+  .status-pills, .filter-bar { gap: 6px !important; }
+  .topbar-avatar { width: 32px !important; height: 32px !important; font-size: 12px !important; }
+}

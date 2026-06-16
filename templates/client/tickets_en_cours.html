@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes Tickets — Stokvis SAV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="/static/css/variables.css">
+<link rel="stylesheet" href="/static/css/sidebar.css">
+<link rel="stylesheet" href="/static/css/base.css">
+<style>
+/* ==========================================================================
+   VARIABLES & BASE
+   ========================================================================== */
+/* Variables : voir /static/css/variables.css (aucun override local) */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--grey);background-color:var(--off-white);overflow-x:hidden;line-height:1.6;}
+a{color:var(--steel-blue);text-decoration:none;transition:color var(--transition);}
+a:hover{color:var(--primary);text-decoration:underline;}
+ul{list-style:none;}
+button{font-family:inherit;cursor:pointer;outline:none;}
+input, textarea{font-family:inherit;outline:none;}
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+
+.topbar{position:fixed;top:0;left:var(--sidebar-width);right:0;height:var(--topbar-height);background-color:var(--white);border-bottom:1px solid var(--light-grey);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:90;}
+.topbar-title{font-size:18px;font-weight:600;color:var(--dark-charcoal);}
+.topbar-right{display:flex;align-items:center;gap:16px;}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background-color:var(--primary);color:var(--white);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+
+.content{margin-left:var(--sidebar-width);margin-top:var(--topbar-height);padding:32px;max-width:1400px;min-height:calc(100vh - var(--topbar-height));}
+.page-header{margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.page-title{font-size:24px;font-weight:700;color:var(--dark-charcoal);}
+.search-bar{position:relative;width:100%;max-width:360px;}
+.search-bar input{width:100%;height:40px;border:1.5px solid var(--light-grey);border-radius:6px;padding:0 12px 0 36px;font-size:14px;color:var(--dark-charcoal);background:var(--white);transition:border-color var(--transition);}
+.search-bar input:focus{border-color:var(--steel-blue);}
+.search-bar svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--light-slate);fill:none;stroke-width:1.5;}
+
+/* ==========================================================================
+   SEARCHABLE FILTER DROPDOWNS + TAGS (mêmes styles que tous_les_tickets.html)
+   ========================================================================== */
+.filter-bar-dd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.searchable-filter-wrap { position: relative; min-width: 160px; }
+.searchable-filter-input {
+  width: 100%; height: 36px; border: 1.5px solid var(--light-grey); border-radius: 6px;
+  padding: 0 32px 0 12px; font-size: 13px; color: var(--dark-charcoal);
+  background: var(--white); cursor: text; transition: border-color var(--transition);
+}
+.searchable-filter-input:focus { border-color: var(--steel-blue); outline: none; }
+.searchable-filter-chevron { position: absolute; right: 10px; top: 10px; width: 16px; height: 16px; pointer-events: none; color: var(--light-slate); }
+.searchable-filter-dropdown {
+  position: absolute; top: 100%; left: 0; min-width: 100%;
+  background: var(--white); border: 1px solid var(--light-grey); border-radius: 6px;
+  box-shadow: var(--shadow-popup); margin-top: 4px; max-height: 250px; overflow-y: auto;
+  z-index: 1000; display: none;
+}
+.searchable-filter-dropdown.open { display: block; }
+.filter-opt { padding: 8px 12px; font-size: 13px; cursor: pointer; transition: background var(--transition); white-space: nowrap; }
+.filter-opt:hover { background-color: var(--off-white); color: var(--primary); }
+.filter-opt.empty { color: var(--light-slate); cursor: default; pointer-events: none; }
+.tags-container{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.filter-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background-color:var(--off-white);border:1px solid var(--light-grey);border-radius:4px;font-size:12px;font-weight:500;color:var(--dark-charcoal);}
+.filter-tag strong{color:var(--steel-blue);font-weight:600;}
+.filter-tag .tag-close{cursor:pointer;color:var(--light-slate);display:flex;align-items:center;transition:color var(--transition);}
+.filter-tag .tag-close:hover{color:var(--danger);}
+.filter-tag .tag-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;}
+.btn-clear-filters{background:none;border:none;color:var(--steel-blue);font-size:12px;font-weight:600;cursor:pointer;display:none;padding:4px 8px;border-radius:4px;}
+
+/* En-têtes triables (mêmes styles que tous_les_tickets.html) */
+.data-table th{cursor:pointer;user-select:none;}
+.data-table th:hover{color:var(--primary);}
+.data-table th .sort-icon{display:inline-block;margin-left:4px;opacity:0.4;font-size:10px;}
+.data-table th.sorted .sort-icon{opacity:1;color:var(--primary);}
+
+/* ==========================================================================
+   FILTER PILLS
+   ========================================================================== */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.filter-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--light-grey);background:var(--white);color:var(--grey);cursor:pointer;transition:all var(--transition);user-select:none;}
+.filter-pill:hover{border-color:var(--steel-blue);color:var(--steel-blue);}
+.filter-pill.active{background-color:var(--primary);border-color:var(--primary);color:var(--white);}
+.filter-pill .pill-count{font-size:11px;font-weight:700;background:rgba(0,0,0,0.12);padding:1px 6px;border-radius:10px;}
+.filter-pill.active .pill-count{background:rgba(255,255,255,0.25);}
+
+/* ==========================================================================
+   TABLE
+   ========================================================================== */
+.table-container{background-color:var(--white);border-radius:8px;box-shadow:var(--shadow-card);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.table-container::-webkit-scrollbar{height:8px;}
+.table-container::-webkit-scrollbar-track{background:var(--off-white);border-radius:0 0 8px 8px;}
+.table-container::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:4px;}
+.table-container::-webkit-scrollbar-thumb:hover{background:#94A3B8;}
+.data-table{width:100%;min-width:1000px;border-collapse:collapse;}
+.data-table th{background-color:var(--off-white);font-size:12px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:0.5px;padding:18px 24px;text-align:left;border-bottom:1px solid var(--light-grey);white-space:nowrap;}
+.data-table td{padding:18px 24px;font-size:14px;color:var(--dark-charcoal);border-bottom:1px solid var(--light-grey);vertical-align:middle;}
+.data-table tbody tr{transition:background-color var(--transition);cursor:pointer;}
+.data-table tbody tr:hover{background-color:#EDF1F7;}
+.data-table tbody tr:last-child td{border-bottom:none;}
+.col-titre{max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.col-id{font-weight:700;color:var(--primary);letter-spacing:0.5px;white-space:nowrap;}
+.col-date,.col-tech{white-space:nowrap;}
+.col-date{font-size:13px;color:var(--dark-charcoal);}
+.col-date span{display:block;font-size:12px;color:var(--light-slate);margin-top:2px;}
+.col-machine{font-family:monospace;font-size:13px;background-color:var(--off-white);padding:4px 8px;border-radius:4px;border:1px solid var(--light-grey);white-space:nowrap;}
+.col-tech{font-size:13px;}
+.col-tech span{display:block;font-size:12px;color:var(--light-slate);margin-top:2px;}
+.btn-icon{width:32px;height:32px;border-radius:6px;background:none;border:1px solid var(--light-grey);color:var(--steel-blue);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all var(--transition);flex-shrink:0;}
+.btn-icon:hover{background-color:var(--off-white);border-color:var(--primary);color:var(--primary);}
+.btn-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+.btn-icon.danger{color:var(--danger);border-color:rgba(239,68,68,0.25);}
+.btn-icon.danger:hover{background-color:var(--danger-bg);border-color:var(--danger);color:var(--danger);}
+
+/* Status Badges */
+.status-badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap;transition:background-color var(--transition), color var(--transition);}
+.status-envoye{background-color:rgba(143,163,191,0.12);color:var(--grey);}
+.status-assigne{background-color:rgba(74,127,181,0.12);color:var(--status-assigned);}
+.status-attente-piece{background-color:#FFF9E6;color:#D97706;}
+.status-en-route{background-color:#FFFBEB;color:var(--status-progress);}
+.status-en-reparation{background-color:#FEF3F2;color:#F04438;}
+.status-distance{background-color:#F0FDF4;color:#16A34A;}
+.status-termine{background-color:rgba(45,143,94,0.12);color:var(--status-success);}
+.status-annule{background-color:#F1F5F9;color:#64748B;}
+
+.status-noter{background-color:var(--primary);color:var(--white);cursor:pointer;}
+.status-noter:hover{background-color:var(--primary-hover);}
+
+/* Empty state */
+.empty-state-row td{text-align:center;padding:64px 24px;color:var(--light-slate);font-size:14px;border-bottom:none;cursor:default;}
+.empty-state-row td:hover{background:none;}
+.empty-state-icon{width:40px;height:40px;stroke:var(--light-grey);fill:none;stroke-width:1.5;margin:0 auto 12px;display:block;}
+
+@media(max-width:768px){
+  .table-container{box-shadow:none;background:transparent;overflow-x:visible;}
+  .data-table{min-width:100%;}
+  .data-table,.data-table tbody,.data-table tr,.data-table td{display:block;width:100%;}
+  .data-table thead{display:none;}
+  .data-table tr{background-color:var(--white);border-radius:8px;box-shadow:var(--shadow-card);margin-bottom:16px;padding:24px;padding-top:64px;position:relative;border:1px solid var(--light-grey);}
+  .data-table td{padding:10px 0;border:none;display:flex;align-items:center;justify-content:space-between;text-align:right;gap:16px;}
+  .data-table td::before{content:attr(data-label);font-size:12px;font-weight:600;color:var(--light-slate);text-transform:uppercase;text-align:left;flex-shrink:0;}
+  .data-table td:first-child{position:absolute;top:20px;left:24px;padding:0;font-size:16px;display:block;text-align:left;}
+  .data-table td:first-child::before{display:none;}
+  .data-table td:last-child{position:absolute;top:16px;right:24px;padding:0;width:auto;}
+  .data-table td:last-child::before{display:none;}
+  .col-titre{max-width:none;white-space:normal;overflow:visible;text-overflow:unset;}
+  .filter-bar{margin-bottom:12px;}
+}
+
+/* ==========================================================================
+   MODAL (TICKET DETAIL)
+   ========================================================================== */
+.popup-overlay{position:fixed;inset:0;background-color:rgba(27,58,107,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;padding:24px;}
+.popup-overlay.vis{opacity:1;pointer-events:auto;}
+.popup-modal{background-color:var(--white);border-radius:12px;box-shadow:var(--shadow-popup);width:1200px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;transform:scale(0.98);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);overflow:hidden;}
+.popup-overlay.vis .popup-modal{transform:scale(1);}
+.popup-header{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--light-grey);background-color:var(--white);flex-shrink:0;position:relative;gap:16px;}
+.popup-logo{font-size:18px;font-weight:700;color:var(--primary);letter-spacing:-0.5px;flex-shrink:0;}
+.popup-logo span{font-weight:400;color:var(--light-slate);}
+.popup-header-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;}
+.popup-title{font-size:13px;font-weight:700;color:var(--primary);letter-spacing:1px;text-transform:uppercase;}
+.popup-close{width:32px;height:32px;border:none;background:none;color:var(--grey);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all var(--transition);flex-shrink:0;}
+.popup-close:hover{background-color:var(--off-white);color:var(--dark-charcoal);transform:rotate(90deg);}
+.popup-close svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;}
+
+/* Header action for Cancel */
+.header-actions { display:flex; gap:12px; align-items:center; margin-left:auto; margin-right:16px; }
+.btn-danger-outline { display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:4px;border:1.5px solid var(--danger);color:var(--danger);background:transparent;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s; }
+.btn-danger-outline:hover { background:var(--danger); color:#fff; }
+.btn-danger-outline svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; }
+
+/* popup body */
+.popup-body{display:flex;flex:1;overflow-y:auto;overflow-x:hidden;background-color:var(--off-white);padding:32px;gap:32px;}
+.popup-body::-webkit-scrollbar{width:8px;}
+.popup-body::-webkit-scrollbar-track{background:transparent;}
+.popup-body::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:4px;}
+.popup-body::-webkit-scrollbar-thumb:hover{background:#94A3B8;}
+.popup-left{flex:1 1 55%;display:flex;flex-direction:column;gap:24px;min-width:0;}
+.popup-right{flex:1 1 45%;display:flex;flex-direction:column;gap:24px;position:sticky;top:0;align-self:flex-start;min-width:0;}
+
+@media(max-width:1024px){
+  .popup-body{flex-direction:column;padding:24px;}
+  .popup-left,.popup-right{flex:none;width:100%;position:static;}
+  .popup-header-center{display:none;}
+  .header-actions{margin-left:0;}
+}
+
+.popup-section{background-color:var(--white);border-radius:8px;box-shadow:var(--shadow-card);padding:24px 28px;border:1px solid var(--light-grey);}
+.popup-section-title{font-size:12px;font-weight:700;color:var(--steel-blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--light-grey);}
+
+/* skeleton */
+.skeleton{position:relative;overflow:hidden;background-color:var(--light-grey);border-radius:4px;color:transparent !important;min-height:20px;pointer-events:none;}
+.skeleton::after{content:'';position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent);animation:shimmer 1.5s infinite;}
+@keyframes shimmer{100%{transform:translateX(100%);}}
+.skeleton *{visibility:hidden;}
+
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+.info-grid.single-col{grid-template-columns:1fr;}
+.info-item{display:flex;flex-direction:column;gap:6px;}
+.info-lbl{font-size:11px;font-weight:600;color:var(--light-slate);text-transform:uppercase;letter-spacing:0.5px;}
+.info-val{font-size:14px;color:var(--dark-charcoal);line-height:1.5;}
+.info-val.mono{font-family:monospace;font-size:13px;}
+.info-val.bold{font-weight:600;color:var(--primary);}
+
+.chk-list{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
+.chk-item{display:flex;align-items:flex-start;gap:8px;font-size:14px;color:var(--dark-charcoal);}
+.chk-item svg{width:16px;height:16px;stroke:var(--status-success);fill:none;stroke-width:2.5;flex-shrink:0;margin-top:3px;}
+.chk-item-field{font-size:13px;color:var(--dark-charcoal);}
+.chk-item-field strong{color:var(--grey);font-weight:600;}
+
+.timeline{display:flex;flex-direction:column;position:relative;padding-left:10px;margin-top:8px;padding-bottom:4px;}
+.timeline::before{content:'';position:absolute;left:15px;top:8px;bottom:12px;width:2px;background-color:var(--light-grey);}
+.timeline-item{position:relative;padding-bottom:20px;padding-left:24px;}
+.timeline-item:last-child{padding-bottom:0;}
+.timeline-item::after{content:'';position:absolute;left:0;top:4px;width:12px;height:12px;border-radius:50%;background-color:var(--steel-blue);border:2px solid var(--white);box-shadow:0 0 0 1px var(--light-grey);z-index:2;}
+.timeline-item.timeline-last::after{width:14px;height:14px;left:-1px;top:3px;border:2px solid var(--white);box-shadow:0 0 0 2px currentColor;}
+.timeline-item.timeline-last .timeline-status{font-weight:700;}
+.timeline-status{font-size:14px;font-weight:600;color:var(--dark-charcoal);line-height:1;}
+.timeline-time{font-size:13px;color:var(--light-slate);margin-top:6px;}
+
+.empty-report{text-align:center;padding:40px 24px;color:var(--light-slate);font-size:14px;background-color:var(--off-white);border-radius:8px;border:1.5px dashed var(--light-grey);}
+.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 20px;font-size:14px;font-weight:600;border-radius:6px;border:1.5px solid transparent;cursor:pointer;background-color:var(--primary);color:var(--white);transition:background-color var(--transition);}
+.btn-primary:hover{background-color:var(--primary-hover);}
+.btn-primary:disabled{opacity:0.7;cursor:not-allowed;}
+.btn-primary svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
+.btn-secondary { display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 20px;font-size:14px;font-weight:600;border-radius:6px;border:1.5px solid var(--light-grey);cursor:pointer;background-color:var(--white);color:var(--grey);transition:all var(--transition); }
+.btn-secondary:hover { border-color:var(--primary); color:var(--primary); }
+.btn-secondary.btn-sm { height: 32px; padding: 0 12px; font-size: 12px; }
+
+.gal-grid{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;}
+.gal-thumb{width:72px;height:72px;border-radius:6px;border:1px solid var(--light-grey);object-fit:cover;cursor:pointer;transition:transform 0.2s,border-color 0.2s;}
+.gal-thumb:hover{transform:scale(1.05);border-color:var(--steel-blue);}
+.link-map{color:var(--steel-blue);text-decoration:none;display:inline-flex;align-items:center;gap:6px;font-weight:500;font-size:13px;}
+.link-map:hover{color:var(--primary);text-decoration:underline;}
+.link-map svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+
+/* Rating Numbers */
+.rating-numbers { display: flex; gap: 8px; }
+.rating-num { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--light-grey); border-radius: 6px; font-size: 16px; font-weight: 600; color: var(--grey); cursor: pointer; transition: all 0.2s; user-select: none; background: var(--white); }
+.rating-num:hover { border-color: var(--primary); color: var(--primary); background: var(--off-white); }
+.rating-num.selected { background: var(--primary); border-color: var(--primary); color: var(--white); }
+
+/* Cancel Confirmation Modal */
+.confirm-box{background:var(--white);border-radius:8px;box-shadow:var(--shadow-popup);width:400px;padding:24px;text-align:center;transform:scale(0.95);transition:transform 0.2s;}
+.confirm-overlay.vis .confirm-box{transform:scale(1);}
+.confirm-icon{width:48px;height:48px;border-radius:50%;background:rgba(239,68,68,0.1);color:var(--danger);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.confirm-icon svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;}
+.confirm-title{font-size:18px;font-weight:700;color:var(--dark-charcoal);margin-bottom:8px;}
+.confirm-text{font-size:14px;color:var(--grey);margin-bottom:24px;line-height:1.5;}
+.confirm-actions{display:flex;gap:12px;justify-content:center;align-items:center;}
+
+/* Lightbox */
+.lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.lightbox-overlay.vis{opacity:1;pointer-events:auto;}
+.lightbox-img{max-width:90vw;max-height:90vh;border-radius:8px;box-shadow:0 0 20px rgba(0,0,0,0.5);}
+.lightbox-close{position:absolute;top:20px;right:20px;color:white;background:none;border:none;font-size:32px;cursor:pointer;line-height:1;padding:10px;}
+.lightbox-close:hover{color:#ccc;}
+
+/* ==========================================================================
+   TOAST
+   ========================================================================== */
+.toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:3000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;}
+.toast{background:var(--white);border:1.5px solid var(--light-grey);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--dark-charcoal);box-shadow:0 6px 20px rgba(0,0,0,0.12);display:flex;align-items:center;gap:8px;min-width:240px;animation:fadeUp 200ms ease-out;pointer-events:auto;}
+.toast svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.toast.success{border-left:4px solid var(--status-success);color:var(--status-success);}
+.toast.error{border-left:4px solid var(--danger);color:var(--danger);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+</style>
+<link rel="stylesheet" href="/static/css/responsive.css">
+</head>
+<body>
+
+{% set active_nav = 'tickets-en-cours' %}{% include 'partials/_sidebar_client.html' %}
+
+<header class="topbar">
+  <div class="topbar-title">Mes Tickets</div>
+  <div class="topbar-avatar">S</div>
+</header>
+
+<main class="content">
+  <div class="page-header">
+    <h1 class="page-title">Tickets en cours</h1>
+  </div>
+
+  <!-- Recherche pleine largeur : ID + titre + référence machine -->
+  <div class="search-bar" style="max-width:400px;margin-bottom:12px;">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search-input" placeholder="Rechercher par ID, titre ou référence machine…">
+  </div>
+
+  <!-- Filtres Référence / Technicien : valeurs issues des tickets affichés -->
+  <div class="filter-bar-dd">
+    <div class="searchable-filter-wrap" id="wrap-ref">
+      <input type="text" class="searchable-filter-input" id="inp-ref" placeholder="Référence..." autocomplete="off">
+      <svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+      <div class="searchable-filter-dropdown" id="drop-ref"></div>
+    </div>
+    <div class="searchable-filter-wrap" id="wrap-tech">
+      <input type="text" class="searchable-filter-input" id="inp-tech" placeholder="Technicien..." autocomplete="off">
+      <svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+      <div class="searchable-filter-dropdown" id="drop-tech"></div>
+    </div>
+    <div class="tags-container" id="active-tags"></div>
+    <button class="btn-clear-filters" id="btn-clear-filters" onclick="clearDDFilters()">Tout effacer</button>
+  </div>
+
+  <div class="filter-bar" id="filter-bar"></div>
+
+  <div class="table-container">
+    <table class="data-table" id="tickets-table">
+      <thead>
+        <tr>
+          <th onclick="sortTable('id')" id="th-id">ID <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('date')" id="th-date">Date <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('title')" id="th-title">Titre de l'opération <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('machine')" id="th-machine">Machine concernée <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('tech')" id="th-tech">Technicien <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('status')" id="th-status">État <span class="sort-icon">↕</span></th>
+          <th style="text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- Le modal d'annulation est le composant partagé TicketTable.openCancelModal
+     (voir /static/js/ticket_table.js) : raison obligatoire + commentaire. -->
+
+<!-- POPUP -->
+<div class="popup-overlay" id="ticket-modal">
+  <div class="popup-modal">
+    <div class="popup-header">
+      <div class="popup-logo"><img src="/static/stokvis360.png" alt="Stokvis 360" style="height:28px;width:auto;object-fit:contain;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">STOKVIS <span style="font-weight:400;font-size:16px;">360</span></span></div>
+      <div class="popup-header-center">
+        <div class="popup-title">DÉTAILS DU TICKET</div>
+        <span id="popup-status-badge" style="margin-left: 10px;"></span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-danger-outline" id="btn-cancel-ticket" onclick="openCancelConfirm()" style="display:none;">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Annuler le ticket
+        </button>
+      </div>
+      <button class="popup-close" onclick="closeModal()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    
+    <div class="popup-body">
+      <div class="popup-left">
+        <div class="popup-section">
+          <div class="popup-section-title">Informations du ticket</div>
+          <div class="info-grid">
+            <div class="info-item"><span class="info-lbl">Titre du ticket</span><span class="info-val bold sk-target" id="m-title"></span></div>
+            <div class="info-item" id="m-res-wrap"><span class="info-lbl">Temps de résolution</span><span class="info-val sk-target" id="m-res"></span></div>
+            <div class="info-item"><span class="info-lbl">Client et Contact</span><span class="info-val sk-target" id="m-client"></span></div>
+            <div class="info-item"><span class="info-lbl">Technicien</span><span class="info-val sk-target" id="m-tech"></span></div>
+            <div class="info-item"><span class="info-lbl">Pôle</span><span class="info-val sk-target" id="m-pole"></span></div>
+            <div class="info-item"><span class="info-lbl">Marque</span><span class="info-val sk-target" id="m-marque"></span></div>
+            <div class="info-item"><span class="info-lbl">Catégorie</span><span class="info-val sk-target" id="m-cat"></span></div>
+            <div class="info-item"><span class="info-lbl">Référence</span><span class="info-val sk-target" id="m-ref"></span></div>
+            <div class="info-item"><span class="info-lbl">Identifiant Parc</span><span class="info-val mono sk-target" id="m-serial"></span></div>
+            <div class="info-item" id="m-loc-wrap"><span class="info-lbl">Localisation</span><div class="sk-target" id="m-loc"></div></div>
+          </div>
+        </div>
+
+        <div class="popup-section" id="m-diag-wrap">
+          <div class="popup-section-title">Pré-diagnostic</div>
+          <div class="info-grid single-col">
+            <div class="info-item" id="m-checklist-wrap">
+              <span class="info-lbl">Éléments signalés</span>
+              <div class="chk-list sk-target" id="m-checklist"></div>
+            </div>
+            <div class="info-item" id="m-desc-wrap"><span class="info-lbl">Description</span><span class="info-val sk-target" id="m-desc"></span></div>
+            <div class="info-item" id="m-img-wrap"><span class="info-lbl">Images jointes</span><div class="gal-grid sk-target" id="m-images"></div></div>
+          </div>
+        </div>
+
+        <div class="popup-section">
+          <div class="popup-section-title">Historique</div>
+          <div class="timeline sk-target" id="m-timeline"></div>
+        </div>
+      </div>
+
+      <div class="popup-right">
+        <div class="popup-section">
+          <div class="popup-section-title">Rapport d'intervention</div>
+          <div id="m-report-content" class="info-grid single-col" style="display:none;">
+            <div class="info-item"><span class="info-lbl">Titre de l'intervention</span><span class="info-val bold sk-target" id="m-rep-title"></span></div>
+            <div class="info-item"><span class="info-lbl">Situation constatée</span><span class="info-val sk-target" id="m-rep-sit"></span></div>
+            <div class="info-item"><span class="info-lbl">Actions effectuées</span><span class="info-val sk-target" id="m-rep-act"></span></div>
+            <div class="info-item" id="m-tech-img-wrap" style="display:none;">
+              <span class="info-lbl">Images après résolution</span>
+              <div class="gal-grid sk-target" id="m-tech-images"></div>
+            </div>
+            <button class="btn-primary sk-target" onclick="generatePDF(this)" style="margin-top:16px; width:fit-content;">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Télécharger PDF
+            </button>
+          </div>
+          <div id="m-report-empty" class="empty-report sk-target">
+            <p>Le rapport d'intervention n'est pas encore disponible.</p>
+          </div>
+        </div>
+        
+        <!-- Section Évaluation du Service -->
+        <div class="popup-section" id="m-eval-wrap" style="display:none;">
+          <div class="popup-section-title">Évaluation du service</div>
+          
+          <!-- Mode Formulaire (Non noté) -->
+          <div id="m-eval-form" style="display:none;">
+            <div class="info-item" style="margin-bottom: 16px;">
+              <span class="info-lbl">Votre note (sur 5)</span>
+              <div class="rating-numbers" id="m-rating-stars">
+                <!-- Numbers rendered via JS -->
+              </div>
+            </div>
+            <div class="info-item" style="margin-bottom: 16px;">
+              <span class="info-lbl">Commentaire (Optionnel)</span>
+              <textarea id="m-eval-comment" style="width:100%; min-height:80px; padding:10px; border:1px solid var(--light-grey); border-radius:6px; font-family:inherit; font-size:13px; color:var(--dark-charcoal); resize:vertical;" placeholder="Partagez votre avis sur l'intervention..."></textarea>
+            </div>
+            <button class="btn-primary" onclick="submitEvaluation()" id="btn-submit-eval" disabled style="margin-top:12px;">Soumettre l'évaluation</button>
+          </div>
+
+          <!-- Mode Lecture Seule (Déjà noté) -->
+          <div id="m-eval-readonly" style="display:none;" class="info-grid single-col">
+            <div class="info-item">
+              <span class="info-lbl">Note attribuée</span>
+              <div id="m-rating-readonly" style="font-size: 18px; font-weight: 700; color: var(--primary);">
+                <!-- Note rendered via JS -->
+              </div>
+            </div>
+            <div class="info-item" id="m-eval-comment-readonly-wrap">
+              <span class="info-lbl">Votre commentaire</span>
+              <span class="info-val" id="m-eval-comment-readonly" style="background:var(--off-white); padding:10px; border-radius:6px; border:1px solid var(--light-grey);"></span>
+            </div>
+            <button class="btn-secondary btn-sm" onclick="editEvaluation()" style="width: fit-content; margin-top: 8px;">Modifier l'évaluation</button>
+          </div>
+          
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+  <img id="lightbox-img" class="lightbox-img" src="" alt="Plein écran">
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/ticket_table.js"></script>
+<script src="/static/js/ticket_detail.js"></script>
+<script src="/static/js/ui.js"></script>
+<script>
+/* ==========================================================================
+   DONNÉES — alimentées par l'API (voir /static/js/api.js).
+   État de page : recherche plein texte, filtres dropdown (réf/tech), pill de
+   statut, et tri par colonne (délégué à TicketTable). Les dropdowns ne
+   proposent QUE les valeurs présentes dans les tickets actuellement affichés.
+   ========================================================================== */
+let MY_CLIENT_ID = null; // défini à l'init depuis la session
+let TICKETS = [];
+
+function mapTicket(t){
+  const tech = (t.techs && t.techs.length) ? t.techs[0] : null;
+  return {
+    id: t.id, date: t.date, time: t.time, timestamp: t.timestamp,
+    title: t.titre, titre: t.titre, reference: t.reference, status: t.status,
+    termine_via: t.termine_via,
+    client_name: t.client_name,
+    usageReadings: t.usage_readings || [],
+    techs: t.techs || [],
+    techIds: t.technicien_ids || [],
+    tech_name: tech ? tech.name : '—',
+    tech_phone: tech ? tech.telephone : '',
+    evaluation: t.evaluation  // {note, commentaire} ou null -> badge "Noter le service" si Terminé sans éval
+  };
+}
+
+// Cellule technicien côté client : nom + téléphone en dessous, badge +N tech si plusieurs.
+function renderClientTechCell(techs){
+  if(!techs || !techs.length) return '—';
+  const first = techs[0];
+  const badge = techs.length > 1
+    ? ` <span style="display:inline-block;background:#F4F6F9;border:1px solid #E2E6EC;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:600;color:#4A7FB5;white-space:nowrap;">+${techs.length-1} tech</span>`
+    : '';
+  const phone = first.telephone
+    ? `<div style="font-size:12px;color:var(--light-slate);margin-top:2px;white-space:nowrap;">${xe(first.telephone)}</div>`
+    : '';
+  return `<div style="white-space:nowrap;">${xe(first.name)}${badge}</div>${phone}`;
+}
+
+// Relevés d'usage sous la référence machine : un indice par ligne (empilés),
+// gris ardoise sobre. La hauteur de ligne s'étend naturellement.
+function usageSubHtml(readings){
+  if(!readings || !readings.length) return '';
+  return readings.map(u =>
+    `<div style="font-size:11px;color:#4A5568;font-weight:600;margin-top:3px;white-space:nowrap;">${xe(u.name)} ${xe(u.value)}${u.unit ? ' '+xe(u.unit) : ''}</div>`
+  ).join('');
+}
+
+async function reload(){
+  const tickets = await API.tickets();
+  TICKETS = tickets.map(mapTicket);
+  renderAll();
+}
+
+/* Point d'entrée unique du rendu : pills + dropdowns + table restent cohérents. */
+function renderAll(){
+  buildFilters();
+  refreshDDOptions();
+  renderTable(getFiltered(document.getElementById('search-input').value.toLowerCase()));
+}
+
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+function xe(str) {
+  if (!str) return "";
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+/* Titre : délègue à genTitle (source unique dans static/js/ui.js). */
+function generateTitle(t) { return genTitle(t); }
+TICKETS.forEach(t => { t.title = generateTitle(t); });
+
+function getResolutionTime(ticket) {
+  if (ticket.status !== 'Terminé') return '-';
+  const created = parseDate(ticket.date, ticket.time);
+  let resolvedDate = NOW;
+  const term = ticket.history.find(h => h.status === "Terminé");
+  if (term) {
+    const p = term.date.split(' ');
+    resolvedDate = parseDate(p[0], p[1]);
+  }
+  const diffMs = resolvedDate.getTime() - created.getTime();
+  if (diffMs < 0) return '-';
+  
+  const absM = Math.floor(diffMs / 60000);
+  const dDays = Math.floor(absM / (60 * 24));
+  const dHrs = Math.floor((absM % (60 * 24)) / 60);
+  const dMins = absM % 60;
+  
+  if (dDays > 0) {
+    return `${dDays}j ${dHrs}h ${dMins}m`;
+  }
+  return `${dHrs}h ${dMins}m`;
+}
+
+const STATUS_COLORS = {
+  'Envoyé':                 { bg:'rgba(143,163,191,0.12)', color:'#58595B',  pdfColor:'#58595B'  },
+  'Assigné':                { bg:'rgba(74,127,181,0.12)',  color:'#4A7FB5',  pdfColor:'#4A7FB5'  },
+  'Attente pièce':          { bg:'#FFF9E6',               color:'#D97706',  pdfColor:'#D97706'  },
+  'En route':               { bg:'#FFFBEB',               color:'#E8A817',  pdfColor:'#B45309'  },
+  'En Réparation':          { bg:'#FEF3F2',               color:'#F04438',  pdfColor:'#DC2626'  },
+  'Maintenance à distance': { bg:'#F0FDF4',               color:'#16A34A',  pdfColor:'#16A34A'  },
+  'Terminé':                { bg:'rgba(45,143,94,0.12)',   color:'#2D8F5E',  pdfColor:'#2D8F5E'  },
+  'Annulé':                 { bg:'#F1F5F9',               color:'#64748B',  pdfColor:'#64748B'  }
+};
+function getStatusStyle(s) {
+  // "Terminé (Terrain)" / "Terminé (à Distance)" héritent du style de "Terminé".
+  return STATUS_COLORS[s] || STATUS_COLORS[String(s).split(' (')[0]] ||
+         { bg:'#F4F6F9', color:'#58595B', pdfColor:'#58595B' };
+}
+
+function showToast(msg, type='success'){
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast' + (type === 'error' ? ' error' : '');
+  const icon = type === 'success'
+    ? '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+    : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+  t.innerHTML = `<div class="toast-icon">${icon}</div><div class="toast-msg">${xe(msg)}</div>`;
+  c.appendChild(t);
+  setTimeout(() => {
+    t.style.transition = 'opacity 200ms';
+    t.style.opacity = '0';
+    setTimeout(() => t.remove(), 200);
+  }, 2400);
+}
+
+/* ==========================================================================
+   FILTRES — recherche + dropdowns (réf/tech) + pills de statut.
+   Les options des dropdowns sont recalculées à CHAQUE changement de filtre :
+   elles ne listent que les valeurs des tickets actuellement affichés.
+   ========================================================================== */
+let activeFilter = 'Tous';
+let ddFilters = { ref: [], tech: [] };   // sélections × (tags)
+let sortCol = 'default';
+let sortDir = 'asc';
+
+function buildFilters() {
+  const bar = document.getElementById('filter-bar');
+  const base = TICKETS.filter(t => matchesSearch(t) && matchesDD(t));
+  const counts = {};
+  base.forEach(t => { counts[t.status] = (counts[t.status]||0) + 1; });
+  const statuses = Object.keys(counts);
+  if (statuses.length <= 1) { bar.style.display='none'; activeFilter = 'Tous'; return; }
+  bar.style.display = 'flex';
+  bar.innerHTML = '';
+
+  const allPill = document.createElement('button');
+  allPill.className = 'filter-pill' + (activeFilter === 'Tous' ? ' active' : '');
+  allPill.dataset.filter = 'Tous';
+  allPill.innerHTML = `Tous <span class="pill-count">${base.length}</span>`;
+  allPill.addEventListener('click', () => applyFilter('Tous'));
+  bar.appendChild(allPill);
+
+  statuses.forEach(s => {
+    const p = document.createElement('button');
+    p.className = 'filter-pill' + (activeFilter === s ? ' active' : '');
+    p.dataset.filter = s;
+    p.innerHTML = `${s} <span class="pill-count">${counts[s]}</span>`;
+    p.addEventListener('click', () => applyFilter(s));
+    bar.appendChild(p);
+  });
+}
+
+function applyFilter(filter) {
+  activeFilter = filter;
+  renderAll();
+}
+
+function matchesSearch(t) {
+  const q = (document.getElementById('search-input').value || '').toLowerCase();
+  if (!q) return true;
+  return t.id.toLowerCase().includes(q) || t.title.toLowerCase().includes(q) ||
+         t.reference.toLowerCase().includes(q);
+}
+
+function matchesDD(t) {
+  if (ddFilters.ref.length && !ddFilters.ref.includes(t.reference)) return false;
+  if (ddFilters.tech.length) {
+    const names = t.techs.map(x => x.name);
+    if (!ddFilters.tech.some(n => names.includes(n))) return false;
+  }
+  return true;
+}
+
+function getFiltered() {
+  return TICKETS.filter(t => {
+    const mf = activeFilter === 'Tous' || t.status === activeFilter;
+    return mf && matchesSearch(t) && matchesDD(t);
+  });
+}
+
+/* Options des dropdowns = valeurs des tickets actuellement affichés. */
+function refreshDDOptions() {
+  const visible = getFiltered();
+  const unique = arr => [...new Set(arr)].filter(Boolean);
+  setupDD('ref',  unique(visible.map(t => t.reference)));
+  setupDD('tech', unique(visible.flatMap(t => t.techs.map(x => x.name))));
+  renderDDTags();
+}
+
+function setupDD(type, options) {
+  const inp = document.getElementById('inp-' + type);
+  const drop = document.getElementById('drop-' + type);
+  const renderList = (filterTxt = '') => {
+    const lf = filterTxt.toLowerCase();
+    drop.innerHTML = '';
+    const filtered = options.filter(o => o.toLowerCase().includes(lf) && !ddFilters[type].includes(o));
+    if (filtered.length === 0) {
+      drop.innerHTML = '<div class="filter-opt empty">Aucun résultat</div>';
+    } else {
+      filtered.forEach(opt => {
+        const div = document.createElement('div');
+        div.className = 'filter-opt'; div.textContent = opt;
+        div.onmousedown = () => selectDD(type, opt);
+        drop.appendChild(div);
+      });
+    }
+  };
+  inp.onfocus = () => { renderList(inp.value); drop.classList.add('open'); };
+  inp.oninput = e => { renderList(e.target.value); drop.classList.add('open'); };
+}
+
+function selectDD(type, val) {
+  if (!ddFilters[type].includes(val)) ddFilters[type].push(val);
+  const inp = document.getElementById('inp-' + type);
+  inp.value = ''; inp.blur();
+  renderAll();
+}
+
+function removeDD(type, val) {
+  ddFilters[type] = ddFilters[type].filter(v => v !== val);
+  renderAll();
+}
+
+function clearDDFilters() {
+  ddFilters = { ref: [], tech: [] };
+  activeFilter = 'Tous';
+  document.getElementById('search-input').value = '';
+  renderAll();
+}
+
+function renderDDTags() {
+  const container = document.getElementById('active-tags');
+  container.innerHTML = '';
+  let count = 0;
+  const labels = { ref: 'Réf', tech: 'Tech' };
+  for (const [type, vals] of Object.entries(ddFilters)) {
+    vals.forEach(val => {
+      count++;
+      const div = document.createElement('div'); div.className = 'filter-tag';
+      div.innerHTML = `<span>${labels[type]}: <strong>${xe(val)}</strong></span><span class="tag-close"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>`;
+      div.querySelector('.tag-close').onclick = () => removeDD(type, val);
+      container.appendChild(div);
+    });
+  }
+  document.getElementById('btn-clear-filters').style.display = count > 0 ? 'inline-block' : 'none';
+}
+
+// Fermeture des dropdowns au clic extérieur
+document.addEventListener('mousedown', e => {
+  document.querySelectorAll('.searchable-filter-wrap').forEach(wrap => {
+    if (!wrap.contains(e.target)) {
+      const drop = wrap.querySelector('.searchable-filter-dropdown');
+      if (drop.classList.contains('open')) { drop.classList.remove('open'); wrap.querySelector('input').value = ''; }
+    }
+  });
+});
+
+/* Tri par colonne — délégué à TicketTable (mêmes règles que le manager). */
+function sortTable(col) {
+  if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  else { sortCol = col; sortDir = 'asc'; }
+  ['id','date','title','machine','tech','status'].forEach(c => {
+    TicketTable.renderSortHeader(document.getElementById('th-' + c), c, sortCol, sortDir);
+  });
+  renderTable(getFiltered());
+}
+
+/* ==========================================================================
+   TABLE RENDER
+   ========================================================================== */
+function renderTable(data) {
+  const tbody = document.querySelector('#tickets-table tbody');
+  tbody.innerHTML = '';
+
+  // Ordre par défaut = cycle de vie (TicketTable), sinon tri de colonne choisi.
+  data = sortCol === 'default'
+    ? TicketTable.defaultSort(data)
+    : TicketTable.sortBy(data, sortCol, sortDir);
+
+  if (data.length === 0) {
+    tbody.innerHTML = `<tr class="empty-state-row"><td colspan="7">
+      <svg class="empty-state-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Aucun ticket trouvé</td></tr>`;
+    return;
+  }
+  data.forEach(t => {
+    const tr = document.createElement('tr');
+
+    // Status Badge Logic (including "Noter le service")
+    let badgeHtml = '';
+    if (t.status === 'Terminé' && !t.evaluation) {
+      badgeHtml = `<span class="status-badge status-noter" onclick="event.stopPropagation(); openRatingPopup('${t.id}')">Noter le service</span>`;
+    } else {
+      const st = getStatusStyle(t.status);
+      // Les deux Terminé sont différenciés à l'affichage (Terrain / à Distance).
+      badgeHtml = `<span class="status-badge" style="background:${st.bg};color:${st.color};">${xe(TicketTable.displayStatus(t))}</span>`;
+    }
+
+    tr.innerHTML = `
+      <td data-label="ID" class="col-id">${t.id}</td>
+      <td data-label="Date" class="col-date">${t.date}<span>${t.time}</span></td>
+      <td data-label="Opération" class="col-titre" title="${xe(t.title)}">${xe(t.title)}</td>
+      <td data-label="Machine"><span class="col-machine">${xe(t.reference)}</span>${usageSubHtml(t.usageReadings)}</td>
+      <td data-label="Technicien" class="col-tech">${renderClientTechCell(t.techs)}</td>
+      <td data-label="État">${badgeHtml}</td>
+      <td style="text-align:right;">
+        <div style="display:flex; gap:6px; justify-content:flex-end;">
+          <button class="btn-icon" onclick="event.stopPropagation();openModal('${t.id}')" title="Voir le détail">
+            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          ${(t.status !== 'Terminé' && t.status !== 'Annulé') ? `
+          <button class="btn-icon danger" onclick="event.stopPropagation(); openCancelConfirmFromRow('${t.id}')" title="Annuler le ticket">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          ` : ''}
+        </div>
+      </td>`;
+    tr.addEventListener('click', () => openModal(t.id));
+    tbody.appendChild(tr);
+  });
+}
+
+document.getElementById('search-input').addEventListener('input', () => renderAll());
+
+/* ==========================================================================
+   CANCEL & RATING LOGIC — annulation via le composant partagé (raison radio +
+   commentaire) ; by_role/by_name/by_id = identité client de la session.
+   ========================================================================== */
+function openCancelConfirmFromRow(id) {
+  const t = TICKETS.find(x => x.id === id);
+  TicketTable.openCancelModal(id, t ? {
+    titre: t.title, client_name: t.client_name, reference: t.reference
+  } : null, reload, {
+    byRole: 'client',
+    byName: Session.userName() || 'Client',
+    byId: MY_CLIENT_ID
+  });
+}
+// Stub conservé : l'ancien modal local du popup (code legacy) y faisait référence.
+function openCancelConfirm() { if (currentTicketId) openCancelConfirmFromRow(currentTicketId); }
+
+let pendingRating = 0;
+function openRatingPopup(id) {
+  // Ouvre le popup partagé : le formulaire d'évaluation y est disponible (ticket Terminé)
+  openModal(id);
+}
+
+function renderRatingForm() {
+  let html = '';
+  for(let i=1; i<=5; i++) {
+    html += `<div class="rating-num ${i === pendingRating ? 'selected' : ''}" onclick="setRating(${i})">${i}</div>`;
+  }
+  document.getElementById('m-rating-stars').innerHTML = html;
+}
+
+function setRating(val) {
+  pendingRating = val;
+  renderRatingForm();
+  document.getElementById('btn-submit-eval').disabled = false;
+}
+
+function editEvaluation() {
+  const t = TICKETS.find(x => x.id === currentTicketId);
+  if (!t || !t.evaluation) return;
+  document.getElementById('m-eval-readonly').style.display = 'none';
+  document.getElementById('m-eval-form').style.display = 'block';
+  pendingRating = t.evaluation.rating;
+  document.getElementById('m-eval-comment').value = t.evaluation.comment || '';
+  renderRatingForm();
+  document.getElementById('btn-submit-eval').disabled = false;
+  document.getElementById('btn-submit-eval').textContent = "Mettre à jour l'évaluation";
+}
+
+function submitEvaluation() {
+  if (!currentTicketId || pendingRating === 0) return;
+  const t = TICKETS.find(x => x.id === currentTicketId);
+  const comment = document.getElementById('m-eval-comment').value.trim();
+  if (t) {
+    t.evaluation = { rating: pendingRating, comment: comment };
+    showToast("Évaluation enregistrée avec succès !");
+    populateModal(t); // refresh view
+    renderTable(getFiltered(document.getElementById('search-input').value.toLowerCase()));
+  }
+}
+
+/* ==========================================================================
+   LIGHTBOX
+   ========================================================================== */
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('vis');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('vis');
+  document.getElementById('lightbox-img').src = '';
+}
+
+/* ==========================================================================
+   MODAL
+   ========================================================================== */
+const modalOverlay = document.getElementById('ticket-modal');
+
+function openModal(id) {
+  // Popup partagé en mode client (lecture seule + évaluation + discussion)
+  currentTicketId = id;
+  TicketDetail.open(id, { role: 'client', onChange: reload });
+}
+
+function populateModal(t) {
+  // Header badge
+  const st = getStatusStyle(t.status);
+  document.getElementById('popup-status-badge').innerHTML =
+    `<span class="status-badge" style="background:${st.bg};color:${st.color};">${t.status}</span>`;
+
+  // Cancel Button visibility
+  const cancelBtn = document.getElementById('btn-cancel-ticket');
+  if (t.status !== 'Terminé' && t.status !== 'Annulé') {
+    cancelBtn.style.display = 'inline-flex';
+  } else {
+    cancelBtn.style.display = 'none';
+  }
+
+  // Basic fields
+  document.getElementById('m-title').textContent  = t.title;
+  document.getElementById('m-res').textContent    = getResolutionTime(t);
+  document.getElementById('m-client').textContent = `${t.entreprise} — ${t.contact}`;
+  document.getElementById('m-tech').textContent   = t.tech_name !== '—' ? `${t.tech_name} — ${t.tech_phone}` : '—';
+  document.getElementById('m-pole').textContent   = t.pole;
+  document.getElementById('m-marque').textContent = t.marque;
+  document.getElementById('m-cat').textContent    = t.categorie;
+  document.getElementById('m-ref').textContent    = t.reference;
+  document.getElementById('m-serial').textContent = t.serial;
+
+  // Localisation
+  const locWrap = document.getElementById('m-loc-wrap');
+  if (t.loc) {
+    locWrap.style.display = 'flex';
+    document.getElementById('m-loc').innerHTML =
+      `<a href="${t.loc}" target="_blank" class="link-map">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Ouvrir sur Google Maps
+      </a>`;
+  } else { locWrap.style.display = 'none'; }
+
+  // Checklist
+  const chkWrap  = document.getElementById('m-checklist-wrap');
+  const descWrap = document.getElementById('m-desc-wrap');
+  const imgWrap  = document.getElementById('m-img-wrap');
+  const diagWrap = document.getElementById('m-diag-wrap');
+  let hasDiag = false;
+
+  const checklist = (t.checklist && t.checklist.length > 0) ? t.checklist : [{type: 'panne', label: 'Autre problème'}];
+  hasDiag = true;
+  chkWrap.style.display = 'flex';
+  document.getElementById('m-checklist').innerHTML = checklist.map(c => {
+    if (c.type === 'panne') {
+      return `<div class="chk-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>${xe(c.label)}</span></div>`;
+    } else {
+      return `<div class="chk-item chk-item-field"><strong>${xe(c.label)} :</strong>&nbsp;${xe(c.val)}</div>`;
+    }
+  }).join('');
+
+  if (t.desc) {
+    descWrap.style.display = 'flex';
+    document.getElementById('m-desc').textContent = t.desc;
+  } else { descWrap.style.display = 'none'; }
+
+  if (t.client_images && t.client_images.length > 0) {
+    imgWrap.style.display = 'flex';
+    document.getElementById('m-images').innerHTML = t.client_images
+      .map(img => `<img src="${img}" class="gal-thumb" onclick="openLightbox('${img}')" alt="Image Client">`).join('');
+  } else { imgWrap.style.display = 'none'; }
+
+  diagWrap.style.display = hasDiag ? 'block' : 'none';
+
+  // Timeline
+  document.getElementById('m-timeline').innerHTML = t.history.map((h, i) => {
+    const isLast = i === t.history.length - 1;
+    const sc = getStatusStyle(h.status);
+    return `<div class="timeline-item ${isLast ? 'timeline-last' : ''}" ${isLast ? `style="color:${sc.color};"` : ''}>
+      <div class="timeline-status">${h.status}</div>
+      <div class="timeline-time">${h.date}</div>
+    </div>`;
+  }).join('');
+
+  // Rapport
+  const repContent  = document.getElementById('m-report-content');
+  const repEmpty    = document.getElementById('m-report-empty');
+  const techImgWrap = document.getElementById('m-tech-img-wrap');
+  if (t.report) {
+    repEmpty.style.display   = 'none';
+    repContent.style.display = 'grid';
+    document.getElementById('m-rep-title').textContent = t.report.title;
+    document.getElementById('m-rep-sit').textContent   = t.report.sit;
+    document.getElementById('m-rep-act').textContent   = t.report.act || "En attente de résolution.";
+    if (t.tech_images && t.tech_images.length > 0) {
+      techImgWrap.style.display = 'flex';
+      document.getElementById('m-tech-images').innerHTML = t.tech_images
+        .map(img => `<img src="${img}" class="gal-thumb" onclick="openLightbox('${img}')" alt="Image Technicien">`).join('');
+    } else { techImgWrap.style.display = 'none'; }
+  } else {
+    repContent.style.display = 'none';
+    repEmpty.style.display   = 'block';
+  }
+
+  // Evaluation
+  const evalWrap = document.getElementById('m-eval-wrap');
+  const evalForm = document.getElementById('m-eval-form');
+  const evalReadonly = document.getElementById('m-eval-readonly');
+  
+  if (t.status === 'Terminé') {
+    evalWrap.style.display = 'block';
+    if (t.evaluation) {
+      // Show Readonly
+      evalForm.style.display = 'none';
+      evalReadonly.style.display = 'grid';
+      document.getElementById('m-rating-readonly').innerHTML = `${t.evaluation.rating} / 5`;
+      if(t.evaluation.comment) {
+        document.getElementById('m-eval-comment-readonly-wrap').style.display = 'flex';
+        document.getElementById('m-eval-comment-readonly').textContent = t.evaluation.comment;
+      } else {
+        document.getElementById('m-eval-comment-readonly-wrap').style.display = 'none';
+      }
+    } else {
+      // Show Form
+      evalForm.style.display = 'block';
+      evalReadonly.style.display = 'none';
+      document.getElementById('btn-submit-eval').disabled = true;
+      document.getElementById('btn-submit-eval').textContent = "Soumettre l'évaluation";
+      document.getElementById('m-eval-comment').value = '';
+      
+      renderRatingForm();
+    }
+  } else {
+    evalWrap.style.display = 'none';
+  }
+}
+
+function closeModal() { modalOverlay.classList.remove('vis'); currentTicketId = null; }
+modalOverlay.addEventListener('mousedown', e => { if (e.target === modalOverlay) closeModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (modalOverlay.classList.contains('vis')) closeModal();
+  }
+});
+
+/* ==========================================================================
+   PDF GENERATION
+   ========================================================================== */
+function generatePDF(btnElement) {
+  if (!currentTicketId) return;
+  const t = TICKETS.find(x => x.id === currentTicketId);
+  if (!t) return;
+
+  const origHtml = btnElement.innerHTML;
+  btnElement.innerHTML = `<svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;animation:spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke-dasharray="30 30"/></svg> Génération…`;
+  btnElement.disabled = true;
+
+  const resTime   = getResolutionTime(t);
+  const tech      = t.tech_name !== '—' ? t.tech_name : 'Non assigné';
+  const techTel   = t.tech_phone || '—';
+  const repTitle  = t.report ? t.report.title : t.title;
+  const repSit    = t.report ? t.report.sit : '—';
+  const repAct    = t.report ? t.report.act : 'En attente de résolution.';
+
+  const esc = s => xe(s);
+
+  const label = txt =>
+    `<div style="font-size:8px;font-weight:700;color:#4A7FB5;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">${txt}</div>`;
+
+  const hr = () =>
+    `<div style="border-top:1px solid #D1D9E6;margin:16px 0;"></div>`;
+
+  const cell = (lbl, val, sub) => `
+    <td style="width:25%;padding:10px 14px;border:1px solid #D1D9E6;border-right:none;vertical-align:top;background:#F8FAFC;">
+      <div style="font-size:8px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px;">${lbl}</div>
+      <div style="font-size:11px;font-weight:700;color:#1E293B;">${val}</div>
+      ${sub ? `<div style="font-size:9px;color:#64748B;margin-top:2px;">${sub}</div>` : ''}
+    </td>`;
+
+  const resCell = `
+    <td style="width:25%;padding:10px 14px;border:1px solid #D1D9E6;vertical-align:top;background:#F8FAFC;">
+      <div style="font-size:8px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px;">TEMPS DE RÉSOLUTION</div>
+      <div style="font-size:11px;font-weight:700;color:#1E293B;">${esc(resTime)}</div>
+    </td>`;
+
+  const mCell = (lbl, val, border) => `
+    <td style="width:50%;padding:8px 12px;border:1px solid #D1D9E6;${border};vertical-align:top;background:#F8FAFC;">
+      <div style="font-size:8px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:3px;">${lbl}</div>
+      <div style="font-size:11px;font-weight:600;color:#1E293B;">${val}</div>
+    </td>`;
+
+  const imgGrid = (imgs, labelFn) => {
+    if (!imgs || !imgs.length) return '';
+    const cells = imgs.map((src, i) => `
+      <td style="width:33.333%;padding:0 8px 8px 0;vertical-align:top;">
+        <img src="${src}" style="width:100%;height:90px;object-fit:cover;border-radius:4px;border:1px solid #D1D9E6;display:block;">
+        <div style="font-size:8px;color:#94A3B8;text-align:center;margin-top:4px;">${labelFn(i, imgs.length)}</div>
+      </td>`).join('');
+    return `<table style="width:100%;border-collapse:collapse;"><tr>${cells}</tr></table>`;
+  };
+
+  const checklist = (t.checklist && t.checklist.length > 0) ? t.checklist : [{type: 'panne', label: 'Autre problème'}];
+  let diagHtml = '';
+  checklist.forEach(c => {
+    if (c.type === 'panne') {
+      diagHtml += `<div style="font-size:10px;color:#1E293B;margin-bottom:4px;display:flex;gap:6px;align-items:baseline;">
+        <span style="color:#4A7FB5;font-size:11px;flex-shrink:0;">•</span>${esc(c.label)}
+      </div>`;
+    } else {
+      diagHtml += `<div style="font-size:10px;color:#1E293B;margin-bottom:4px;">
+        <span style="color:#64748B;">${esc(c.label)} :</span> <strong>${esc(c.val)}</strong>
+      </div>`;
+    }
+  });
+  if (t.desc) {
+    diagHtml += `<div style="margin-top:8px;padding-top:8px;border-top:1px solid #E2E8F0;">
+      <div style="font-size:8px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px;">Description complémentaire</div>
+      <div style="font-size:10px;color:#1E293B;line-height:1.5;">${esc(t.desc)}</div>
+    </div>`;
+  }
+
+  const timelineHtml = t.history.map((h, i) => {
+    const isLast = i === t.history.length - 1;
+    const sc = getStatusStyle(h.status);
+    return `<div style="display:flex;gap:12px;margin-bottom:${isLast ? 0 : 10}px;align-items:flex-start;">
+      <div style="flex-shrink:0;width:10px;height:10px;border-radius:50%;background:${isLast ? sc.pdfColor : '#94A3B8'};margin-top:2px;"></div>
+      <div>
+        <div style="font-size:10px;font-weight:${isLast ? 700 : 500};color:${isLast ? sc.pdfColor : '#1E293B'};">${esc(h.status)}</div>
+        <div style="font-size:8.5px;color:#94A3B8;margin-top:1px;">${esc(h.date)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const clientImgs = (t.client_images && t.client_images.length > 0)
+    ? label('IMAGES JOINTES PAR LE CLIENT') + imgGrid(t.client_images, (i,n) => `Image ${i+1} / ${n}`) + '<div style="margin-bottom:14px;"></div>'
+    : '';
+
+  const techImgs = (t.tech_images && t.tech_images.length > 0)
+    ? label('IMAGES APRÈS RÉSOLUTION') + imgGrid(t.tech_images, (i,n) => `Image ${i+1} / ${n}`) + '<div style="margin-bottom:14px;"></div>'
+    : '';
+
+  let evalHtml = '';
+  if (t.evaluation) {
+    evalHtml = `
+      ${label('ÉVALUATION CLIENT')}
+      <div style="font-size:10px;color:#334155;line-height:1.6;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:4px;padding:10px;margin-bottom:14px;">
+        <div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:4px;">Note : ${t.evaluation.rating} / 5</div>
+        ${t.evaluation.comment ? `<div>${esc(t.evaluation.comment)}</div>` : ''}
+      </div>
+    `;
+  }
+
+  const html = `
+<div style="font-family:Helvetica,Arial,sans-serif;font-size:11px;color:#334155;line-height:1.5;padding:0;">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:#1B3A6B;margin-bottom:0;">
+    <div style="font-size:17px;font-weight:800;color:#fff;letter-spacing:-0.3px;">STOKVIS <span style="font-weight:300;color:rgba(255,255,255,0.5);">360</span></div>
+    <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:2px;text-transform:uppercase;">RAPPORT D'INTERVENTION</div>
+  </div>
+
+  <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
+    <tr>
+      ${cell('RÉFÉRENCE', `<span style="font-size:15px;color:#1B3A6B;">${esc(t.id)}</span>`, '')}
+      ${cell('DATE DE CRÉATION', esc(t.date), esc(t.time))}
+      ${cell('MACHINE', `<span style="font-family:monospace;">${esc(t.reference)}</span>`, esc(t.categorie)+' — '+esc(t.marque))}
+      ${resCell}
+    </tr>
+  </table>
+
+  ${label('MACHINE')}
+  <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
+    <tr>
+      ${mCell('PÔLE', esc(t.pole), '')}
+      ${mCell('RÉFÉRENCE', `<span style="font-family:monospace;">${esc(t.reference)}</span>`, 'border-left:none;')}
+    </tr>
+    <tr>
+      ${mCell('MARQUE', esc(t.marque), 'border-top:none;')}
+      ${mCell('IDENTIFIANT MACHINE', `<span style="font-family:monospace;">${esc(t.serial)}</span>`, 'border-left:none;border-top:none;')}
+    </tr>
+    <tr>
+      ${mCell('CATÉGORIE', esc(t.categorie), 'border-top:none;')}
+      <td style="width:50%;border:1px solid #D1D9E6;border-left:none;border-top:none;background:#F8FAFC;"></td>
+    </tr>
+  </table>
+
+  <table style="width:100%;border-collapse:collapse;margin-bottom:0;">
+    <tr>
+      <td style="width:50%;padding:12px 16px;vertical-align:top;border-right:1px solid #D1D9E6;">
+        <div style="font-size:9px;font-weight:700;color:#1B3A6B;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Client</div>
+        <div style="font-size:10px;color:#1E293B;margin-bottom:3px;"><strong>${esc(t.entreprise)}</strong></div>
+        <div style="font-size:10px;color:#475569;">Tél : ${esc(t.contact)}</div>
+      </td>
+      <td style="width:50%;padding:12px 16px;vertical-align:top;">
+        <div style="font-size:9px;font-weight:700;color:#1B3A6B;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Technicien en charge</div>
+        <div style="font-size:10px;color:#1E293B;margin-bottom:3px;"><strong>${esc(tech)}</strong></div>
+        <div style="font-size:10px;color:#475569;">Tél : ${esc(techTel)}</div>
+      </td>
+    </tr>
+  </table>
+  ${hr()}
+
+  ${label('TITRE DE L\'INTERVENTION')}
+  <div style="font-size:13px;font-weight:700;color:#1E293B;margin-bottom:14px;">${esc(repTitle)}</div>
+
+  ${label('PRÉ-DIAGNOSTIC CLIENT')}
+  <div style="margin-bottom:14px;">${diagHtml}</div>
+
+  ${clientImgs}
+
+  ${label('SITUATION CONSTATÉE')}
+  <div style="font-size:10px;color:#334155;line-height:1.6;margin-bottom:14px;">${esc(repSit)}</div>
+
+  ${label('TRAVAUX EFFECTUÉS ET RÉSOLUTION')}
+  <div style="font-size:10px;color:#334155;line-height:1.6;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:4px;padding:10px;margin-bottom:14px;">${esc(repAct)}</div>
+
+  ${techImgs}
+
+  ${label('HISTORIQUE DES ÉTATS')}
+  <div style="margin-bottom:14px;">${timelineHtml}</div>
+  
+  ${evalHtml}
+
+  <div style="border-top:1px solid #D1D9E6;padding-top:10px;margin-top:10px;display:flex;justify-content:space-between;font-size:8.5px;color:#94A3B8;">
+    <div>Stokvis Nord Afrique — Distributeur officiel Komatsu au Maroc</div>
+    <div>Page 1</div>
+  </div>
+
+</div>`;
+
+  const opt = {
+    margin:      [12, 14, 12, 14],
+    filename:    `Rapport_Intervention_${t.id}.pdf`,
+    image:       { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, logging: false },
+    jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(html).save().then(() => {
+    btnElement.innerHTML = origHtml;
+    btnElement.disabled  = false;
+  });
+}
+
+if (!document.querySelector('style#spin-anim')) {
+  const style = document.createElement('style');
+  style.id = 'spin-anim';
+  style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
+  document.head.appendChild(style);
+}
+
+/* ==========================================================================
+   INIT
+   ========================================================================== */
+(function init(){
+  const s = Session.require('client');   // renvoie vers /login si pas client
+  if(!s) return;
+  MY_CLIENT_ID = s.user_id;
+  document.getElementById('sb-user-name').textContent = s.user_name || 'Client';
+  document.getElementById('sb-logout').textContent = (s.user_name || 'Client') + ' · Déconnexion';
+  document.getElementById('sb-logout').addEventListener('click', e => { e.preventDefault(); Session.clear(); window.location.href='/'; });
+
+  reload().catch(err => showToast('Erreur de chargement : ' + err.message, 'error'));
+
+  // Temps réel : pause si une modale ou le popup partagé est ouvert
+  API.poll(function(tickets){
+    const busy = document.querySelector('.modal-overlay.vis, .tt-cancel-overlay.vis')
+              || (window.TicketDetail && TicketDetail.isOpen && TicketDetail.isOpen());
+    if(busy) return;
+    TICKETS = tickets.map(mapTicket);
+    renderAll();
+  }, 4000);
+})();
+</script>
+<script src="/static/js/responsive.js"></script>
+</body>
+</html>

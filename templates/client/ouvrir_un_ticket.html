@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ouvrir un ticket — Stokvis SAV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/variables.css">
+<link rel="stylesheet" href="/static/css/sidebar.css">
+<link rel="stylesheet" href="/static/css/base.css">
+<style>
+/* ==========================================================================
+   VARIABLES & BASE
+   ========================================================================== */
+:root {
+  /* Overrides locaux — le canon vit dans /static/css/variables.css */
+  --primary-light: rgba(27, 58, 107, 0.06);
+  --primary-ring: rgba(74, 127, 181, 0.15);
+  --off-white: #F8FAFC;
+  --light-grey: #E2E8F0;
+  --border-color: #CBD5E1;
+  --dark-charcoal: #1E293B;
+  --status-success: #10B981;
+  --status-danger: #EF4444;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--grey);background:var(--off-white);overflow-x:hidden;}
+ul{list-style:none;}
+button{font-family:inherit;cursor:pointer;outline:none;}
+input, select, textarea { font-family:inherit; outline:none; }
+
+/* ==========================================================================
+   LAYOUT: SIDEBAR & TOPBAR
+   ========================================================================== */
+
+.topbar{position:fixed;top:0;left:var(--sidebar-width);right:0;height:var(--topbar-height);background:var(--white);border-bottom:1px solid var(--light-grey);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:90;}
+.topbar-title{font-size:18px;font-weight:600;color:var(--dark-charcoal);}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:var(--steel-blue);color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(74,127,181,0.3);}
+
+/* ==========================================================================
+   CONTENT & FORM CONTAINER
+   ========================================================================== */
+.content{margin-top:var(--topbar-height);margin-left:var(--sidebar-width);padding:40px 32px 80px;display:flex;flex-direction:column;align-items:center;min-height:calc(100vh - var(--topbar-height));}
+.page-header { width: 100%; max-width: 840px; margin-bottom: 32px; }
+.page-header h1 { font-size: 24px; font-weight: 700; color: var(--dark-charcoal); margin-bottom: 8px; }
+.page-header p { font-size: 14px; color: var(--light-slate); max-width: 600px; line-height: 1.5; }
+
+.form-container { width: 100%; max-width: 840px; display: flex; flex-direction: column; gap: 24px; }
+
+/* ==========================================================================
+   MODERN CARDS
+   ========================================================================== */
+.form-card { background: var(--white); border: 1px solid var(--light-grey); border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.02); transition: opacity 0.3s ease, filter 0.3s ease; position: relative; overflow: hidden; }
+.form-card.disabled { opacity: 0.5; filter: grayscale(40%); pointer-events: none; }
+.form-card.disabled::after { content: ''; position: absolute; inset: 0; z-index: 10; cursor: not-allowed; }
+
+.card-hdr { padding: 24px 32px 16px; display: flex; align-items: flex-start; gap: 16px; }
+.card-hdr-num { width: 32px; height: 32px; border-radius: 8px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+.card-hdr-text { display: flex; flex-direction: column; gap: 4px; flex: 1; margin-top: 5px; }
+.card-hdr-title { font-size: 16px; font-weight: 600; color: var(--dark-charcoal); display: flex; align-items: center; justify-content: space-between; }
+.card-hdr-title .opt-badge { font-size: 11px; font-weight: 500; color: var(--light-slate); background: var(--off-white); padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.card-hdr-subtitle { font-size: 13px; color: var(--light-slate); line-height: 1.5; }
+
+.card-body { padding: 0 32px 32px 80px; display: flex; flex-direction: column; gap: 20px; }
+@media (max-width: 768px) {
+  .card-body { padding: 0 24px 24px 24px; }
+  .card-hdr { padding: 20px 24px 16px; }
+}
+
+/* ==========================================================================
+   FORM ELEMENTS & GRID
+   ========================================================================== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-label { font-size: 13px; font-weight: 600; color: var(--dark-charcoal); display: flex; align-items: center; justify-content: space-between; }
+.form-label .req { color: var(--status-danger); margin-left: 4px; font-weight: 700; }
+
+.form-control { width: 100%; height: 44px; border: 1px solid var(--border-color); border-radius: 8px; padding: 0 16px; font-size: 14px; color: var(--dark-charcoal); background: var(--white); box-shadow: 0 1px 2px rgba(0,0,0,0.04); transition: border-color var(--transition), box-shadow var(--transition); }
+.form-control:focus { border-color: var(--steel-blue); box-shadow: 0 0 0 3px var(--primary-ring); }
+.form-control:disabled { background: var(--off-white); color: var(--light-slate); cursor: not-allowed; box-shadow: none; border-color: var(--light-grey); }
+select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2358595B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px; cursor: pointer; }
+select.form-control:disabled { cursor: not-allowed; opacity: 0.8; }
+
+textarea.form-control { height: auto; min-height: 120px; padding: 12px 16px; resize: vertical; line-height: 1.5; }
+
+.inline-error { display: none; color: var(--status-danger); font-size: 13px; font-weight: 500; margin-top: 6px; align-items: center; gap: 6px; background: rgba(239, 68, 68, 0.05); padding: 8px 12px; border-radius: 6px; }
+.inline-error.vis { display: flex; }
+.inline-error svg { width: 16px; height: 16px; stroke: currentColor; flex-shrink: 0; }
+
+/* ==========================================================================
+   CHECKLIST (PANNES) - CSS GRID DYNAMIQUE
+   ========================================================================== */
+.checklist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.chk-item-full { grid-column: 1 / -1; }
+
+.checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--white); transition: all var(--transition); cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+.checklist-item:hover { border-color: var(--steel-blue); background: var(--off-white); }
+.checklist-item.selected { border-color: var(--steel-blue); background: var(--primary-light); box-shadow: 0 0 0 1px var(--steel-blue); }
+
+.chk-box-wrap { position: relative; display: flex; align-items: center; padding-top: 2px; }
+.chk-box-wrap input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); }
+.chk-content { flex: 1; display: flex; flex-direction: column; gap: 4px; pointer-events: none; }
+.chk-lbl { font-size: 14px; font-weight: 500; color: var(--dark-charcoal); line-height: 1.4; }
+
+/* Styles spécifiques pour les items de type "champ" dans la checklist */
+.checklist-field { display: flex; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--off-white); }
+
+/* ==========================================================================
+   UPLOAD DROPZONE
+   ========================================================================== */
+.upload-dropzone { border: 2px dashed var(--border-color); border-radius: 12px; padding: 32px 24px; text-align: center; cursor: pointer; background: var(--white); transition: all var(--transition); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.upload-dropzone:hover { border-color: var(--steel-blue); background: var(--primary-light); }
+.uz-icon { width: 48px; height: 48px; border-radius: 50%; background: var(--off-white); display: flex; align-items: center; justify-content: center; color: var(--steel-blue); margin-bottom: 4px; transition: transform var(--transition); }
+.upload-dropzone:hover .uz-icon { transform: translateY(-2px); background: #fff; box-shadow: 0 4px 12px rgba(74,127,181,0.1); }
+.uz-icon svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.uz-text { font-size: 15px; font-weight: 600; color: var(--dark-charcoal); }
+.uz-sub { font-size: 13px; color: var(--light-slate); }
+
+.attachments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 16px; margin-top: 16px; }
+.thumbnail { position: relative; width: 100%; aspect-ratio: 1; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; background: var(--off-white); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+.thumb-del { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; background: rgba(0,0,0,0.65); color: #fff; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background var(--transition), transform var(--transition); backdrop-filter: blur(4px); }
+.thumb-del:hover { background: var(--status-danger); transform: scale(1.1); }
+.thumb-del svg { width: 14px; height: 14px; stroke-width: 2.5; }
+
+/* ==========================================================================
+   BUTTONS & LOCATION LAYOUT
+   ========================================================================== */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 20px; font-size: 14px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: all var(--transition); }
+.btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(27, 58, 107, 0.2); }
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(27, 58, 107, 0.25); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-secondary { background: var(--white); border: 1px solid var(--border-color); color: var(--dark-charcoal); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+.btn-secondary:hover { border-color: var(--steel-blue); color: var(--steel-blue); background: var(--off-white); }
+
+.loc-layout { display: flex; flex-direction: column; gap: 16px; }
+.loc-divider { display: flex; align-items: center; text-align: center; color: var(--light-slate); font-size: 12px; font-weight: 600; margin: 4px 0; }
+.loc-divider::before, .loc-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
+.loc-divider::before { margin-right: 12px; }
+.loc-divider::after { margin-left: 12px; }
+
+/* ==========================================================================
+   TOASTS & ANIMATIONS
+   ========================================================================== */
+@keyframes fadeUp{from{opacity:0;transform:translate(-50%, 15px);}to{opacity:1;transform:translate(-50%, 0);}}
+.toast-container{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:2000;display:flex;flex-direction:column;gap:12px;align-items:center;pointer-events:none;}
+.toast{background:var(--white);border:1px solid var(--border-color);border-radius:10px;padding:14px 24px;font-size:14px;font-weight:500;color:var(--dark-charcoal);box-shadow:0 10px 25px rgba(0,0,0,0.1);display:flex;align-items:center;gap:12px;min-width:320px;animation:fadeUp 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;pointer-events:auto;}
+.toast svg{width:20px;height:20px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.toast.success{border-left:4px solid var(--status-success);color:var(--status-success);}
+.toast.error{border-left:4px solid var(--status-danger);color:var(--status-danger);}
+
+.ui-blocker { position: fixed; inset: 0; background: rgba(248, 250, 252, 0.8); z-index: 1000; display: none; backdrop-filter: blur(3px); }
+.ui-blocker.vis { display: block; }
+
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+</style>
+<link rel="stylesheet" href="/static/css/responsive.css">
+</head>
+<body>
+
+{% set active_nav = 'ouvrir-un-ticket' %}{% include 'partials/_sidebar_client.html' %}
+
+<header class="topbar">
+  <div class="topbar-title"></div> <!-- Laissé vide volontairement pour alléger la topbar, le titre est dans la page -->
+  <div class="topbar-avatar">S</div>
+</header>
+
+<main class="content">
+  
+  <div class="page-header">
+    <h1>Nouveau ticket d'intervention</h1>
+    <p>Signalez un incident sur l'une de vos machines. Le formulaire dynamique s'adaptera automatiquement à votre modèle pour un diagnostic plus rapide.</p>
+  </div>
+
+  <form class="form-container" id="ticketForm">
+    
+    <!-- CHAMP 1 : SÉLECTION MACHINE -->
+    <div class="form-card" id="card-machine">
+      <div class="card-hdr">
+        <div class="card-hdr-num">1</div>
+        <div class="card-hdr-text">
+          <div class="card-hdr-title">Identification de la machine</div>
+          <div class="card-hdr-subtitle">Sélectionnez l'équipement concerné par l'incident.</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Référence machine (Modèle)<span class="req">*</span></label>
+            <select class="form-control" id="sel-ref">
+              <option value="">Sélectionner une référence...</option>
+              <!-- Peuplé dynamiquement -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Identifiant (Numéro de série)<span class="req">*</span></label>
+            <select class="form-control" id="sel-id" disabled>
+              <option value="">Sélectionnez d'abord un modèle...</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WRAPPER POUR LA SUITE (Désactivé jusqu'au choix de la machine) -->
+    <div id="rest-of-form" class="disabled" style="display:flex; flex-direction:column; gap:24px;">
+
+      <!-- CHAMP 2 : PANNES -->
+      <div class="form-card" id="card-pannes">
+        <div class="card-hdr">
+          <div class="card-hdr-num">2</div>
+          <div class="card-hdr-text">
+            <div class="card-hdr-title">Pré-diagnostic</div>
+            <div class="card-hdr-subtitle">Cochez les symptômes correspondants ou complétez les informations requises.</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="checklist-grid" id="checklist-container">
+            <!-- Peuplé dynamiquement depuis le catalogue -->
+          </div>
+          <div class="inline-error" id="err-pannes">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Veuillez sélectionner au moins une panne ou cocher "Autre problème non listé".</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAMP 3 : DESCRIPTION -->
+      <div class="form-card">
+        <div class="card-hdr">
+          <div class="card-hdr-num">3</div>
+          <div class="card-hdr-text">
+            <div class="card-hdr-title">
+              Description détaillée
+              <span class="opt-badge">Optionnel</span>
+            </div>
+            <div class="card-hdr-subtitle">Précisez le contexte de l'incident ou toute information non couverte par le pré-diagnostic.</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <textarea class="form-control" id="f-desc" placeholder="Ex: La machine s'est arrêtée brusquement pendant le terrassement..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAMP 4 : PIÈCES JOINTES -->
+      <div class="form-card">
+        <div class="card-hdr">
+          <div class="card-hdr-num">4</div>
+          <div class="card-hdr-text">
+            <div class="card-hdr-title">
+              Photos de la panne
+              <span class="opt-badge">Optionnel</span>
+            </div>
+            <div class="card-hdr-subtitle"><i>Merci de fournir une ou plusieurs photos illustrant le problème (ex: code d'erreur sur le tableau de bord, pièce endommagée, fuite visible).</i></div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="upload-dropzone" onclick="document.getElementById('file-upload').click()">
+            <div class="uz-icon">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/><path d="M12 2v6m-3-3h6"/></svg>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span class="uz-text">Ajouter une ou plusieurs photos</span>
+              <span class="uz-sub">Touchez ici pour ouvrir la galerie ou l'appareil photo.</span>
+            </div>
+          </div>
+          <!-- L'attribut accept="image/*" ouvre naturellement la galerie ou l'appareil photo sur mobile -->
+          <input type="file" id="file-upload" accept="image/*" multiple style="display:none" onchange="handleFile(this)">
+          
+          <div class="attachments-grid" id="attach-grid"></div>
+        </div>
+      </div>
+
+      <!-- CHAMP 5 : LOCALISATION -->
+      <div class="form-card">
+        <div class="card-hdr">
+          <div class="card-hdr-num">5</div>
+          <div class="card-hdr-text">
+            <div class="card-hdr-title">Localisation de l'équipement</div>
+            <div class="card-hdr-subtitle">Indiquez où se trouve la machine pour faciliter l'intervention de l'équipe technique.</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="loc-layout">
+            <button type="button" class="btn btn-secondary" id="btn-gps" onclick="simulateGPS()" style="height:48px;">
+              <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              Localiser ma position actuelle (GPS)
+            </button>
+            
+            <div class="loc-divider">OU</div>
+            
+            <div class="form-group">
+              <label class="form-label">Saisie manuelle</label>
+              <input type="text" class="form-control" id="f-loc" placeholder="Adresse textuelle ou lien Google Maps...">
+            </div>
+          </div>
+          
+          <div class="inline-error" id="err-loc">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Veuillez fournir une localisation (GPS ou saisie manuelle).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOUMISSION -->
+      <div style="display:flex; justify-content:flex-end; padding-top:16px;">
+        <button type="submit" class="btn btn-primary" style="height:52px; padding:0 40px; font-size:15px; border-radius:10px;" id="btn-submit">
+          Envoyer la demande d'intervention
+          <svg viewBox="0 0 24 24" style="margin-left:4px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </form>
+</main>
+
+<!-- TOASTS & UI BLOCKER -->
+<div class="toast-container" id="toasts"></div>
+<div class="ui-blocker" id="ui-block"></div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/ui.js"></script>
+<script>
+'use strict';
+
+/* ==========================================================================
+   DONNÉES SIMULÉES (Mocks)
+   ========================================================================== */
+// Données chargées depuis l'API à l'init (scopées au client connecté)
+let MY_CLIENT_ID = null;
+let PARC_CLIENT = [];   // [{ machine_id, ref }]
+let CATALOG = {};       // ref -> [{type,label,required}] (sans l'item système, ajouté par le formulaire)
+let CATALOG_INDICES = {}; // ref -> [{name, unit}] (indices d'usage, hors N/A)
+
+let isDirty = false;
+let uploadedFiles = [];
+
+const selRef = document.getElementById('sel-ref');
+const selId = document.getElementById('sel-id');
+const restOfForm = document.getElementById('rest-of-form');
+const chkContainer = document.getElementById('checklist-container');
+const form = document.getElementById('ticketForm');
+const fDesc = document.getElementById('f-desc');
+const fLoc = document.getElementById('f-loc');
+
+/* ==========================================================================
+   INITIALISATION
+   ========================================================================== */
+window.onload = async () => {
+  const s = Session.require('client');   // renvoie vers /login si pas client
+  if(!s) return;
+  MY_CLIENT_ID = s.user_id;
+  const un = document.getElementById('sb-user-name'); if(un) un.textContent = s.user_name || 'Client';
+  const lo = document.getElementById('sb-logout'); if(lo) lo.addEventListener('click', e => { e.preventDefault(); Session.clear(); window.location.href='/'; });
+
+  let data;
+  try { data = await API.bootstrap(); }
+  catch(e){ showToast("Erreur de chargement : " + e.message, "error"); return; }
+
+  // Parc du client = machines assignées à ce client
+  PARC_CLIENT = data.parc
+    .filter(m => m.assignation === MY_CLIENT_ID)
+    .map(m => ({ machine_id: m.instance_id, ref: m.reference }));
+
+  // Catalogue : ref -> pannes (on retire l'item système, le formulaire ajoute "Autre problème")
+  CATALOG = {};
+  CATALOG_INDICES = {};
+  Object.values(data.catalogue.nodes).forEach(n => {
+    if (n.level === 4) {
+      CATALOG[n.name] = (n.pannes || [])
+        .filter(p => !p.system)
+        .map(p => ({ type: p.type, label: p.label, required: !!p.required }));
+      CATALOG_INDICES[n.name] = (n.indices || [])
+        .filter(idx => (idx.unit || '').toUpperCase() !== 'N/A')
+        .map(idx => ({ name: idx.name, unit: idx.unit }));
+    }
+  });
+
+  if (PARC_CLIENT.length === 0) {
+    document.getElementById('ui-block').classList.add('vis');
+    showToast("Votre parc est vide. Veuillez contacter votre manager Stokvis.", "error");
+    return;
+  }
+  const distinctRefs = [...new Set(PARC_CLIENT.map(m => m.ref))];
+  distinctRefs.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r; opt.textContent = r;
+    selRef.appendChild(opt);
+  });
+};
+
+/* ==========================================================================
+   LOGIQUE CHAMP 1 : SÉLECTION DE LA MACHINE
+   ========================================================================== */
+selRef.addEventListener('change', (e) => {
+  const ref = e.target.value;
+  selId.innerHTML = '<option value="">Sélectionnez un identifiant...</option>';
+  restOfForm.classList.add('disabled');
+  isDirty = true;
+  
+  if (!ref) {
+    selId.disabled = true;
+    return;
+  }
+
+  const machines = PARC_CLIENT.filter(m => m.ref === ref);
+  machines.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.machine_id; opt.textContent = m.machine_id;
+    selId.appendChild(opt);
+  });
+  selId.disabled = false;
+
+  if (machines.length === 1) {
+    selId.value = machines[0].machine_id;
+    selId.disabled = true; 
+    onMachineConfirmed(ref);
+  }
+});
+
+selId.addEventListener('change', (e) => {
+  if (e.target.value) onMachineConfirmed(selRef.value);
+  else restOfForm.classList.add('disabled');
+});
+
+function onMachineConfirmed(refId) {
+  restOfForm.classList.remove('disabled');
+  buildChecklist(refId);
+}
+
+/* Échappement HTML des libellés issus du catalogue (saisis côté manager) avant
+   injection dans la checklist — même helper xe() que les autres pages (audit C-5). */
+/* ==========================================================================
+   LOGIQUE CHAMP 2 : CHECKLIST DYNAMIQUE AVEC GRID
+   ========================================================================== */
+function buildChecklist(refId) {
+  chkContainer.innerHTML = '';
+  document.getElementById('err-pannes').classList.remove('vis');
+
+  // --- Indices d'usage (relevé obligatoire saisi par le client) ---
+  const indices = CATALOG_INDICES[refId] || [];
+  indices.forEach((idx, i) => {
+    const div = document.createElement('div');
+    div.className = 'checklist-field chk-item-full';
+    div.innerHTML = `
+      <label class="form-label">${xe(idx.name)} ( ${xe(idx.unit)} ) <span class="req">*</span></label>
+      <input type="text" inputmode="decimal" class="form-control indice-input" name="indice_${i}"
+             data-indice-name="${xe(idx.name)}" data-indice-unit="${xe(idx.unit)}" required
+             oninput="sanitizeUsageInput(this); isDirty=true" placeholder="Ex : 10000,000">
+    `;
+    chkContainer.appendChild(div);
+  });
+
+  const pannes = CATALOG[refId] || [];
+
+  pannes.forEach((item, index) => {
+    if (item.type === 'champ') {
+      const div = document.createElement('div');
+      div.className = 'checklist-field chk-item-full'; // Full width pour les champs
+      const reqHtml = item.required ? '<span class="req">*</span>' : '';
+      div.innerHTML = `
+        <label class="form-label">${xe(item.label)} ${reqHtml}</label>
+        <input type="text" class="form-control" name="champ_${index}" data-label="${xe(item.label)}" ${item.required ? 'required' : ''} oninput="isDirty=true" placeholder="Saisir la valeur...">
+      `;
+      chkContainer.appendChild(div);
+    } else {
+      const div = document.createElement('div');
+      div.className = 'checklist-item';
+      div.onclick = function(e) {
+        if(e.target.tagName !== 'INPUT') {
+          const cb = this.querySelector('input[type="checkbox"]');
+          cb.checked = !cb.checked;
+          cb.dispatchEvent(new Event('change'));
+        }
+      };
+      div.innerHTML = `
+        <div class="chk-box-wrap">
+          <input type="checkbox" name="panne_${index}" value="${xe(item.label)}" class="chk-panne" onchange="toggleCardState(this); isDirty=true">
+        </div>
+        <div class="chk-content">
+          <span class="chk-lbl">${xe(item.label)}</span>
+        </div>
+      `;
+      chkContainer.appendChild(div);
+    }
+  });
+
+  // "Autre problème" en pleine largeur à la fin
+  const autreDiv = document.createElement('div');
+  autreDiv.className = 'checklist-item chk-item-full';
+  autreDiv.onclick = function(e) {
+    if(e.target.tagName !== 'INPUT') {
+      const cb = this.querySelector('input[type="checkbox"]');
+      cb.checked = !cb.checked;
+      cb.dispatchEvent(new Event('change'));
+    }
+  };
+  autreDiv.innerHTML = `
+    <div class="chk-box-wrap">
+      <input type="checkbox" name="panne_autre" value="Autre problème" class="chk-panne" onchange="toggleCardState(this); isDirty=true">
+    </div>
+    <div class="chk-content">
+      <span class="chk-lbl">Autre problème non listé ci-dessus</span>
+    </div>
+  `;
+  chkContainer.appendChild(autreDiv);
+}
+
+// Nettoie la saisie d'un indice d'usage : chiffres + UN séparateur décimal (',' ou '.').
+function sanitizeUsageInput(el) {
+  let out = '';
+  let sep = false;
+  for (const ch of el.value) {
+    if (ch >= '0' && ch <= '9') out += ch;
+    else if ((ch === '.' || ch === ',') && !sep && out.length) { out += ch; sep = true; }
+  }
+  el.value = out;
+}
+
+// Fonction pour styliser la carte checkbox au clic
+function toggleCardState(checkbox) {
+  const card = checkbox.closest('.checklist-item');
+  if(checkbox.checked) card.classList.add('selected');
+  else card.classList.remove('selected');
+}
+
+fDesc.addEventListener('input', () => isDirty = true);
+
+/* ==========================================================================
+   LOGIQUE CHAMP 4 : PIÈCES JOINTES (Images)
+   ========================================================================== */
+/* Chaque image est envoyée immédiatement à /api/upload : l'URL renvoyée
+   (/static/uploads/…) est PERMANENTE et sera persistée sur le ticket.
+   uploadedFiles = [{id, url}] */
+function handleFile(input) {
+  if (!input.files || input.files.length === 0) return;
+  isDirty = true;
+
+  Array.from(input.files).forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const id = Date.now() + Math.random().toString(36).substring(7);
+
+    const thumb = document.createElement('div');
+    thumb.className = 'thumbnail';
+    thumb.id = `thumb-${id}`;
+    thumb.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:11px;color:var(--light-slate);">Envoi…</div>`;
+    document.getElementById('attach-grid').appendChild(thumb);
+
+    API.upload(file).then(result => {
+      uploadedFiles.push({ id: id, url: result.url });
+      thumb.innerHTML = `
+        <img src="${result.url}" alt="Pièce jointe">
+        <button type="button" class="thumb-del" onclick="removeThumb('${id}')" title="Supprimer la photo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      `;
+    }).catch(err => {
+      thumb.remove();
+      showToast("Échec de l'envoi de l'image : " + err.message, 'error');
+    });
+  });
+
+  input.value = ""; // reset pour permettre de ré-uploader le même fichier si besoin
+}
+
+function removeThumb(id) {
+  document.getElementById(`thumb-${id}`).remove();
+  uploadedFiles = uploadedFiles.filter(f => f.id !== id);
+}
+
+/* ==========================================================================
+   LOGIQUE CHAMP 5 : LOCALISATION (Simulation GPS)
+   ========================================================================== */
+function simulateGPS() {
+  const btn = document.getElementById('btn-gps');
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = `<svg viewBox="0 0 24 24" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Recherche en cours...`;
+  
+  setTimeout(() => {
+    fLoc.value = "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)";
+    btn.innerHTML = origHtml;
+    document.getElementById('err-loc').classList.remove('vis');
+    isDirty = true;
+  }, 1200);
+}
+fLoc.addEventListener('input', () => {
+  isDirty = true;
+  document.getElementById('err-loc').classList.remove('vis');
+});
+
+/* ==========================================================================
+   SOUMISSION ET VALIDATION
+   ========================================================================== */
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  let isValid = true;
+
+  const checkedPannes = Array.from(document.querySelectorAll('.chk-panne:checked'));
+  const errPannes = document.getElementById('err-pannes');
+  if (checkedPannes.length === 0) { errPannes.classList.add('vis'); isValid = false; }
+  else errPannes.classList.remove('vis');
+
+  // Indices d'usage : relevé obligatoire
+  const indiceInputs = Array.from(document.querySelectorAll('#checklist-container input.indice-input'));
+  indiceInputs.forEach(inp => {
+    if (!inp.value.trim()) { inp.style.borderColor = 'var(--danger)'; isValid = false; }
+    else inp.style.borderColor = '';
+  });
+
+  // Champs requis cochés non remplis
+  const champInputs = Array.from(document.querySelectorAll('#checklist-container input[data-label]'));
+  champInputs.forEach(inp => {
+    if (inp.hasAttribute('required') && !inp.value.trim()) { inp.style.borderColor = 'var(--danger)'; isValid = false; }
+    else inp.style.borderColor = '';
+  });
+
+  const errLoc = document.getElementById('err-loc');
+  if (fLoc.value.trim() === '') { errLoc.classList.add('vis'); isValid = false; }
+  else errLoc.classList.remove('vis');
+
+  if (!isValid) {
+    if (checkedPannes.length === 0) document.getElementById('card-pannes').scrollIntoView({behavior: 'smooth', block:'center'});
+    return;
+  }
+
+  // Payload items : UNIQUEMENT les pannes cochées et les champs renseignés
+  // (le serveur refait le même filtrage — cf. create_ticket).
+  const items = [];
+  champInputs.forEach(inp => {
+    if (inp.value.trim()) items.push({ type: 'champ', label: inp.dataset.label, value: inp.value.trim() });
+  });
+  checkedPannes.forEach(cb => items.push({ type: 'panne', label: cb.value, checked: true, system: cb.value === 'Autre problème' }));
+
+  // Relevés d'usage (indices d'usage de la référence)
+  const usage_readings = indiceInputs.map(inp => ({
+    name: inp.dataset.indiceName,
+    unit: inp.dataset.indiceUnit,
+    value: inp.value.trim()
+  }));
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+
+  let created;
+  try {
+    created = await API.createTicket({
+      client_id: MY_CLIENT_ID,
+      instance_id: selId.value,
+      items: items,
+      usage_readings: usage_readings,
+      description: fDesc.value.trim(),
+      localisation: fLoc.value.trim(),
+      images: uploadedFiles.map(f => f.url)   // URLs permanentes (/static/uploads/…)
+    });
+  } catch(err) {
+    showToast("Échec : " + err.message, "error");
+    btn.disabled = false;
+    return;
+  }
+
+  isDirty = false;
+  btn.innerHTML = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Ticket ${created.id} envoyé`;
+  btn.style.background = 'var(--status-success)';
+  showToast(`Ticket ${created.id} créé avec succès. Redirection…`, "success");
+  setTimeout(() => { window.location.href = '/client/tickets-en-cours'; }, 1200);
+});
+
+window.addEventListener('beforeunload', (e) => {
+  if (isDirty) {
+    e.preventDefault();
+    e.returnValue = "Voulez-vous quitter ? Votre formulaire sera perdu.";
+    return e.returnValue;
+  }
+});
+
+function showToast(msg, type = 'success') {
+  const c = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icon = type === 'success'
+    ? '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+    : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+  t.innerHTML = `${icon}<span>${xe(msg)}</span>`;
+  c.appendChild(t);
+  setTimeout(() => {
+    t.style.transition = 'opacity 300ms, transform 300ms';
+    t.style.opacity = '0';
+    t.style.transform = 'translate(-50%, 15px)';
+    setTimeout(() => t.remove(), 300);
+  }, 4000);
+}
+</script>
+<script src="/static/js/responsive.js"></script>
+</body>
+</html>

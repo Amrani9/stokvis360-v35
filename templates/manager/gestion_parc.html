@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion du Parc Machines — Stokvis SAV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="/static/css/variables.css">
+<link rel="stylesheet" href="/static/css/sidebar.css">
+<link rel="stylesheet" href="/static/css/base.css">
+<style>
+/* ==========================================================================
+   VARIABLES & BASE
+   ========================================================================== */
+/* Variables : voir /static/css/variables.css (aucun override local) */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--grey);background-color:var(--off-white);overflow-x:hidden;line-height:1.6;}
+ul{list-style:none;}
+button{font-family:inherit;cursor:pointer;outline:none;}
+input, select{font-family:inherit;outline:none;}
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+
+.topbar{position:fixed;top:0;left:var(--sidebar-width);right:0;height:var(--topbar-height);background-color:var(--white);border-bottom:1px solid var(--light-grey);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:90;}
+.topbar-title{font-size:18px;font-weight:600;color:var(--dark-charcoal);}
+.topbar-right{display:flex;align-items:center;gap:16px;}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background-color:var(--primary);color:var(--white);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+
+.content{margin-left:var(--sidebar-width);margin-top:var(--topbar-height);padding:32px;max-width:1400px;min-height:calc(100vh - var(--topbar-height));}
+.page-header{margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.page-title{font-size:24px;font-weight:700;color:var(--dark-charcoal); display:flex; align-items:center; gap:12px;}
+.page-title-counts{font-size:15px;font-weight:500;color:var(--light-slate);display:inline-block;margin-top:4px;}
+
+/* ==========================================================================
+   TOOLBAR & FILTERS
+   ========================================================================== */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap;}
+.search-bar{position:relative;width:100%;max-width:340px;}
+.search-bar input{width:100%;height:40px;border:1.5px solid var(--light-grey);border-radius:6px;padding:0 12px 0 36px;font-size:14px;color:var(--dark-charcoal);background:var(--white);transition:border-color var(--transition);}
+.search-bar input:focus{border-color:var(--steel-blue);}
+.search-bar svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--light-slate);fill:none;stroke-width:1.5;}
+.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 20px;font-size:14px;font-weight:600;border-radius:6px;border:none;cursor:pointer;background-color:var(--primary);color:var(--white);transition:background-color var(--transition);white-space:nowrap;}
+.btn-primary:hover{background-color:var(--primary-hover);}
+.btn-primary svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
+.btn-secondary{display:inline-flex;align-items:center;height:40px;padding:0 20px;font-size:14px;font-weight:600;border-radius:6px;border:1.5px solid var(--light-grey);cursor:pointer;background-color:var(--white);color:var(--grey);transition:all var(--transition);}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary);}
+
+/* Custom Searchable Filters */
+.filter-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.searchable-filter-wrap { position: relative; min-width: 160px; }
+.searchable-filter-input {
+  width: 100%; height: 36px; border: 1.5px solid var(--light-grey); border-radius: 6px;
+  padding: 0 32px 0 12px; font-size: 13px; color: var(--dark-charcoal);
+  background: var(--white); cursor: text; transition: border-color var(--transition);
+}
+.searchable-filter-input:focus { border-color: var(--steel-blue); outline: none; }
+.searchable-filter-chevron { position: absolute; right: 10px; top: 10px; width: 16px; height: 16px; pointer-events: none; color: var(--light-slate); }
+.searchable-filter-dropdown {
+  position: absolute; top: 100%; left: 0; min-width: 100%;
+  background: var(--white); border: 1px solid var(--light-grey); border-radius: 6px;
+  box-shadow: var(--shadow-popup); margin-top: 4px; max-height: 250px; overflow-y: auto;
+  z-index: 1000; display: none;
+}
+.searchable-filter-dropdown.open { display: block; }
+.filter-opt { padding: 8px 12px; font-size: 13px; cursor: pointer; transition: background var(--transition); white-space: nowrap; }
+.filter-opt:hover { background-color: var(--off-white); color: var(--primary); }
+.filter-opt.empty { color: var(--light-slate); cursor: default; pointer-events: none; }
+.filter-opt-group { font-size: 11px; font-weight: 700; color: var(--light-slate); padding: 8px 12px 4px; text-transform: uppercase; cursor: default; }
+
+.tags-container{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.filter-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background-color:var(--off-white);border:1px solid var(--light-grey);border-radius:4px;font-size:12px;font-weight:500;color:var(--dark-charcoal);}
+.filter-tag strong{color:var(--steel-blue);font-weight:600;}
+.filter-tag .tag-close{cursor:pointer;color:var(--light-slate);display:flex;align-items:center;transition:color var(--transition);}
+.filter-tag .tag-close:hover{color:var(--danger);}
+.filter-tag .tag-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;}
+.btn-clear-filters{background:none;border:none;color:var(--steel-blue);font-size:12px;font-weight:600;cursor:pointer;display:none;padding:4px 8px;border-radius:4px;}
+.btn-clear-filters:hover{background-color:rgba(74,127,181,0.1);}
+
+/* Filtre "Indice d'usage" : choisir la métrique filtre immédiatement les
+   machines qui la portent ; la tranche min/max (affichée après sélection)
+   raffine en direct sur le dernier relevé. Style aligné sur les autres filtres. */
+.usage-filter-group{display:flex;align-items:center;gap:8px;}
+.usage-range{display:none;align-items:center;gap:6px;background:var(--white);border:1.5px solid var(--light-grey);border-radius:6px;height:36px;padding:0 10px;transition:border-color var(--transition);}
+.usage-range.vis{display:inline-flex;}
+.usage-range:focus-within{border-color:var(--steel-blue);}
+.usage-bound-input{width:64px;height:32px;border:none;padding:0 2px;font-size:13px;color:var(--dark-charcoal);background:transparent;text-align:center;}
+.usage-bound-input:focus{outline:none;}
+.usage-bound-input::placeholder{color:var(--light-slate);}
+/* Masque les spinners des champs numériques (look épuré) */
+.usage-bound-input::-webkit-outer-spin-button,.usage-bound-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.usage-bound-input[type=number]{-moz-appearance:textfield;}
+.usage-sep{color:var(--light-slate);font-size:13px;}
+.usage-unit{font-size:12px;font-weight:600;color:var(--steel-blue);white-space:nowrap;}
+
+/* ==========================================================================
+   ONGLETS DU PARC (Assignées actifs / En stock / Assignées archivés / Archivées)
+   ========================================================================== */
+.parc-tabs{display:flex;gap:4px;border-bottom:1px solid var(--light-grey);margin-bottom:16px;flex-wrap:wrap;}
+.parc-tab{padding:10px 16px;font-size:13px;font-weight:600;color:var(--grey);cursor:pointer;border:none;background:none;
+  border-bottom:2px solid transparent;transition:all var(--transition);display:inline-flex;align-items:center;gap:8px;margin-bottom:-1px;}
+.parc-tab:hover{color:var(--steel-blue);}
+.parc-tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+.parc-tab-count{background:var(--off-white);color:var(--grey);padding:1px 8px;border-radius:10px;font-size:11px;font-weight:700;}
+.parc-tab.active .parc-tab-count{background:rgba(27,58,107,0.1);color:var(--primary);}
+
+/* ==========================================================================
+   TABLE
+   ========================================================================== */
+.table-container{background-color:var(--white);border-radius:8px;box-shadow:var(--shadow-card);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.data-table{width:100%;min-width:900px;border-collapse:collapse;}
+.data-table th{background-color:var(--off-white);font-size:12px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:0.5px;padding:14px 20px;text-align:left;border-bottom:1px solid var(--light-grey);white-space:nowrap;cursor:pointer;user-select:none;}
+.data-table th:hover{color:var(--primary);}
+.data-table th .sort-icon{display:inline-block;margin-left:4px;opacity:0.4;font-size:10px;}
+.data-table th.sorted .sort-icon{opacity:1;color:var(--primary);}
+.data-table td{padding:16px 20px;font-size:14px;color:var(--dark-charcoal);border-bottom:1px solid var(--light-grey);vertical-align:middle;}
+.data-table tbody tr{transition:background-color var(--transition), opacity var(--transition);cursor:pointer;}
+.data-table tbody tr:hover{background-color:#EDF1F7;}
+.data-table tbody tr.row-archived{opacity:0.6;}
+.data-table tbody tr.row-archived:hover{opacity:0.8;}
+.data-table tbody tr:last-child td{border-bottom:none;}
+
+.col-id{font-weight:700;color:var(--primary);letter-spacing:0.5px;white-space:nowrap;}
+.col-ref{font-family:monospace;font-size:13px;background-color:var(--off-white);padding:4px 8px;border-radius:4px;border:1px solid var(--light-grey);white-space:nowrap;}
+
+.badge-assign{display:inline-flex;align-items:center;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600;}
+.badge-stock{background-color:rgba(45,143,94,0.12);color:var(--status-success);}
+.badge-archive{background-color:rgba(88,89,91,0.12);color:var(--grey);}
+.badge-client{background-color:rgba(74,127,181,0.12);color:var(--status-assigned);}
+
+.actions-cell{display:flex;align-items:center;gap:6px;justify-content:flex-end;}
+.btn-icon{width:32px;height:32px;border-radius:6px;background:none;border:1px solid var(--light-grey);color:var(--steel-blue);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all var(--transition);flex-shrink:0;}
+.btn-icon:hover{background-color:var(--off-white);border-color:var(--primary);color:var(--primary);}
+.btn-icon.danger{color:var(--danger);border-color:rgba(239,68,68,0.25);}
+.btn-icon.danger:hover{background-color:var(--danger-bg);border-color:var(--danger);color:var(--danger);}
+.btn-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+
+.empty-state-row td{text-align:center;padding:64px 24px;color:var(--light-slate);font-size:14px;border-bottom:none;cursor:default;}
+.empty-state-icon{width:40px;height:40px;stroke:var(--light-grey);fill:none;stroke-width:1.5;margin:0 auto 12px;display:block;}
+
+/* ==========================================================================
+   MODAL — CREATION / EDITION
+   ========================================================================== */
+.modal-overlay{position:fixed;inset:0;background-color:rgba(27,58,107,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;padding:24px;}
+.modal-overlay.vis{opacity:1;pointer-events:auto;}
+.modal-box{background-color:var(--white);border-radius:12px;box-shadow:var(--shadow-popup);width:540px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;transform:scale(0.97) translateY(8px);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);overflow:hidden;}
+.modal-overlay.vis .modal-box{transform:scale(1) translateY(0);}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;border-bottom:1px solid var(--light-grey);flex-shrink:0;}
+.modal-title{font-size:16px;font-weight:700;color:var(--dark-charcoal);}
+.modal-close{width:32px;height:32px;border:none;background:none;color:var(--grey);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all var(--transition);}
+.modal-close:hover{background-color:var(--off-white);color:var(--dark-charcoal);transform:rotate(90deg);}
+.modal-close svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;}
+.modal-body{padding:28px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;}
+.modal-footer{padding:20px 28px;border-top:1px solid var(--light-grey);display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-shrink:0; background:var(--off-white);}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+/* En-dessous de 600px : les grilles 2 colonnes des modales passent en 1 colonne
+   (le champ Assignation reste entièrement visible, sans scroll horizontal). */
+@media(max-width:600px){.form-row{grid-template-columns:1fr;}}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:13px;font-weight:600;color:var(--dark-charcoal);}
+.form-label span{color:var(--danger);margin-left:2px;}
+.form-control{width:100%;height:42px;border:1.5px solid var(--light-grey);border-radius:6px;padding:0 14px;font-size:14px;color:var(--dark-charcoal);background:var(--white);transition:border-color var(--transition),box-shadow var(--transition);}
+.form-control:focus{border-color:var(--steel-blue);box-shadow:0 0 0 3px rgba(74,127,181,0.12);}
+.form-control.error{border-color:var(--danger);}
+.form-control:disabled{background-color:var(--off-white);color:var(--light-slate);cursor:not-allowed;}
+.field-error{font-size:12px;color:var(--danger);display:none;margin-top:2px;}
+.field-error.vis{display:block;}
+
+/* Custom Searchable Select Style for Modal */
+.searchable-select-container {position:relative; width:100%;}
+.searchable-select-input {width:100%; height:42px; border:1.5px solid var(--light-grey); border-radius:6px; padding:0 30px 0 14px; font-size:14px; color:var(--dark-charcoal); background:var(--white); cursor:pointer;}
+.searchable-select-input:focus {border-color:var(--steel-blue); outline:none;}
+.searchable-select-input:disabled {background-color:var(--off-white); color:var(--light-slate); cursor:not-allowed;}
+.searchable-select-chevron {position:absolute; right:12px; top:13px; pointer-events:none; color:var(--light-slate);}
+.searchable-select-dropdown {position:absolute; top:100%; left:0; right:0; background:var(--white); border:1px solid var(--light-grey); border-radius:6px; box-shadow:var(--shadow-popup); margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; display:none;}
+.searchable-select-dropdown.open {display:block;}
+.searchable-option {padding:10px 14px; font-size:13px; cursor:pointer;}
+.searchable-option:hover {background-color:var(--off-white); color:var(--primary);}
+.searchable-option.disabled {color:var(--light-slate); cursor:default; pointer-events:none; background:var(--off-white); font-weight:600; font-size:11px; text-transform:uppercase; padding:6px 14px;}
+.searchable-option.opt-sep {border-top:1px solid var(--light-grey); margin-top:4px; padding-top:4px;}
+
+/* ==========================================================================
+   CONFIRM ARCHIVE DIALOG
+   ========================================================================== */
+.confirm-overlay{position:fixed;inset:0;background-color:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.confirm-overlay.vis{opacity:1;pointer-events:auto;}
+.confirm-box{background:var(--white);border-radius:8px;box-shadow:var(--shadow-popup);width:400px;padding:24px;text-align:center;transform:scale(0.95);transition:transform 0.2s;}
+.confirm-overlay.vis .confirm-box{transform:scale(1);}
+.confirm-icon{width:48px;height:48px;border-radius:50%;background:rgba(239,68,68,0.1);color:var(--danger);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.confirm-icon svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;}
+.confirm-title{font-size:18px;font-weight:700;color:var(--dark-charcoal);margin-bottom:8px;}
+.confirm-text{font-size:14px;color:var(--grey);margin-bottom:24px;line-height:1.5;}
+.confirm-actions{display:flex;gap:12px;justify-content:center;}
+
+/* ==========================================================================
+   POPUP — MACHINE DETAILS
+   ========================================================================== */
+.detail-overlay{position:fixed;inset:0;background-color:rgba(27,58,107,0.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:700;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;padding:24px;}
+.detail-overlay.vis{opacity:1;pointer-events:auto;}
+.detail-modal{background-color:var(--white);border-radius:12px;box-shadow:var(--shadow-popup);width:1200px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;transform:scale(0.98);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);overflow:hidden;}
+.detail-overlay.vis .detail-modal{transform:scale(1);}
+
+.popup-header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--light-grey);flex-shrink:0;gap:16px;}
+.popup-logo{font-size:18px;font-weight:700;color:var(--primary);letter-spacing:-0.5px;flex-shrink:0;}
+.popup-logo span{font-weight:400;color:var(--light-slate);}
+.popup-header-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;}
+.popup-title{font-size:13px;font-weight:700;color:var(--primary);letter-spacing:1px;text-transform:uppercase;}
+.popup-close{width:32px;height:32px;border:none;background:none;color:var(--grey);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all var(--transition);flex-shrink:0;}
+.popup-close:hover{background-color:var(--off-white);color:var(--dark-charcoal);transform:rotate(90deg);}
+.popup-close svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;}
+
+.popup-body{display:flex;flex-direction:column;flex:1;overflow-y:auto;overflow-x:hidden;background-color:var(--off-white);padding:28px;gap:28px;}
+.popup-section{background-color:var(--white);border-radius:8px;box-shadow:var(--shadow-card);padding:22px 24px;border:1px solid var(--light-grey);}
+.popup-section-title{font-size:11px;font-weight:700;color:var(--steel-blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--light-grey);}
+
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.info-item{display:flex;flex-direction:column;gap:5px;}
+.info-lbl{font-size:11px;font-weight:600;color:var(--light-slate);text-transform:uppercase;letter-spacing:0.5px;}
+.info-val{font-size:14px;color:var(--dark-charcoal);line-height:1.5;}
+.info-val.mono{font-family:monospace;font-size:13px;background:var(--off-white);padding:2px 6px;border-radius:4px;border:1px solid var(--light-grey);width:fit-content;}
+
+/* Onglets internes de la fiche machine (mêmes styles que gestion_client) */
+.tabs-nav { display:flex; border-bottom:1px solid var(--light-grey); padding: 0 28px; background:var(--off-white); flex-shrink: 0; }
+.tab-btn { padding:14px 24px; border:none; background:none; font-size:13px; font-weight:600; color:var(--light-slate); cursor:pointer; border-bottom:2px solid transparent; transition:all var(--transition); margin-bottom:-1px;}
+.tab-btn:hover { color:var(--dark-charcoal); }
+.tab-btn.active { color:var(--primary); border-bottom-color:var(--primary); }
+.tab-content { display:none; padding: 24px 28px; }
+.tab-content.active { display:block; }
+.search-bar-small { position:relative; width:100%; max-width:300px; margin-bottom:12px; }
+.search-bar-small input { width:100%; height:36px; border:1.5px solid var(--light-grey); border-radius:6px; padding:0 12px 0 32px; font-size:13px; transition:border-color var(--transition); }
+.search-bar-small input:focus { border-color:var(--steel-blue); }
+.search-bar-small svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); width:14px; height:14px; stroke:var(--light-slate); fill:none; stroke-width:1.5; }
+.machine-info-grid { display:grid; grid-template-columns:repeat(6, 1fr); gap:16px; padding: 20px 28px; border-bottom:1px solid var(--light-grey); background: var(--off-white); flex-shrink: 0;}
+.m-info-item { display:flex; flex-direction:column; gap:4px; }
+.m-info-lbl { font-size:11px; font-weight:700; color:var(--light-slate); text-transform:uppercase; letter-spacing:0.5px; }
+.m-info-val { font-size:14px; font-weight:600; color:var(--primary); }
+.m-info-val.mono { font-family:monospace; }
+.popup-table-wrapper { width: 100%; overflow-x: auto; border: 1px solid var(--light-grey); border-radius: 8px; }
+@media (max-width: 768px){ .machine-info-grid{ grid-template-columns:1fr 1fr; } }
+
+/* Sub-table for tickets */
+.popup-table{width:100%;border-collapse:collapse;min-width:780px;}
+.popup-table th{background-color:var(--off-white);font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:0.5px;padding:12px 20px;text-align:left;border-bottom:1px solid var(--light-grey);white-space:nowrap;cursor:pointer;user-select:none;}
+.popup-table th:hover{color:var(--primary);}
+.popup-table th .sort-icon{display:inline-block;margin-left:4px;opacity:0.4;font-size:10px;}
+.popup-table th.sorted .sort-icon{opacity:1;color:var(--primary);}
+.popup-table td{padding:14px 20px;font-size:13px;color:var(--dark-charcoal);border-bottom:1px solid var(--light-grey);vertical-align:middle;}
+.popup-table tbody tr{transition:background-color var(--transition);cursor:pointer;}
+.popup-table tbody tr:hover{background-color:#EDF1F7;}
+.popup-table tbody tr:last-child td{border-bottom:none;}
+.status-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;}
+.status-envoye{background-color:rgba(143,163,191,0.12);color:var(--grey);}
+.status-assigne{background-color:rgba(74,127,181,0.12);color:var(--status-assigned);}
+.status-en-reparation{background-color:#FEF3F2;color:#F04438;}
+.status-termine{background-color:rgba(45,143,94,0.12);color:var(--status-success);}
+.status-annule{background-color:#F1F5F9;color:#64748B;}
+
+/* ==========================================================================
+   POPUP — TICKET DETAIL (Nested)
+   ========================================================================== */
+.ticket-detail-overlay{position:fixed;inset:0;background-color:rgba(27,58,107,0.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:800;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;padding:24px;}
+.ticket-detail-overlay.vis{opacity:1;pointer-events:auto;}
+.detail-modal-ticket{background-color:var(--white);border-radius:12px;box-shadow:var(--shadow-popup);width:1100px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;transform:scale(0.98);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);overflow:hidden;}
+.ticket-detail-overlay.vis .detail-modal-ticket{transform:scale(1);}
+.popup-body-detail{display:flex;flex:1;overflow-y:auto;overflow-x:hidden;background-color:var(--off-white);padding:28px;gap:28px;}
+.popup-left{flex:1 1 55%;display:flex;flex-direction:column;gap:20px;min-width:0;}
+.popup-right{flex:1 1 45%;display:flex;flex-direction:column;gap:20px;position:sticky;top:0;align-self:flex-start;min-width:0;}
+.info-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.info-grid-2.single-col{grid-template-columns:1fr;}
+
+/* Rating Stars */
+.rating-stars { display: flex; gap: 2px; }
+.rating-stars svg { width: 16px; height: 16px; fill: #E2E8F0; stroke: #CBD5E1; }
+.rating-stars svg.filled { fill: #F59E0B; stroke: #F59E0B; }
+
+/* skeleton */
+.skeleton{position:relative;overflow:hidden;background-color:var(--light-grey);border-radius:4px;color:transparent !important;min-height:20px;pointer-events:none;}
+.skeleton::after{content:'';position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent);animation:shimmer 1.5s infinite;}
+@keyframes shimmer{100%{transform:translateX(100%);}}
+.skeleton *{visibility:hidden;}
+
+.btn-dl{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 20px;font-size:14px;font-weight:600;border-radius:6px;border:none;cursor:pointer;background-color:var(--primary);color:var(--white);transition:background-color var(--transition);margin-top:12px;width:fit-content;}
+.btn-dl:hover{background-color:var(--primary-hover);}
+.btn-dl svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
+
+.gal-grid{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;}
+.gal-thumb{width:72px;height:72px;border-radius:6px;border:1px solid var(--light-grey);object-fit:cover;cursor:pointer;transition:transform 0.2s,border-color 0.2s;}
+.gal-thumb:hover{transform:scale(1.05);border-color:var(--steel-blue);}
+.link-map{color:var(--steel-blue);text-decoration:none;display:inline-flex;align-items:center;gap:6px;font-weight:500;font-size:13px;}
+.link-map:hover{color:var(--primary);text-decoration:underline;}
+.link-map svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+
+/* Lightbox */
+.lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.lightbox-overlay.vis{opacity:1;pointer-events:auto;}
+.lightbox-img{max-width:90vw;max-height:90vh;border-radius:8px;box-shadow:0 0 20px rgba(0,0,0,0.5);}
+.lightbox-close{position:absolute;top:20px;right:20px;color:white;background:none;border:none;font-size:32px;cursor:pointer;line-height:1;padding:10px;}
+.lightbox-close:hover{color:#ccc;}
+
+.chk-list{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.chk-item{display:flex;align-items:flex-start;gap:8px;font-size:14px;color:var(--dark-charcoal);}
+.chk-item svg{width:16px;height:16px;stroke:var(--status-success);fill:none;stroke-width:2.5;flex-shrink:0;margin-top:3px;}
+.timeline{display:flex;flex-direction:column;position:relative;padding-left:10px;margin-top:4px;padding-bottom:4px;}
+.timeline::before{content:'';position:absolute;left:15px;top:8px;bottom:12px;width:2px;background-color:var(--light-grey);}
+.timeline-item{position:relative;padding-bottom:18px;padding-left:24px;}
+.timeline-item:last-child{padding-bottom:0;}
+.timeline-item::after{content:'';position:absolute;left:0;top:4px;width:12px;height:12px;border-radius:50%;background-color:var(--steel-blue);border:2px solid var(--white);box-shadow:0 0 0 1px var(--light-grey);z-index:2;}
+.timeline-item.timeline-last::after{width:14px;height:14px;left:-1px;top:3px;border:2px solid var(--white);box-shadow:0 0 0 2px currentColor;}
+.timeline-item.timeline-last .timeline-status{font-weight:700;}
+.timeline-status{font-size:14px;font-weight:500;color:var(--dark-charcoal);line-height:1;}
+.timeline-time{font-size:12px;color:var(--light-slate);margin-top:4px;}
+.empty-report{text-align:center;padding:36px 24px;color:var(--light-slate);font-size:14px;background-color:var(--off-white);border-radius:8px;border:1.5px dashed var(--light-grey);}
+
+/* ==========================================================================
+   TOAST
+   ========================================================================== */
+.toast-container{position:fixed;top:20px;right:24px;z-index:3000;display:flex;flex-direction:column;gap:10px;}
+.toast{display:flex;align-items:center;gap:12px;padding:14px 18px;background-color:#fff;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.1);min-width:280px;max-width:360px;border-left:4px solid var(--status-success);animation:slideInRight 0.3s ease;}
+.toast.error{border-left-color:var(--danger);}
+.toast-icon{width:20px;height:20px;flex-shrink:0;}
+.toast-icon svg{width:20px;height:20px;stroke:var(--status-success);fill:none;stroke-width:2;}
+.toast.error .toast-icon svg{stroke:var(--danger);}
+.toast-msg{font-size:14px;font-weight:500;color:var(--dark-charcoal);flex:1;}
+.toast-dismiss{background:none;border:none;color:var(--light-slate);cursor:pointer;font-size:18px;line-height:1;padding:0;}
+@keyframes slideInRight{from{opacity:0;transform:translateX(100%);}to{opacity:1;transform:translateX(0);}}
+</style>
+<link rel="stylesheet" href="/static/css/responsive.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+{% set active_nav = 'gestion-parc' %}{% include 'partials/_sidebar_manager.html' %}
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-title">Gestion du Parc</div>
+  <div class="topbar-right">
+    <div class="topbar-avatar">YM</div>
+  </div>
+</header>
+
+<!-- CONTENT -->
+<main class="content">
+  <div class="page-header">
+    <h1 class="page-title">
+      Parc Machines
+      <div class="page-title-counts" id="page-counts">-- machines</div>
+    </h1>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search-input" placeholder="ID instance, référence, client…">
+    </div>
+    <button class="btn-primary" onclick="openMachineModal()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Ajouter une machine
+    </button>
+  </div>
+
+  <div class="filter-bar">
+    <div class="searchable-filter-wrap" id="wrap-pole">
+      <input type="text" class="searchable-filter-input" id="inp-pole" placeholder="Pôle..." autocomplete="off" onfocus="this.placeholder='Rechercher...'" onblur="this.placeholder='Pôle...'; this.value='';">
+      <svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+      <div class="searchable-filter-dropdown" id="drop-pole"></div>
+    </div>
+    <div class="searchable-filter-wrap" id="wrap-marque">
+      <input type="text" class="searchable-filter-input" id="inp-marque" placeholder="Marque..." autocomplete="off" onfocus="this.placeholder='Rechercher...'" onblur="this.placeholder='Marque...'; this.value='';">
+      <svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+      <div class="searchable-filter-dropdown" id="drop-marque"></div>
+    </div>
+    <div class="searchable-filter-wrap" id="wrap-cat">
+      <input type="text" class="searchable-filter-input" id="inp-cat" placeholder="Catégorie..." autocomplete="off" onfocus="this.placeholder='Rechercher...'" onblur="this.placeholder='Catégorie...'; this.value='';">
+      <svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+      <div class="searchable-filter-dropdown" id="drop-cat"></div>
+    </div>
+    <div class="searchable-filter-wrap" id="wrap-ref">
+      <input type="text" class="searchable-filter-input" id="inp-ref" placeholder="Référence..." autocomplete="off" onfocus="this.placeholder='Rechercher...'" onblur="this.placeholder='Référence...'; this.value='';">
+      <svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+      <div class="searchable-filter-dropdown" id="drop-ref"></div>
+    </div>
+    <div class="searchable-filter-wrap" id="wrap-assign">
+      <input type="text" class="searchable-filter-input" id="inp-assign" placeholder="Assignation..." autocomplete="off" onfocus="this.placeholder='Rechercher...'" onblur="this.placeholder='Assignation...'; this.value='';">
+      <svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+      <div class="searchable-filter-dropdown" id="drop-assign"></div>
+    </div>
+
+    <!-- Filtre "Indice d'usage" : choisir une métrique filtre immédiatement ;
+         la tranche min/max raffine en direct (ex. de 400 à 500 Hr) -->
+    <div class="usage-filter-group" id="wrap-usage">
+      <div class="searchable-filter-wrap" style="min-width:165px;">
+        <input type="text" class="searchable-filter-input" id="inp-usage" placeholder="Indice d'usage..." autocomplete="off" readonly style="cursor:pointer;">
+        <svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+        <div class="searchable-filter-dropdown" id="drop-usage"></div>
+      </div>
+      <div class="usage-range" id="usage-range">
+        <input type="number" class="usage-bound-input" id="inp-usage-min" placeholder="Min" min="0">
+        <span class="usage-sep">–</span>
+        <input type="number" class="usage-bound-input" id="inp-usage-max" placeholder="Max" min="0">
+        <span class="usage-unit" id="usage-unit"></span>
+      </div>
+    </div>
+
+    <div class="tags-container" id="active-tags"></div>
+    <button class="btn-clear-filters" id="btn-clear-filters" onclick="clearFilters()">Tout effacer</button>
+  </div>
+
+  <!-- 4 onglets : cycle de vie de l'assignation des machines -->
+  <div class="parc-tabs" id="parc-tabs"></div>
+
+  <div class="table-container">
+    <table class="data-table" id="machines-table">
+      <thead>
+        <tr>
+          <th onclick="sortTable('idInstance')" id="th-idInstance">ID Instance <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('ref')" id="th-ref">Référence constructeur <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('assignation')" id="th-assignation">Assignation <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('lastUsage')" id="th-lastUsage">Dernier Relevé d'usage <span class="sort-icon">↕</span></th>
+          <th style="text-align:right;cursor:default;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="machines-tbody"></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- MODAL — CREER / MODIFIER MACHINE -->
+<div class="modal-overlay" id="machine-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Ajouter une machine</div>
+      <button class="modal-close" onclick="closeMachineModal()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- Catalogue Cascade -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Pôle <span>*</span></label>
+          <select class="form-control" id="f-pole" onchange="onCascadeChange('pole')"></select>
+          <div class="field-error" id="err-pole">Champ requis</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Marque <span>*</span></label>
+          <select class="form-control" id="f-marque" onchange="onCascadeChange('marque')" disabled></select>
+          <div class="field-error" id="err-marque">Champ requis</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Catégorie <span>*</span></label>
+          <select class="form-control" id="f-cat" onchange="onCascadeChange('cat')" disabled></select>
+          <div class="field-error" id="err-cat">Champ requis</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Référence <span>*</span></label>
+          <select class="form-control" id="f-ref" onchange="onCascadeChange('ref')" disabled></select>
+          <div class="field-error" id="err-ref">Champ requis</div>
+        </div>
+      </div>
+      
+      <hr style="border:0; border-top:1px solid var(--light-grey); margin:8px 0;">
+
+      <!-- ID & Assignation côte à côte : le champ Assignation reste visible sans
+           scroll (la grille passe en 1 colonne sous 600px). -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">ID Instance <span style="color:var(--light-slate);font-weight:400;margin-left:4px;">(vide = auto)</span></label>
+          <input type="text" class="form-control" id="f-id" placeholder="ex. PC200-01">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assignation <span>*</span></label>
+          <div class="searchable-select-container">
+            <input type="text" class="searchable-select-input" id="f-assign-input" placeholder="Statut ou client..." autocomplete="off">
+            <svg class="searchable-select-chevron" width="16" height="16" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+            <div class="searchable-select-dropdown" id="f-assign-dropdown"></div>
+          </div>
+          <input type="hidden" id="f-assign-val">
+          <div class="field-error" id="err-assign">Veuillez choisir une option</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeMachineModal()">Annuler</button>
+      <button class="btn-primary" onclick="submitMachineForm()" id="modal-submit-btn">Ajouter la machine</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM ARCHIVE MODAL -->
+<div class="confirm-overlay" id="confirm-archive-modal">
+  <div class="confirm-box">
+    <div class="confirm-icon">
+      <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div class="confirm-title">Confirmation avant archivage</div>
+    <div class="confirm-text">Êtes-vous sûr de vouloir archiver cette machine ?<br>Elle n'apparaîtra plus dans le portail du client et aucun nouveau ticket ne pourra être ouvert.</div>
+    <div class="confirm-actions">
+      <button class="btn-secondary" onclick="document.getElementById('confirm-archive-modal').classList.remove('vis')">Annuler</button>
+      <button class="btn-primary" style="background-color:var(--danger);" onclick="executeArchive()">Archiver</button>
+    </div>
+  </div>
+</div>
+
+<!-- POPUP — FICHE MACHINE (même fiche que gestion_client : info card +
+     onglets Tickets / Relevés d'usage) -->
+<div class="detail-overlay" id="machine-detail-popup">
+  <div class="detail-modal" style="width:1200px;">
+    <div class="popup-header">
+      <div class="popup-logo"><img src="/static/stokvis360.png" alt="Stokvis 360" style="height:28px;width:auto;object-fit:contain;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">STOKVIS <span>360</span></span></div>
+      <div class="popup-header-center">
+        <div class="popup-title">FICHE MACHINE</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span id="md-assign-badge"></span>
+        <button class="popup-close" onclick="closeMachineDetailPopup()">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="machine-info-grid">
+      <div class="m-info-item"><span class="m-info-lbl">ID Instance</span><span class="m-info-val mono" id="md-id">—</span></div>
+      <div class="m-info-item"><span class="m-info-lbl">Référence</span><span class="m-info-val mono" id="md-ref">—</span></div>
+      <div class="m-info-item"><span class="m-info-lbl">Pôle</span><span class="m-info-val" id="md-pole">—</span></div>
+      <div class="m-info-item"><span class="m-info-lbl">Marque</span><span class="m-info-val" id="md-marque">—</span></div>
+      <div class="m-info-item"><span class="m-info-lbl">Catégorie</span><span class="m-info-val" id="md-cat">—</span></div>
+      <div class="m-info-item"><span class="m-info-lbl">Dernière relevée d'usage</span><span id="md-last-usage">—</span></div>
+    </div>
+
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchPmTab('tickets')" id="tab-btn-pm-tickets">Tickets</button>
+      <button class="tab-btn" onclick="switchPmTab('releves')" id="tab-btn-pm-releves">Relevés d'usage</button>
+    </div>
+
+    <div class="popup-body" style="padding:0;gap:0;">
+      <!-- Onglet Tickets -->
+      <div class="tab-content active" id="tab-pm-tickets">
+        <div class="search-bar-small">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search-pm-tickets" placeholder="Rechercher dans toutes les colonnes...">
+        </div>
+
+        <div class="filter-bar" id="pmt-filters" style="margin-bottom:10px;">
+          <div class="searchable-filter-wrap" id="wrap-pmt-tech"><input type="text" class="searchable-filter-input" id="inp-pmt-tech" placeholder="Technicien…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2"/></svg><div class="searchable-filter-dropdown" id="drop-pmt-tech"></div></div>
+          <div class="searchable-filter-wrap" id="wrap-pmt-status"><input type="text" class="searchable-filter-input" id="inp-pmt-status" placeholder="État…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2"/></svg><div class="searchable-filter-dropdown" id="drop-pmt-status"></div></div>
+          <div class="tags-container" id="pmt-tags"></div>
+        </div>
+
+        <div class="popup-table-wrapper">
+          <table class="popup-table" id="machine-tickets-table">
+            <thead>
+              <tr>
+                <th onclick="sortPmtTable('id')" id="pmtth-id">ID <span class="sort-icon">↕</span></th>
+                <th onclick="sortPmtTable('date')" id="pmtth-date">Date <span class="sort-icon">↕</span></th>
+                <th onclick="sortPmtTable('title')" id="pmtth-title">Titre <span class="sort-icon">↕</span></th>
+                <th onclick="sortPmtTable('tech')" id="pmtth-tech">Technicien <span class="sort-icon">↕</span></th>
+                <th onclick="sortPmtTable('status')" id="pmtth-status">État <span class="sort-icon">↕</span></th>
+                <th style="text-align:right;cursor:default;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="machine-tickets-tbody"></tbody>
+          </table>
+        </div>
+        <div id="pm-tickets-empty" style="display:none;text-align:center;padding:40px;color:var(--light-slate);border:1px dashed var(--light-grey);border-radius:8px;">Aucun ticket correspondant lié à cette machine.</div>
+      </div>
+
+      <!-- Onglet Relevés d'usage -->
+      <div class="tab-content" id="tab-pm-releves">
+        <div id="pm-releves-list" style="max-height:260px;overflow-y:auto;border:1px solid var(--light-grey);border-radius:8px;background:var(--white);">
+          <div style="padding:24px;text-align:center;color:var(--light-slate);">Chargement…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- POPUP — TICKET DETAIL (Nested) -->
+<div class="ticket-detail-overlay" id="ticket-detail-overlay">
+  <div class="detail-modal-ticket" style="width:1100px;">
+    <div class="popup-header">
+      <div class="popup-logo"><img src="/static/stokvis360.png" alt="Stokvis 360" style="height:28px;width:auto;object-fit:contain;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">STOKVIS <span>360</span></span></div>
+      <div class="popup-header-center">
+        <div class="popup-title">DÉTAILS DU TICKET</div>
+        <span id="td-status-badge" style="margin-left: 10px;"></span>
+      </div>
+      <button class="popup-close" onclick="closeTicketDetailPopup()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="popup-body-detail">
+      <div class="popup-left">
+        <div class="popup-section">
+          <div class="popup-section-title">Informations du ticket</div>
+          <div class="info-grid-2">
+            <div class="info-item"><span class="info-lbl">Titre du ticket</span><span class="info-val bold sk-target" id="td-title"></span></div>
+            <div class="info-item"><span class="info-lbl">Temps de résolution</span><span class="info-val sk-target" id="td-res"></span></div>
+            <div class="info-item"><span class="info-lbl">Client et contact</span><span class="info-val sk-target" id="td-client"></span></div>
+            <div class="info-item"><span class="info-lbl">Technicien</span><span class="info-val sk-target" id="td-tech"></span></div>
+            <div class="info-item"><span class="info-lbl">Pôle</span><span class="info-val sk-target" id="td-pole"></span></div>
+            <div class="info-item"><span class="info-lbl">Marque</span><span class="info-val sk-target" id="td-marque"></span></div>
+            <div class="info-item"><span class="info-lbl">Catégorie</span><span class="info-val sk-target" id="td-cat"></span></div>
+            <div class="info-item"><span class="info-lbl">Référence</span><span class="info-val sk-target" id="td-ref"></span></div>
+            <div class="info-item"><span class="info-lbl">Identifiant Parc</span><span class="info-val mono sk-target" id="td-serial"></span></div>
+            <div class="info-item" id="td-loc-wrap"><span class="info-lbl">Localisation</span><div class="sk-target" id="td-loc"></div></div>
+          </div>
+        </div>
+        <div class="popup-section" id="td-diag-section">
+          <div class="popup-section-title">Pré-diagnostic</div>
+          <div class="info-grid-2 single-col">
+            <div class="info-item" id="td-chk-wrap"><span class="info-lbl">Éléments signalés</span><div class="chk-list sk-target" id="td-checklist"></div></div>
+            <div class="info-item" id="td-desc-wrap"><span class="info-lbl">Description</span><span class="info-val sk-target" id="td-desc"></span></div>
+            <div class="info-item" id="td-img-wrap"><span class="info-lbl">Images jointes</span><div class="gal-grid sk-target" id="td-images"></div></div>
+          </div>
+        </div>
+        <div class="popup-section">
+          <div class="popup-section-title">Historique</div>
+          <div class="timeline sk-target" id="td-timeline"></div>
+        </div>
+      </div>
+      <div class="popup-right">
+        <div class="popup-section">
+          <div class="popup-section-title">Rapport d'intervention</div>
+          <div id="td-report-content" class="info-grid-2 single-col" style="display:none;">
+            <div class="info-item"><span class="info-lbl">Titre de l'intervention</span><span class="info-val bold sk-target" id="td-rep-title"></span></div>
+            <div class="info-item"><span class="info-lbl">Situation constatée</span><span class="info-val sk-target" id="td-rep-sit"></span></div>
+            <div class="info-item"><span class="info-lbl">Actions effectuées</span><span class="info-val sk-target" id="td-rep-act"></span></div>
+            <div class="info-item" id="td-tech-img-wrap" style="display:none;">
+              <span class="info-lbl">Images après résolution</span>
+              <div class="gal-grid sk-target" id="td-tech-images"></div>
+            </div>
+            <button class="btn-dl sk-target" onclick="generateDetailPDF(this)">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Télécharger PDF
+            </button>
+          </div>
+          <div id="td-report-empty" class="empty-report">
+            <p>Le rapport d'intervention n'est pas encore disponible.</p>
+          </div>
+        </div>
+        
+        <!-- Évaluation Client (Read-Only on Manager Side) -->
+        <div class="popup-section" id="td-eval-section" style="display:none; margin-top: 20px;">
+          <div class="popup-section-title">Évaluation du service</div>
+          <div id="td-eval-readonly" class="info-grid-2 single-col" style="display:none;">
+            <div class="info-item"><span class="info-lbl">Note attribuée</span><div class="info-val bold sk-target" id="td-rating-readonly" style="font-size: 18px; color: var(--primary);"></div></div>
+            <div class="info-item" id="td-eval-comment-readonly-wrap"><span class="info-lbl">Commentaire du client</span><span class="info-val sk-target" id="td-eval-comment-readonly" style="background:var(--off-white); padding:10px; border-radius:6px; border:1px solid var(--light-grey);"></span></div>
+          </div>
+          <div id="td-eval-empty" class="empty-report">
+            Le client n'a pas encore évalué cette intervention.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+  <img id="lightbox-img" class="lightbox-img" src="" alt="Plein écran">
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/ticket_table.js"></script>
+<script src="/static/js/ticket_detail.js"></script>
+<script src="/static/js/ui.js"></script>
+<script>
+/* ==========================================================================
+   MOCK DATA & STATE
+   ========================================================================== */
+// Données alimentées par l'API. On conserve les mêmes noms/structures que le
+// prototype pour ne pas toucher au rendu. L'assignation interne reste
+// 'en_stock' / 'archivee' / clientId ; on convertit vers/depuis l'API.
+let CATALOG = { poles: [], marques: {}, categories: {}, references: {} };
+let CLIENTS = [];
+let MACHINES = [];
+let TICKETS = [];
+
+function assignFromApi(v){ return v === 'En stock' ? 'en_stock' : v === 'Archivée' ? 'archivee' : v; }
+function assignToApi(v){ return v === 'en_stock' ? 'En stock' : v === 'archivee' ? 'Archivée' : v; }
+
+function buildCatalogFromTree(cat){
+  const out = { poles: [], marques: {}, categories: {}, references: {} };
+  const nodes = cat.nodes, H = cat.hierarchy;
+  const nameOf = id => nodes[id] ? nodes[id].name : id;
+  (H.root || []).forEach(poleId => {
+    const pole = nameOf(poleId); out.poles.push(pole); out.marques[pole] = [];
+    (H[poleId] || []).forEach(mId => {
+      const marque = nameOf(mId); out.marques[pole].push(marque); out.categories[marque] = [];
+      (H[mId] || []).forEach(cId => {
+        const categ = nameOf(cId); out.categories[marque].push(categ); out.references[categ] = [];
+        (H[cId] || []).forEach(rId => out.references[categ].push(nameOf(rId)));
+      });
+    });
+  });
+  return out;
+}
+
+function mapMachine(m){
+  // idInstance = clé interne stable (URL d'API, liens tickets). parcId = étiquette
+  // AFFICHÉE : recomposée en direct si auto (suit les renommages), figée si saisie.
+  return { idInstance: m.instance_id, parcId: m.parc_id || m.instance_id,
+           isAuto: m.unit_seq != null, ref: m.reference, pole: m.pole,
+           marque: m.marque, cat: m.categorie, assignation: assignFromApi(m.assignation),
+           nodeId: m.node_id,
+           lastUsage: m.last_usage || null };
+}
+
+// Texte de tri pour la colonne "Dernier Relevé d'usage" (valeur numérique principale).
+function lastUsageSortKey(m){
+  if(!m.lastUsage || !m.lastUsage.readings || !m.lastUsage.readings.length) return -1;
+  const v = String(m.lastUsage.readings[0].value || '').replace(',', '.');
+  const n = parseFloat(v);
+  return isNaN(n) ? -1 : n;
+}
+
+// Cellule "Dernier Relevé d'usage" : valeur + unité, et la date du ticket en dessous.
+function lastUsageCellHtml(m){
+  if(!m.lastUsage || !m.lastUsage.readings || !m.lastUsage.readings.length){
+    return '<span style="color:var(--light-slate);">—</span>';
+  }
+  const vals = m.lastUsage.readings
+    .map(u => `${xe(String(u.value))}${u.unit ? ' '+xe(u.unit) : ''}`)
+    .join(' · ');
+  return `<div style="font-weight:600;color:var(--dark-charcoal);">${vals}</div>`+
+         `<div style="font-size:11px;color:var(--light-slate);margin-top:2px;">${xe(m.lastUsage.date)}</div>`;
+}
+function mapParcTicket(t){
+  const tech = (t.techs && t.techs.length) ? t.techs[0] : null;
+  return { id: t.id, machineId: t.instance_id, parcId: t.parc_id || t.instance_id, date: t.date, time: t.time, title: t.titre,
+           titre: t.titre, timestamp: t.timestamp, client_name: t.client_name,
+           techs: t.techs || [], technicien_ids: t.technicien_ids,
+           tech_name: tech ? tech.name : '—', tech_phone: tech ? tech.telephone : '—',
+           status: t.status, loc: t.localisation,
+           checklist: (t.items||[]).filter(it=>it.type==='panne'&&it.checked&&!it.system),
+           desc: t.description, client_images: t.images||[], tech_images: (t.report&&t.report.images)||[],
+           history: (t.timeline||[]).map(e=>({status:e.status,date:e.timestamp})),
+           report: t.report ? {title:t.report.titre_intervention,sit:t.report.situation,act:t.report.travaux} : null,
+           evaluation: t.evaluation ? {rating:t.evaluation.note,comment:t.evaluation.commentaire} : undefined };
+}
+
+let CLIENTS_ACTIVE = [];   // clients non archivés : seuls proposés à l'assignation
+let USAGE_METRICS = [];    // métriques d'usage filtrables : fixes + custom du catalogue
+let NODE_METRICS = {};     // node_id -> noms (minuscules) des métriques EXPLOITABLES de la référence
+
+function isRealMetric(name, unit){
+  const n = (name || '').trim(), u = (unit || '').trim();
+  return !!n && u.toUpperCase() !== 'N/A' && n.toLowerCase() !== 'non applicable';
+}
+
+/* Métriques proposées au filtre d'usage : la liste canonique du catalogue
+   (mêmes options que le select "Indices d'usage" de gestion_catalogue) + toute
+   métrique custom d'un nœud niveau 4. "Non Applicable" est ajouté à part dans
+   le dropdown (références sans métrique exploitable). */
+function collectUsageMetrics(catalogue){
+  const seen = new Map();
+  const add = (name, unit) => {
+    if(!isRealMetric(name, unit)) return;
+    const n = name.trim(), u = (unit || '').trim();
+    const key = (n + '|' + u).toLowerCase();
+    if(!seen.has(key)) seen.set(key, { name: n, unit: u });
+  };
+  add("Heure d'utilisation", 'Hr');
+  add('Kilometrage', 'Km');
+  add('Nombre de Cycle', 'N° Cycle');
+  Object.values((catalogue && catalogue.nodes) || {}).forEach(node => {
+    if(node.level === 4) (node.indices || []).forEach(ix => add(ix.name, ix.unit));
+  });
+  return [...seen.values()];
+}
+
+/* node_id -> métriques exploitables de la référence (sert au filtre : une
+   machine "porte" une métrique si sa référence catalogue la définit). */
+function buildNodeMetrics(catalogue){
+  const map = {};
+  Object.entries((catalogue && catalogue.nodes) || {}).forEach(([nid, node]) => {
+    if(node.level !== 4) return;
+    map[nid] = (node.indices || [])
+      .filter(ix => isRealMetric(ix.name, ix.unit))
+      .map(ix => ix.name.trim().toLowerCase());
+  });
+  return map;
+}
+
+async function reload(){
+  const data = await API.bootstrap();
+  CATALOG = buildCatalogFromTree(data.catalogue);
+  USAGE_METRICS = collectUsageMetrics(data.catalogue);
+  NODE_METRICS = buildNodeMetrics(data.catalogue);
+  CLIENTS = data.clients.map(c => ({ id: c.id, name: c.raison_sociale, phone: c.telephone, archived: !!c.archived }));
+  CLIENTS_ACTIVE = (data.clients_active || data.clients).map(c => ({ id: c.id, name: c.raison_sociale, phone: c.telephone }));
+  MACHINES = data.parc.map(mapMachine);
+  TICKETS = data.tickets.map(mapParcTicket);
+  initFilters();
+  renderParcTabs();
+  renderTable();
+}
+
+let activeFilters = { pole: [], marque: [], cat: [], ref: [], assignation: [] };
+// Filtre d'usage actif :
+//   { type:'metric', name, unit, key, min, max }  -> machines dont la référence
+//     porte cette métrique ; min/max (nullables) raffinent sur le dernier relevé.
+//   { type:'na' }                                 -> références sans métrique.
+let usageFilter = null;
+let searchQuery = '';
+let sortCol = 'default';
+let sortDir = 'asc';
+let editingMachine = null;
+let pendingArchiveData = null;
+let currentDetailTicketId = null;
+
+/* ── Onglets du parc : cycle de vie de l'assignation ──
+   actifs            machines assignées à un client NON archivé
+   stock             assignation === "En stock"
+   clients_archives  machines assignées à un client archivé
+   archivees         assignation === "Archivée" */
+let currentParcTab = 'actifs';
+const PARC_TABS = [
+  { key: 'actifs',            label: 'Assignées (actifs)' },
+  { key: 'stock',             label: 'En stock' },
+  { key: 'clients_archives',  label: 'Assignées (archivés)' },
+  { key: 'archivees',         label: 'Archivées' },
+];
+
+function machineTab(m){
+  if(m.assignation === 'en_stock') return 'stock';
+  if(m.assignation === 'archivee') return 'archivees';
+  const c = CLIENTS.find(x => x.id === m.assignation);
+  return (c && c.archived) ? 'clients_archives' : 'actifs';
+}
+
+function setParcTab(key){
+  currentParcTab = key;
+  renderParcTabs();
+  renderTable();
+}
+
+function renderParcTabs(){
+  const cont = document.getElementById('parc-tabs');
+  const base = filteredMachines();   // recherche + filtres appliqués, tous onglets
+  const counts = { actifs:0, stock:0, clients_archives:0, archivees:0 };
+  base.forEach(m => counts[machineTab(m)]++);
+  cont.innerHTML = PARC_TABS.map(t =>
+    `<button class="parc-tab ${currentParcTab===t.key?'active':''}" onclick="setParcTab('${t.key}')">${t.label}<span class="parc-tab-count">${counts[t.key]}</span></button>`
+  ).join('');
+}
+
+/* Date du dernier relevé (dd/mm/yyyy) -> timestamp ; null si jamais relevée. */
+function lastUsageDateTs(m){
+  if(!m.lastUsage || !m.lastUsage.date) return null;
+  const p = m.lastUsage.date.split('/');
+  return new Date(p[2], p[1]-1, p[0]).getTime();
+}
+
+/* ==========================================================================
+   UTILITIES & FORMATTING
+   ========================================================================== */
+function getClientName(id){ const c = CLIENTS.find(x=>x.id===id); return c ? c.name : 'Inconnu'; }
+function getClientPhone(id){ const c = CLIENTS.find(x=>x.id===id); return c ? c.phone : ''; }
+
+function showToast(msg, type='success'){
+  const c=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className='toast'+(type==='error'?' error':'');
+  t.innerHTML=`<div class="toast-icon"><svg viewBox="0 0 24 24">${type==='error'?'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>':'<polyline points="20 6 9 17 4 12"/>'}</svg></div><div class="toast-msg">${xe(msg)}</div>`;
+  c.appendChild(t);
+  setTimeout(()=>t.remove(), 4000);
+}
+
+function fmtDT(dt){ const dd=n=>('0'+n).slice(-2); return dd(dt.getDate())+'/'+dd(dt.getMonth()+1)+'/'+dt.getFullYear()+' '+dd(dt.getHours())+':'+dd(dt.getMinutes()); }
+
+function getResolutionTime(ticket) {
+  if (ticket.status !== 'Terminé') return '-';
+  const created = parseDate(ticket.date, ticket.time);
+  let resolvedDate = NOW;
+  const term = ticket.history.find(h => h.status === "Terminé");
+  if (term) {
+    const p = term.date.split(' ');
+    resolvedDate = parseDate(p[0], p[1]);
+  }
+  const diffMs = resolvedDate.getTime() - created.getTime();
+  if (diffMs < 0) return '-';
+  
+  const absM = Math.floor(diffMs / 60000);
+  const dDays = Math.floor(absM / (60 * 24));
+  const dHrs = Math.floor((absM % (60 * 24)) / 60);
+  const dMins = absM % 60;
+  
+  if (dDays > 0) return `${dDays}j ${dHrs}h ${dMins}m`;
+  return `${dHrs}h ${dMins}m`;
+}
+
+const STATUS_COLORS={
+  'Envoyé': {bg:'rgba(143,163,191,0.12)', color:'#58595B', pdfColor:'#58595B'}, 
+  'Assigné': {bg:'rgba(74,127,181,0.12)', color:'#4A7FB5', pdfColor:'#4A7FB5'},
+  'Attente pièce': {bg:'#FFF9E6', color:'#D97706', pdfColor:'#D97706'},
+  'En route': {bg:'#FFFBEB', color:'#E8A817', pdfColor:'#B45309'},
+  'En Réparation': {bg:'#FEF3F2', color:'#F04438', pdfColor:'#DC2626'}, 
+  'Maintenance à distance': {bg:'#F0FDF4', color:'#16A34A', pdfColor:'#16A34A'},
+  'Terminé': {bg:'rgba(45,143,94,0.12)', color:'#2D8F5E', pdfColor:'#2D8F5E'},
+  'Annulé': {bg:'#F1F5F9', color:'#64748B', pdfColor:'#64748B'}
+};
+function getStatusStyle(s){ return STATUS_COLORS[s] || {bg:'#F4F6F9', color:'#58595B', pdfColor:'#58595B'}; }
+
+/* ==========================================================================
+   INITIALIZATION & FILTER UI
+   ========================================================================== */
+function initFilters(){
+  const unique = arr => [...new Set(arr)].filter(Boolean);
+  const filterData = {
+    pole: CATALOG.poles,
+    marque: unique(Object.values(CATALOG.marques).flat()),
+    cat: unique(Object.values(CATALOG.categories).flat()),
+    ref: unique(Object.values(CATALOG.references).flat())
+  };
+
+  setupFilterDropdown('pole', filterData.pole);
+  setupFilterDropdown('marque', filterData.marque);
+  setupFilterDropdown('cat', filterData.cat);
+  setupFilterDropdown('ref', filterData.ref);
+  setupAssignFilterDropdown();
+  setupUsageFilterDropdown();
+}
+
+/* ── Filtre "Indice d'usage" ──
+   1) Choisir une métrique filtre IMMÉDIATEMENT les machines dont la référence
+      catalogue porte cette métrique ("Non Applicable" = références sans métrique).
+   2) Taper une tranche Min/Max raffine EN DIRECT sur le dernier relevé. */
+function usageMetricLabel(m){ return m.unit ? `${m.name} (${m.unit})` : m.name; }
+
+function setupUsageFilterDropdown(){
+  const inp = document.getElementById('inp-usage');
+  const drop = document.getElementById('drop-usage');
+  const renderList = () => {
+    drop.innerHTML = '';
+    USAGE_METRICS.forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'filter-opt';
+      div.textContent = usageMetricLabel(m);
+      div.onmousedown = () => selectUsageMetric(m);
+      drop.appendChild(div);
+    });
+    const na = document.createElement('div');
+    na.className = 'filter-opt';
+    na.style.borderTop = '1px solid var(--light-grey)';
+    na.textContent = 'Non Applicable (N/A)';
+    na.onmousedown = () => selectUsageMetric('na');
+    drop.appendChild(na);
+  };
+  inp.addEventListener('focus', () => { renderList(); drop.classList.add('open'); });
+  inp.addEventListener('click', () => { renderList(); drop.classList.add('open'); });
+  // La tranche raffine en direct, à chaque frappe.
+  ['inp-usage-min','inp-usage-max'].forEach(id => {
+    document.getElementById(id).addEventListener('input', onUsageRangeInput);
+  });
+}
+
+function selectUsageMetric(m){
+  const inp = document.getElementById('inp-usage');
+  const range = document.getElementById('usage-range');
+  document.getElementById('drop-usage').classList.remove('open');
+  document.getElementById('inp-usage-min').value = '';
+  document.getElementById('inp-usage-max').value = '';
+  if(m === 'na'){
+    usageFilter = { type: 'na' };
+    inp.value = 'Non Applicable (N/A)';
+    range.classList.remove('vis');
+  } else {
+    usageFilter = { type: 'metric', name: m.name, unit: m.unit,
+                    key: m.name.trim().toLowerCase(), min: null, max: null };
+    inp.value = usageMetricLabel(m);
+    document.getElementById('usage-unit').textContent = m.unit || '';
+    range.classList.add('vis');
+    document.getElementById('inp-usage-min').focus();
+  }
+  renderTags();
+  renderParcTabs();
+  renderTable();
+}
+
+function onUsageRangeInput(){
+  if(!usageFilter || usageFilter.type !== 'metric') return;
+  const parse = id => {
+    const raw = document.getElementById(id).value.trim();
+    if(raw === '') return null;
+    const v = parseFloat(raw);
+    return isNaN(v) ? null : v;
+  };
+  usageFilter.min = parse('inp-usage-min');
+  usageFilter.max = parse('inp-usage-max');
+  renderTags();
+  renderParcTabs();
+  renderTable();
+}
+
+function resetUsageControls(){
+  document.getElementById('inp-usage').value = '';
+  document.getElementById('inp-usage-min').value = '';
+  document.getElementById('inp-usage-max').value = '';
+  document.getElementById('usage-range').classList.remove('vis');
+}
+
+function removeUsageFilter(){
+  usageFilter = null;
+  resetUsageControls();
+  renderTags();
+  renderParcTabs();
+  renderTable();
+}
+
+function machineMatchesUsage(m){
+  if(!usageFilter) return true;
+  const metrics = NODE_METRICS[m.nodeId] || [];
+  if(usageFilter.type === 'na') return metrics.length === 0;
+  // La référence de la machine doit porter la métrique choisie.
+  if(!metrics.includes(usageFilter.key)) return false;
+  const hasMin = usageFilter.min != null, hasMax = usageFilter.max != null;
+  if(!hasMin && !hasMax) return true;
+  // Tranche renseignée : le DERNIER relevé doit exister et tomber dedans.
+  const r = ((m.lastUsage && m.lastUsage.readings) || []).find(u =>
+    (u.name || '').trim().toLowerCase() === usageFilter.key);
+  if(!r) return false;
+  const v = parseFloat(String(r.value || '').replace(',', '.'));
+  if(isNaN(v)) return false;
+  if(hasMin && v < usageFilter.min) return false;
+  if(hasMax && v > usageFilter.max) return false;
+  return true;
+}
+
+function setupFilterDropdown(type, options) {
+  const inp = document.getElementById(`inp-${type}`);
+  const drop = document.getElementById(`drop-${type}`);
+
+  const renderList = (filterTxt = '') => {
+    const lFilter = filterTxt.toLowerCase();
+    drop.innerHTML = '';
+    const filtered = options.filter(o => o.toLowerCase().includes(lFilter));
+    
+    if (filtered.length === 0) {
+      const div = document.createElement('div');
+      div.className = 'filter-opt empty';
+      div.textContent = 'Aucun résultat';
+      drop.appendChild(div);
+    } else {
+      filtered.forEach(opt => {
+        const div = document.createElement('div');
+        div.className = 'filter-opt';
+        div.textContent = opt;
+        div.onmousedown = () => selectFilter(type, opt);
+        drop.appendChild(div);
+      });
+    }
+  };
+
+  inp.addEventListener('focus', () => { renderList(inp.value); drop.classList.add('open'); });
+  inp.addEventListener('input', e => { renderList(e.target.value); drop.classList.add('open'); });
+}
+
+function setupAssignFilterDropdown() {
+   const inp = document.getElementById('inp-assign');
+   const drop = document.getElementById('drop-assign');
+
+   const renderList = (filterTxt = '') => {
+     const lFilter = filterTxt.toLowerCase();
+     drop.innerHTML = '';
+     let hasMatch = false;
+
+     const addOpt = (val, lbl) => {
+       if(lbl.toLowerCase().includes(lFilter)) {
+         const div = document.createElement('div');
+         div.className = 'filter-opt';
+         div.textContent = lbl;
+         div.onmousedown = () => selectFilter('assignation', val);
+         drop.appendChild(div);
+         hasMatch = true;
+       }
+     };
+
+     const g1 = document.createElement('div'); g1.className = 'filter-opt-group'; g1.textContent = 'Statuts'; drop.appendChild(g1);
+     addOpt('en_stock', 'En stock');
+     addOpt('archivee', 'Archivée');
+
+     const g2 = document.createElement('div'); g2.className = 'filter-opt-group'; g2.textContent = 'Clients'; drop.appendChild(g2);
+     CLIENTS.forEach(c => addOpt(c.id, c.name));
+
+     if(!hasMatch) {
+       drop.innerHTML = `<div class="filter-opt empty">Aucun résultat</div>`;
+     }
+   };
+
+   inp.addEventListener('focus', () => { renderList(inp.value); drop.classList.add('open'); });
+   inp.addEventListener('input', e => { renderList(e.target.value); drop.classList.add('open'); });
+}
+
+function selectFilter(type, val) {
+  addFilter(type, val);
+  let inp = document.getElementById(type === 'assignation' ? 'inp-assign' : `inp-${type}`);
+  inp.value = '';
+  inp.blur(); 
+}
+
+// Close filter dropdowns on click outside
+document.addEventListener('mousedown', e => {
+  document.querySelectorAll('.searchable-filter-wrap').forEach(wrap => {
+    if(!wrap.contains(e.target)) {
+      const drop = wrap.querySelector('.searchable-filter-dropdown');
+      if(drop.classList.contains('open')){
+        drop.classList.remove('open');
+        const inp = wrap.querySelector('input');
+        // Le champ "Indice d'usage" garde la métrique sélectionnée affichée.
+        if(inp.id === 'inp-usage'){
+          inp.value = !usageFilter ? ''
+            : (usageFilter.type === 'na' ? 'Non Applicable (N/A)' : usageMetricLabel(usageFilter));
+        } else {
+          inp.value = '';
+        }
+      }
+    }
+  });
+});
+
+function addFilter(type, val){
+  if(!val || activeFilters[type].includes(val)) return;
+  activeFilters[type].push(val);
+  renderTags();
+  renderParcTabs();
+  renderTable();
+}
+
+function removeFilter(type, val){
+  activeFilters[type] = activeFilters[type].filter(v => v !== val);
+  renderTags();
+  renderParcTabs();
+  renderTable();
+}
+
+function clearFilters(){
+  activeFilters = { pole: [], marque: [], cat: [], ref: [], assignation: [] };
+  usageFilter = null;
+  resetUsageControls();
+  document.getElementById('search-input').value = '';
+  searchQuery = '';
+  renderTags();
+  renderParcTabs();
+  renderTable();
+}
+
+function renderTags(){
+  const container = document.getElementById('active-tags');
+  container.innerHTML = '';
+  let count = 0;
+  
+  const labels = { pole:'Pôle', marque:'Marque', cat:'Cat', ref:'Réf', assignation:'Assignation' };
+  
+  for(const [type, vals] of Object.entries(activeFilters)){
+    vals.forEach(val => {
+      count++;
+      let displayVal = val;
+      if(type === 'assignation'){
+        if(val === 'en_stock') displayVal = 'En stock';
+        else if(val === 'archivee') displayVal = 'Archivée';
+        else displayVal = getClientName(val);
+      }
+      const div = document.createElement('div');
+      div.className = 'filter-tag';
+      div.innerHTML = `<span>${labels[type]}: <strong>${xe(displayVal)}</strong></span>`;
+      
+      const closeBtn = document.createElement('span');
+      closeBtn.className = 'tag-close';
+      closeBtn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+      closeBtn.onclick = () => removeFilter(type, val);
+      
+      div.appendChild(closeBtn);
+      container.appendChild(div);
+    });
+  }
+
+  // Tag du filtre d'usage : "Usage : Heure d'utilisation" puis, si tranche,
+  // "Usage : Heure d'utilisation 400 – 500 Hr".
+  if(usageFilter){
+    count++;
+    let lbl;
+    if(usageFilter.type === 'na'){
+      lbl = 'Non Applicable';
+    } else {
+      lbl = usageFilter.name;
+      const hasMin = usageFilter.min != null, hasMax = usageFilter.max != null;
+      if(hasMin || hasMax){
+        lbl += ' ' + (hasMin ? usageFilter.min : '0') + ' – ' + (hasMax ? usageFilter.max : '∞') +
+               (usageFilter.unit ? ' ' + usageFilter.unit : '');
+      }
+    }
+    const div = document.createElement('div');
+    div.className = 'filter-tag';
+    div.innerHTML = `<span>Usage: <strong>${xe(lbl)}</strong></span>`;
+    const closeBtn = document.createElement('span');
+    closeBtn.className = 'tag-close';
+    closeBtn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    closeBtn.onclick = removeUsageFilter;
+    div.appendChild(closeBtn);
+    container.appendChild(div);
+  }
+
+  document.getElementById('btn-clear-filters').style.display = count > 0 ? 'inline-block' : 'none';
+}
+
+document.getElementById('search-input').addEventListener('input', e => {
+  searchQuery = e.target.value.toLowerCase();
+  renderParcTabs();
+  renderTable();
+});
+
+/* ==========================================================================
+   TABLE RENDER & SORT
+   ========================================================================== */
+function sortTable(col){
+  if(sortCol===col){sortDir=sortDir==='asc'?'desc':'asc';} else {sortCol=col;sortDir='asc';}
+  document.querySelectorAll('.data-table th').forEach(th=>th.classList.remove('sorted'));
+  const thEl=document.getElementById('th-'+col);
+  if(thEl){thEl.classList.add('sorted');thEl.querySelector('.sort-icon').textContent=sortDir==='asc'?'↑':'↓';}
+  renderTable();
+}
+
+function getSortValue(m, col){
+  if(col==='idInstance') return m.parcId.toLowerCase();
+  if(col==='ref') return m.ref.toLowerCase();
+  if(col==='assignation'){
+    if(m.assignation==='en_stock') return '0_en_stock';
+    if(m.assignation==='archivee') return '2_archivee';
+    return '1_' + getClientName(m.assignation).toLowerCase();
+  }
+  if(col==='lastUsage') return lastUsageSortKey(m);
+  return '';
+}
+
+/* Recherche + filtres dropdown appliqués (AVANT le filtre d'onglet) :
+   sert au tableau et aux compteurs des onglets. */
+function filteredMachines(){
+  return MACHINES.filter(m => {
+    if(searchQuery){
+      const match = m.parcId.toLowerCase().includes(searchQuery) || m.ref.toLowerCase().includes(searchQuery) || (m.assignation !== 'en_stock' && m.assignation !== 'archivee' && getClientName(m.assignation).toLowerCase().includes(searchQuery));
+      if(!match) return false;
+    }
+    if(activeFilters.pole.length && !activeFilters.pole.includes(m.pole)) return false;
+    if(activeFilters.marque.length && !activeFilters.marque.includes(m.marque)) return false;
+    if(activeFilters.cat.length && !activeFilters.cat.includes(m.cat)) return false;
+    if(activeFilters.ref.length && !activeFilters.ref.includes(m.ref)) return false;
+    if(activeFilters.assignation.length && !activeFilters.assignation.includes(m.assignation)) return false;
+    if(!machineMatchesUsage(m)) return false;
+    return true;
+  });
+}
+
+function renderTable(){
+  const tbody = document.getElementById('machines-tbody');
+  tbody.innerHTML = '';
+
+  let filtered = filteredMachines().filter(m => machineTab(m) === currentParcTab);
+
+  // Tri par défaut selon l'onglet ; un clic sur une colonne prend le dessus.
+  filtered.sort((a,b) => {
+    if(sortCol === 'default'){
+      if(currentParcTab === 'actifs'){
+        // Jamais relevée d'abord, puis du relevé le plus ancien au plus récent ;
+        // à égalité, ordre alphabétique du client.
+        const ta = lastUsageDateTs(a), tb = lastUsageDateTs(b);
+        const byClient = getClientName(a.assignation).localeCompare(getClientName(b.assignation));
+        if(ta === null && tb === null) return byClient;
+        if(ta === null) return -1;
+        if(tb === null) return 1;
+        if(ta !== tb) return ta - tb;
+        return byClient;
+      }
+      if(currentParcTab === 'clients_archives'){
+        return getClientName(a.assignation).localeCompare(getClientName(b.assignation));
+      }
+      return a.parcId.localeCompare(b.parcId);
+    }
+    const valA = getSortValue(a, sortCol);
+    const valB = getSortValue(b, sortCol);
+    if(valA < valB) return sortDir==='asc'?-1:1;
+    if(valA > valB) return sortDir==='asc'?1:-1;
+    return 0;
+  });
+
+  // Compteurs d'en-tête (toutes machines confondues)
+  let cStock=0, cArch=0;
+  MACHINES.forEach(m => { if(m.assignation==='en_stock') cStock++; else if(m.assignation==='archivee') cArch++; });
+  document.getElementById('page-counts').textContent = `${MACHINES.length} machines — ${cStock} en stock — ${cArch} archivées`;
+
+  if(filtered.length === 0){
+    tbody.innerHTML = `<tr class="empty-state-row"><td colspan="5"><svg class="empty-state-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Aucune machine dans cet onglet</td></tr>`;
+    return;
+  }
+
+  filtered.forEach(m => {
+    const tr = document.createElement('tr');
+    if(m.assignation === 'archivee') tr.classList.add('row-archived');
+    
+    let assignBadge = '';
+    if(m.assignation === 'en_stock') assignBadge = `<span class="badge-assign badge-stock">En stock</span>`;
+    else if(m.assignation === 'archivee') assignBadge = `<span class="badge-assign badge-archive">Archivée</span>`;
+    else assignBadge = `<span class="badge-assign badge-client">${xe(getClientName(m.assignation))}</span>`;
+
+    tr.innerHTML = `
+      <td class="col-id">${xe(m.parcId)}</td>
+      <td><span class="col-ref">${xe(m.ref)}</span></td>
+      <td>${assignBadge}</td>
+      <td>${lastUsageCellHtml(m)}</td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn-icon" title="Modifier" onclick="event.stopPropagation();openMachineModal('${m.idInstance}')">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn-icon" title="Détails" onclick="event.stopPropagation();openMachineDetailPopup('${m.idInstance}')">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </td>
+    `;
+    tr.onclick = () => openMachineDetailPopup(m.idInstance);
+    tbody.appendChild(tr);
+  });
+}
+
+/* ==========================================================================
+   MODAL: ADD / EDIT
+   ========================================================================== */
+function initCascade(){
+  const fPole = document.getElementById('f-pole');
+  fPole.innerHTML = '<option value="">Sélectionner un pôle...</option>';
+  CATALOG.poles.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p; opt.textContent = p;
+    fPole.appendChild(opt);
+  });
+}
+
+function onCascadeChange(level){
+  if(editingMachine) return; // Read-only in edit
+  
+  const fPole = document.getElementById('f-pole');
+  const fMarque = document.getElementById('f-marque');
+  const fCat = document.getElementById('f-cat');
+  const fRef = document.getElementById('f-ref');
+
+  if(level === 'pole'){
+    fMarque.innerHTML = '<option value="">Sélectionner une marque...</option>';
+    fCat.innerHTML = '<option value="">Sélectionner une catégorie...</option>'; fCat.disabled = true;
+    fRef.innerHTML = '<option value="">Sélectionner une référence...</option>'; fRef.disabled = true;
+    if(fPole.value){
+      CATALOG.marques[fPole.value].forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m; opt.textContent = m;
+        fMarque.appendChild(opt);
+      });
+      fMarque.disabled = false;
+    } else { fMarque.disabled = true; }
+  }
+  else if(level === 'marque'){
+    fCat.innerHTML = '<option value="">Sélectionner une catégorie...</option>';
+    fRef.innerHTML = '<option value="">Sélectionner une référence...</option>'; fRef.disabled = true;
+    if(fMarque.value){
+      CATALOG.categories[fMarque.value].forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c; opt.textContent = c;
+        fCat.appendChild(opt);
+      });
+      fCat.disabled = false;
+    } else { fCat.disabled = true; }
+  }
+  else if(level === 'cat'){
+    fRef.innerHTML = '<option value="">Sélectionner une référence...</option>';
+    if(fCat.value){
+      CATALOG.references[fCat.value].forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r; opt.textContent = r;
+        fRef.appendChild(opt);
+      });
+      fRef.disabled = false;
+    } else { fRef.disabled = true; }
+  }
+}
+
+// Custom Searchable Dropdown for Assignation
+const assignInput = document.getElementById('f-assign-input');
+const assignDropdown = document.getElementById('f-assign-dropdown');
+const assignVal = document.getElementById('f-assign-val');
+
+// IMPORTANT : le dropdown est SORTI du modal et rattaché à <body>. Le
+// transform du .modal-box (et le backdrop-filter de l'overlay) font du modal
+// le "containing block" des position:fixed : les coordonnées viewport seraient
+// décalées et le dropdown rogné par l'overflow:hidden du modal (= invisible).
+document.body.appendChild(assignDropdown);
+assignDropdown.style.zIndex = '1200';
+
+function buildAssignDropdown(filter = ''){
+  assignDropdown.innerHTML = '';
+  let hasItems = false;
+  const lFilter = filter.toLowerCase();
+  
+  const addOpt = (val, label, isSep=false) => {
+    if(isSep){ 
+      const div = document.createElement('div');
+      div.className = 'searchable-option opt-sep';
+      assignDropdown.appendChild(div);
+      return; 
+    }
+    if(label.toLowerCase().includes(lFilter)){
+      const div = document.createElement('div');
+      div.className = 'searchable-option';
+      div.textContent = label;
+      div.onclick = () => selectAssign(val, label);
+      assignDropdown.appendChild(div);
+      hasItems = true;
+    }
+  };
+
+  addOpt('en_stock', 'En stock');
+  addOpt('archivee', 'Archivée');
+  if(!filter) addOpt('', '', true); // Separator
+  // Seuls les clients ACTIFS sont proposés à l'assignation (clients_active du
+  // bootstrap) ; un client archivé garde ses machines mais n'en reçoit plus.
+  CLIENTS_ACTIVE.forEach(c => addOpt(c.id, c.name));
+
+  if(!hasItems) {
+    const div = document.createElement('div');
+    div.className = 'searchable-option disabled';
+    div.textContent = 'Aucun résultat';
+    assignDropdown.appendChild(div);
+  }
+}
+
+function selectAssign(val, label){
+  assignVal.value = val;
+  assignInput.value = label;
+  assignDropdown.classList.remove('open');
+  document.getElementById('f-assign-input').classList.remove('error');
+  document.getElementById('err-assign').classList.remove('vis');
+}
+
+/* Le dropdown est rendu en position:fixed (ancré sur l'input) pour ne PAS être
+   rogné par le scroll du modal : la liste complète est visible d'un coup, avec
+   son propre petit scroll interne (max-height) + recherche au clavier. */
+function positionAssignDropdown(){
+  const r = assignInput.getBoundingClientRect();
+  assignDropdown.style.position = 'fixed';
+  assignDropdown.style.left = r.left + 'px';
+  assignDropdown.style.width = r.width + 'px';
+  assignDropdown.style.right = 'auto';
+  assignDropdown.style.marginTop = '0';
+  const spaceBelow = window.innerHeight - r.bottom - 12;
+  if (spaceBelow < 150 && r.top > spaceBelow) {
+    // Pas de place dessous : ouvrir au-dessus de l'input.
+    assignDropdown.style.top = 'auto';
+    assignDropdown.style.bottom = (window.innerHeight - r.top + 4) + 'px';
+    assignDropdown.style.maxHeight = Math.min(200, r.top - 16) + 'px';
+  } else {
+    assignDropdown.style.bottom = 'auto';
+    assignDropdown.style.top = (r.bottom + 4) + 'px';
+    assignDropdown.style.maxHeight = Math.min(200, spaceBelow) + 'px';
+  }
+}
+
+function openAssignDropdown(){
+  buildAssignDropdown(assignInput.value);
+  assignDropdown.classList.add('open');
+  positionAssignDropdown();
+}
+// 'click' EN PLUS de 'focus' : un clic sur un champ déjà focalisé doit
+// rouvrir la liste (et certains environnements ne déclenchent pas focus).
+assignInput.addEventListener('focus', openAssignDropdown);
+assignInput.addEventListener('click', openAssignDropdown);
+assignInput.addEventListener('input', e => { buildAssignDropdown(e.target.value); assignDropdown.classList.add('open'); assignVal.value = ''; positionAssignDropdown(); });
+document.addEventListener('click', e => {
+  // Le dropdown vit désormais sous <body> : il faut aussi l'exclure du test.
+  if(!e.target.closest('.searchable-select-container') && !e.target.closest('#f-assign-dropdown'))
+    assignDropdown.classList.remove('open');
+});
+// Suit l'input si le modal défile ou si la fenêtre change de taille.
+window.addEventListener('resize', () => { if(assignDropdown.classList.contains('open')) positionAssignDropdown(); });
+document.addEventListener('scroll', () => { if(assignDropdown.classList.contains('open')) positionAssignDropdown(); }, true);
+
+function openMachineModal(id = null){
+  editingMachine = id;
+  const isEdit = !!id;
+  document.getElementById('modal-title').textContent = isEdit ? 'Modifier la machine' : 'Ajouter une machine';
+  document.getElementById('modal-submit-btn').textContent = isEdit ? 'Enregistrer' : 'Ajouter la machine';
+  
+  document.querySelectorAll('.form-control').forEach(el => el.classList.remove('error'));
+  document.getElementById('f-assign-input').classList.remove('error');
+  document.querySelectorAll('.field-error').forEach(el => el.classList.remove('vis'));
+
+  const fPole = document.getElementById('f-pole');
+  const fMarque = document.getElementById('f-marque');
+  const fCat = document.getElementById('f-cat');
+  const fRef = document.getElementById('f-ref');
+
+  if(isEdit){
+    const m = MACHINES.find(x => x.idInstance === id);
+    fPole.innerHTML = `<option value="${m.pole}">${m.pole}</option>`; fPole.disabled = true;
+    fMarque.innerHTML = `<option value="${m.marque}">${m.marque}</option>`; fMarque.disabled = true;
+    fCat.innerHTML = `<option value="${m.cat}">${m.cat}</option>`; fCat.disabled = true;
+    fRef.innerHTML = `<option value="${m.ref}">${m.ref}</option>`; fRef.disabled = true;
+    // ID Parc toujours éditable. Auto = suit la référence tant qu'on n'y touche pas ;
+    // le modifier à la main le FIGE (devient un identifiant manuel).
+    const fId = document.getElementById('f-id');
+    fId.value = m.parcId;
+    fId.readOnly = false;
+    fId.title = m.isAuto
+      ? "Auto-généré : suit la référence. Le modifier fixe un identifiant manuel."
+      : "Identifiant manuel (figé).";
+
+    assignVal.value = m.assignation;
+    if(m.assignation === 'en_stock') assignInput.value = 'En stock';
+    else if(m.assignation === 'archivee') assignInput.value = 'Archivée';
+    else assignInput.value = getClientName(m.assignation);
+  } else {
+    initCascade();
+    fPole.disabled = false; fMarque.disabled = true; fCat.disabled = true; fRef.disabled = true;
+    fMarque.innerHTML = '<option value="">Sélectionner une marque...</option>';
+    fCat.innerHTML = '<option value="">Sélectionner une catégorie...</option>';
+    fRef.innerHTML = '<option value="">Sélectionner une référence...</option>';
+    const fId = document.getElementById('f-id');
+    fId.value = ''; fId.readOnly = false; fId.title = '';
+    assignVal.value = ''; assignInput.value = '';
+  }
+
+  document.getElementById('machine-modal').classList.add('vis');
+}
+
+function closeMachineModal(){
+  document.getElementById('machine-modal').classList.remove('vis');
+  assignDropdown.classList.remove('open');  // le dropdown vit sous <body>
+  editingMachine = null;
+}
+
+function submitMachineForm(){
+  let valid = true;
+  const setErr = (idInp, idErr, isErr) => {
+    document.getElementById(idInp).classList.toggle('error', isErr);
+    document.getElementById(idErr).classList.toggle('vis', isErr);
+    if(isErr) valid = false;
+  };
+
+  const fPole = document.getElementById('f-pole');
+  const fMarque = document.getElementById('f-marque');
+  const fCat = document.getElementById('f-cat');
+  const fRef = document.getElementById('f-ref');
+  
+  if(!editingMachine){
+    setErr('f-pole', 'err-pole', !fPole.value);
+    setErr('f-marque', 'err-marque', !fMarque.value);
+    setErr('f-cat', 'err-cat', !fCat.value);
+    setErr('f-ref', 'err-ref', !fRef.value);
+  }
+
+  const assign = assignVal.value;
+  if(!assign){
+    document.getElementById('f-assign-input').classList.add('error');
+    document.getElementById('err-assign').classList.add('vis');
+    valid = false;
+  }
+
+  if(!valid) return;
+
+  const data = {
+    pole: fPole.value, marque: fMarque.value, cat: fCat.value, ref: fRef.value,
+    assignation: assign, idInstance: document.getElementById('f-id').value.trim()
+  };
+
+  // ID Parc laissé vide -> le backend génère une étiquette AUTO qui suit la référence
+  // (on n'engendre plus l'ID côté client, sinon il serait figé et ne suivrait pas).
+
+  if(editingMachine){
+    const m = MACHINES.find(x => x.idInstance === editingMachine);
+    if(assign === 'archivee' && m.assignation !== 'archivee'){
+      // Archivage = impact fort -> confirmation
+      pendingArchiveData = { m, data };
+      document.getElementById('confirm-archive-modal').classList.add('vis');
+      return;
+    }
+    persistMachineEdit(m, data);
+  } else {
+    persistMachineCreate(data);
+  }
+}
+
+async function persistMachineCreate(data){
+  try {
+    await API.createMachine({
+      reference: data.ref, pole: data.pole, marque: data.marque, categorie: data.cat,
+      assignation: assignToApi(data.assignation), instance_id: data.idInstance
+    });
+    showToast('Machine ajoutée au parc');
+  } catch(e){ showToast('Échec : '+e.message,'error'); return; }
+  closeMachineModal();
+  await reload();
+}
+
+async function persistMachineEdit(m, data){
+  try {
+    // ID modifié à la main -> on l'envoie (la machine devient à identifiant FIXE).
+    // ID inchangé -> on ne touche pas (une machine auto reste auto et suit la référence).
+    const payload = { assignation: assignToApi(data.assignation) };
+    if(data.idInstance && data.idInstance !== m.parcId) payload.new_instance_id = data.idInstance;
+    await API.updateMachine(m.idInstance, payload);
+    showToast(getAssignToastMsg(data.assignation));
+  } catch(e){ showToast('Échec : '+e.message,'error'); return; }
+  closeMachineModal();
+  await reload();
+}
+
+function getAssignToastMsg(assign){
+  if(assign === 'en_stock') return "Machine désassignée — retournée en stock";
+  if(assign === 'archivee') return "Machine archivée";
+  return `Machine assignée à ${getClientName(assign)}`;
+}
+
+async function executeArchive(){
+  if(!pendingArchiveData) return;
+  const {m, data} = pendingArchiveData;
+  try {
+    const payload = { assignation: assignToApi(data.assignation) };
+    if(data.idInstance && data.idInstance !== m.parcId) payload.new_instance_id = data.idInstance;
+    await API.updateMachine(m.idInstance, payload);
+    showToast("Machine archivée", "success");
+  } catch(e){ showToast('Échec : '+e.message,'error'); }
+  document.getElementById('confirm-archive-modal').classList.remove('vis');
+  closeMachineModal();
+  pendingArchiveData = null;
+  await reload();
+}
+
+/* ==========================================================================
+   POPUP: FICHE MACHINE — même fiche que gestion_client (info card + onglets
+   Tickets / Relevés d'usage, tri/filtres/annulation partagés).
+   ========================================================================== */
+let currentMachineDetailId = null;
+let pmtFilters = { tech: [], status: [] };
+let pmtSort = { col: 'default', dir: 'asc' };
+
+function switchPmTab(name){
+  ['tickets','releves'].forEach(k => {
+    document.getElementById('tab-btn-pm-'+k).classList.toggle('active', k===name);
+    document.getElementById('tab-pm-'+k).classList.toggle('active', k===name);
+  });
+}
+
+function lastUsageInfoHtml(m){
+  if(!m.lastUsage || !m.lastUsage.readings || !m.lastUsage.readings.length){
+    return '<span style="color:var(--light-slate);">—</span>';
+  }
+  // Empilé verticalement si plusieurs indices ; gris ardoise sobre (#4A5568).
+  return m.lastUsage.readings.map(r =>
+    `<div style="color:#4A5568;font-size:12px;font-weight:600;white-space:nowrap;">${xe(r.name)} ${xe(String(r.value))}${r.unit?' '+xe(r.unit):''} · ${xe(m.lastUsage.date)}</div>`
+  ).join('');
+}
+
+function pmTickets(){
+  let data = TICKETS.filter(t => t.machineId === currentMachineDetailId);
+  const q = (document.getElementById('search-pm-tickets').value || '').toLowerCase();
+  if(q) data = data.filter(t => t.id.toLowerCase().includes(q) || t.title.toLowerCase().includes(q) || t.date.toLowerCase().includes(q) || t.tech_name.toLowerCase().includes(q) || t.status.toLowerCase().includes(q));
+  if(pmtFilters.tech.length) data = data.filter(t => t.techs.some(x => pmtFilters.tech.includes(x.name)));
+  if(pmtFilters.status.length) data = data.filter(t => pmtFilters.status.includes(t.status));
+  return data;
+}
+
+function sortPmtTable(col){
+  if(pmtSort.col===col) pmtSort.dir = pmtSort.dir==='asc'?'desc':'asc';
+  else { pmtSort.col=col; pmtSort.dir='asc'; }
+  ['id','date','title','tech','status'].forEach(c => TicketTable.renderSortHeader(
+    document.getElementById('pmtth-'+c), c, pmtSort.col, pmtSort.dir));
+  renderPmTickets();
+}
+
+function openPmCancel(ticketId){
+  const t = TICKETS.find(x => x.id === ticketId);
+  TicketTable.openCancelModal(ticketId, t ? {
+    titre: t.title, client_name: t.client_name, reference: t.parcId
+  } : null, async () => { await reload(); renderPmTickets(); },
+  { byRole: 'manager', byName: 'Manager', byId: 'manager' });
+}
+
+function renderPmTickets(){
+  const tbody = document.getElementById('machine-tickets-tbody');
+  const empty = document.getElementById('pm-tickets-empty');
+  const wrapper = document.querySelector('#tab-pm-tickets .popup-table-wrapper');
+  tbody.innerHTML = '';
+
+  let data = pmTickets();
+  if(!data.length){
+    empty.style.display = 'block'; wrapper.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none'; wrapper.style.display = 'block';
+
+  data = pmtSort.col === 'default'
+    ? TicketTable.defaultSort(data)
+    : TicketTable.sortBy(data, pmtSort.col, pmtSort.dir);
+
+  data.forEach(t => {
+    const st = getStatusStyle(t.status);
+    const isTerminal = t.status === 'Terminé' || t.status === 'Annulé';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-weight:700;color:var(--primary);">${t.id}</td>
+      <td>${t.date}<br><span style="font-size:11px;color:var(--light-slate)">${t.time}</span></td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${xe(t.title)}">${xe(t.title)}</td>
+      <td>${TicketTable.renderTechCell(t.techs)}</td>
+      <td><span class="status-badge" style="background:${st.bg};color:${st.color};">${t.status}</span></td>
+      <td style="text-align:right;">
+        <div style="display:inline-flex;gap:6px;">
+          <button class="btn-icon" title="Voir le détail" onclick="event.stopPropagation();openTicketDetailPopup('${t.id}')">
+            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          ${!isTerminal?`<button class="btn-icon danger" title="Annuler le ticket" onclick="event.stopPropagation();openPmCancel('${t.id}')">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>`:''}
+        </div>
+      </td>
+    `;
+    tr.onclick = () => openTicketDetailPopup(t.id);
+    tbody.appendChild(tr);
+  });
+}
+
+/* Filtres Technicien / État de la fiche : options issues des tickets de la machine. */
+function setupPmtFilter(key){
+  const inp = document.getElementById('inp-pmt-'+key);
+  const drop = document.getElementById('drop-pmt-'+key);
+  const renderList = (txt='') => {
+    const lf = txt.toLowerCase();
+    const all = TICKETS.filter(t => t.machineId === currentMachineDetailId);
+    let opts = key === 'tech'
+      ? [...new Set(all.flatMap(t => t.techs.map(x => x.name)))]
+      : [...new Set(all.map(t => t.status))];
+    opts = opts.filter(o => o && !pmtFilters[key].includes(o) && o.toLowerCase().includes(lf));
+    drop.innerHTML = opts.length
+      ? opts.map(o => `<div class="filter-opt" onmousedown="addPmtFilter('${key}','${xe(o).replace(/'/g,"\\'")}')">${xe(o)}</div>`).join('')
+      : '<div class="filter-opt empty">Aucune option</div>';
+  };
+  inp.addEventListener('focus', () => { renderList(inp.value); drop.classList.add('open'); });
+  inp.addEventListener('input', e => { renderList(e.target.value); drop.classList.add('open'); });
+}
+setupPmtFilter('tech'); setupPmtFilter('status');
+
+function addPmtFilter(key, val){
+  if(!pmtFilters[key].includes(val)) pmtFilters[key].push(val);
+  document.getElementById('inp-pmt-'+key).value = '';
+  document.getElementById('drop-pmt-'+key).classList.remove('open');
+  renderPmtTags(); renderPmTickets();
+}
+function removePmtFilter(key, val){
+  pmtFilters[key] = pmtFilters[key].filter(v => v !== val);
+  renderPmtTags(); renderPmTickets();
+}
+function renderPmtTags(){
+  const cont = document.getElementById('pmt-tags');
+  const labels = { tech:'Tech', status:'État' };
+  let html = '';
+  Object.keys(pmtFilters).forEach(key => pmtFilters[key].forEach(v => {
+    html += `<span class="filter-tag"><strong>${labels[key]}:</strong> ${xe(v)} <span class="tag-close" onclick="removePmtFilter('${key}','${xe(v).replace(/'/g,"\\'")}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></span>`;
+  }));
+  cont.innerHTML = html;
+}
+document.getElementById('search-pm-tickets').addEventListener('input', renderPmTickets);
+
+/* Onglet "Relevés d'usage" : historique complet, du plus récent au plus ancien. */
+async function loadPmReleves(machineId){
+  const cont = document.getElementById('pm-releves-list');
+  cont.innerHTML = '<div style="padding:24px;text-align:center;color:var(--light-slate);">Chargement…</div>';
+  let entries = [];
+  try { entries = await API.usageTimeline(machineId); }
+  catch(e){ cont.innerHTML = `<div style="padding:24px;text-align:center;color:var(--danger);">Erreur : ${xe(e.message)}</div>`; return; }
+  if(!entries.length){
+    cont.innerHTML = '<div style="padding:24px;text-align:center;color:var(--light-slate);">Aucun relevé enregistré.</div>';
+    return;
+  }
+  entries.reverse(); // l'API renvoie chronologique -> plus récent d'abord
+  cont.innerHTML = entries.map(e => {
+    const dt = new Date(e.date);
+    const dd = n => ('0'+n).slice(-2);
+    const dateStr = dd(dt.getDate())+'/'+dd(dt.getMonth()+1)+'/'+dt.getFullYear();
+    return `<div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--light-grey);font-size:13px;">
+      <span style="color:var(--light-slate);white-space:nowrap;">${dateStr}</span>
+      <span style="color:var(--light-grey);">·</span>
+      <span style="color:#4A5568;font-weight:600;">${xe(e.name)}</span>
+      <span style="color:var(--light-grey);">·</span>
+      <span style="color:#4A5568;">${xe(String(e.value))}${e.unit?' '+xe(e.unit):''}</span>
+      <span style="color:var(--light-grey);">·</span>
+      <a href="#" style="color:var(--steel-blue);font-weight:700;text-decoration:none;" onclick="event.preventDefault();openTicketDetailPopup('${e.ticket_id}')">${xe(e.ticket_id)}</a>
+    </div>`;
+  }).join('');
+}
+
+function openMachineDetailPopup(id){
+  const m = MACHINES.find(x => x.idInstance === id);
+  if(!m) return;
+  currentMachineDetailId = id;
+
+  let assignBadge = '';
+  if(m.assignation === 'en_stock') assignBadge = `<span class="badge-assign badge-stock">En stock</span>`;
+  else if(m.assignation === 'archivee') assignBadge = `<span class="badge-assign badge-archive">Archivée</span>`;
+  else assignBadge = `<span class="badge-assign badge-client">${xe(getClientName(m.assignation))} — ${xe(getClientPhone(m.assignation))}</span>`;
+
+  document.getElementById('md-assign-badge').innerHTML = assignBadge;
+  document.getElementById('md-id').textContent = m.parcId;
+  document.getElementById('md-ref').textContent = m.ref;
+  document.getElementById('md-pole').textContent = m.pole;
+  document.getElementById('md-marque').textContent = m.marque;
+  document.getElementById('md-cat').textContent = m.cat;
+  document.getElementById('md-last-usage').innerHTML = lastUsageInfoHtml(m);
+
+  // État vierge à chaque ouverture
+  pmtFilters = { tech: [], status: [] };
+  pmtSort = { col: 'default', dir: 'asc' };
+  document.getElementById('search-pm-tickets').value = '';
+  ['id','date','title','tech','status'].forEach(c => TicketTable.renderSortHeader(
+    document.getElementById('pmtth-'+c), c, 'default', 'asc'));
+  renderPmtTags();
+  switchPmTab('tickets');
+  renderPmTickets();
+  loadPmReleves(id);
+
+  document.getElementById('machine-detail-popup').classList.add('vis');
+}
+
+function closeMachineDetailPopup(){
+  document.getElementById('machine-detail-popup').classList.remove('vis');
+  currentMachineDetailId = null;
+}
+
+/* ==========================================================================
+   POPUP: TICKET DETAILS (Nested)
+   ========================================================================== */
+function closeTicketDetailPopup() {
+  document.getElementById('ticket-detail-overlay').classList.remove('vis');
+  currentDetailTicketId = null;
+}
+
+function openTicketDetailPopup(id){
+  // Popup partagé (manager = lecture seule + discussion)
+  TicketDetail.open(id, { role: 'manager', onChange: reload });
+  return;
+  /* eslint-disable */
+  const t = TICKETS.find(x => x.id === id);
+  if(!t) return;
+  currentDetailTicketId = id;
+  const m = MACHINES.find(x => x.idInstance === t.machineId);
+  document.getElementById('ticket-detail-overlay').classList.add('vis');
+  document.querySelectorAll('#ticket-detail-overlay .sk-target').forEach(el=>el.classList.add('skeleton'));
+  
+  setTimeout(() => {
+    const st = getStatusStyle(t.status);
+    document.getElementById('td-status-badge').innerHTML = `<span class="status-badge" style="background:${st.bg};color:${st.color};">${t.status}</span>`;
+    document.getElementById('td-title').textContent = t.title;
+    
+    const clientName = m && m.assignation !== 'en_stock' && m.assignation !== 'archivee' ? getClientName(m.assignation) : '—';
+    const clientPhone = m && m.assignation !== 'en_stock' && m.assignation !== 'archivee' ? getClientPhone(m.assignation) : '';
+    document.getElementById('td-client').textContent = clientName !== '—' ? `${clientName}${clientPhone ? ' — ' + clientPhone : ''}` : '—';
+    
+    document.getElementById('td-tech').textContent = t.tech_name !== '—' ? `${t.tech_name} — ${t.tech_phone}` : '—';
+    document.getElementById('td-pole').textContent = m ? m.pole : '—';
+    document.getElementById('td-marque').textContent = m ? m.marque : '—';
+    document.getElementById('td-cat').textContent = m ? m.cat : '—';
+    document.getElementById('td-ref').textContent = m ? m.ref : '—';
+    document.getElementById('td-serial').textContent = t.parcId;
+    
+    // Résolution
+    document.getElementById('td-res').textContent = t.status === 'Terminé' ? getResolutionTime(t) : '-';
+    
+    const locWrap = document.getElementById('td-loc-wrap');
+    if(t.loc) {
+      locWrap.style.display = 'flex';
+      document.getElementById('td-loc').innerHTML = `<a href="${t.loc}" target="_blank" class="link-map"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Ouvrir sur Google Maps</a>`;
+    } else {
+      locWrap.style.display = 'none';
+    }
+    
+    const chkWrap = document.getElementById('td-chk-wrap');
+    const descWrap = document.getElementById('td-desc-wrap');
+    const imgWrap = document.getElementById('td-img-wrap');
+
+    const checklist = t.checklist && t.checklist.length > 0 ? t.checklist : [{type: 'panne', label: 'Autre problème'}];
+    
+    chkWrap.style.display = 'flex';
+    document.getElementById('td-checklist').innerHTML = checklist.map(c => 
+      c.type==='panne' ? `<div class="chk-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>${xe(c.label)}</span></div>` : 
+      `<div class="chk-item chk-item-field"><strong>${xe(c.label)} :</strong>&nbsp;${xe(c.val)}</div>`
+    ).join('');
+
+    if(t.desc){ descWrap.style.display = 'flex'; document.getElementById('td-desc').textContent = t.desc; }
+    else descWrap.style.display = 'none';
+
+    if(t.client_images && t.client_images.length > 0){
+      imgWrap.style.display = 'flex';
+      document.getElementById('td-images').innerHTML = t.client_images.map(img => `<img src="${img}" class="gal-thumb" onclick="openLightbox('${img}')">`).join('');
+    } else imgWrap.style.display = 'none';
+
+    document.getElementById('td-timeline').innerHTML = t.history.map((h,i) => {
+      const isLast = i === t.history.length-1;
+      const sColor = getStatusStyle(h.status).color;
+      return `<div class="timeline-item ${isLast?'timeline-last':''}" ${isLast?`style="color:${sColor};"`:''}><div class="timeline-status">${h.status}</div><div class="timeline-time">${h.date}</div></div>`;
+    }).join('');
+
+    const rCont = document.getElementById('td-report-content'), rEmpty = document.getElementById('td-report-empty');
+    const techImgWrap = document.getElementById('td-tech-img-wrap');
+    
+    if(t.report){
+      rCont.style.display='grid'; rEmpty.style.display='none';
+      document.getElementById('td-rep-title').textContent = t.report.title;
+      document.getElementById('td-rep-sit').textContent = t.report.sit;
+      document.getElementById('td-rep-act').textContent = t.report.act;
+      if (t.tech_images && t.tech_images.length > 0) {
+        techImgWrap.style.display = 'flex';
+        document.getElementById('td-tech-images').innerHTML = t.tech_images.map(img => `<img src="${img}" class="gal-thumb" onclick="openLightbox('${img}')">`).join('');
+      } else {
+        techImgWrap.style.display = 'none';
+      }
+    } else { rCont.style.display='none'; rEmpty.style.display='block'; }
+
+    // Evaluation
+    const evalSec = document.getElementById('td-eval-section');
+    if (t.status === 'Terminé') {
+      evalSec.style.display = 'block';
+      if (t.evaluation) {
+         document.getElementById('td-eval-readonly').style.display = 'grid';
+         document.getElementById('td-eval-empty').style.display = 'none';
+         document.getElementById('td-rating-readonly').innerHTML = `${t.evaluation.rating} / 5`;
+         if(t.evaluation.comment) {
+           document.getElementById('td-eval-comment-readonly-wrap').style.display = 'flex';
+           document.getElementById('td-eval-comment-readonly').textContent = t.evaluation.comment;
+         } else {
+           document.getElementById('td-eval-comment-readonly-wrap').style.display = 'none';
+         }
+      } else {
+         document.getElementById('td-eval-readonly').style.display = 'none';
+         document.getElementById('td-eval-empty').style.display = 'block';
+      }
+    } else {
+      evalSec.style.display = 'none';
+    }
+
+    document.querySelectorAll('#ticket-detail-overlay .sk-target').forEach(el=>el.classList.remove('skeleton'));
+  }, 400);
+}
+
+// Download PDF event
+function generateDetailPDF(btnElement) {
+  // Stub
+  const origHtml = btnElement.innerHTML;
+  btnElement.innerHTML = `<svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;animation:spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke-dasharray="30 30"/></svg> Génération…`;
+  btnElement.disabled = true;
+  setTimeout(() => {
+    showToast(`PDF téléchargé avec succès`, 'success');
+    btnElement.innerHTML = origHtml;
+    btnElement.disabled = false;
+  }, 1000);
+}
+
+// Ensure spin animation exists
+if (!document.querySelector('style#spin-anim')) {
+  const style = document.createElement('style');
+  style.id = 'spin-anim';
+  style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
+  document.head.appendChild(style);
+}
+
+function openLightbox(src){ document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').classList.add('vis'); }
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('vis'); document.getElementById('lightbox-img').src = ''; }
+
+/* ==========================================================================
+   GLOBAL EVENT LISTENERS
+   ========================================================================== */
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    const tdPopup = document.getElementById('td-popup-overlay');
+    if(tdPopup && tdPopup.classList.contains('open')) return;
+
+    if(document.getElementById('ticket-detail-overlay').classList.contains('vis')) closeTicketDetailPopup();
+    else if(document.getElementById('machine-detail-popup').classList.contains('vis')) closeMachineDetailPopup();
+    else if(document.getElementById('confirm-archive-modal').classList.contains('vis')) document.getElementById('confirm-archive-modal').classList.remove('vis');
+    else if(document.getElementById('machine-modal').classList.contains('vis')) closeMachineModal();
+  }
+});
+document.getElementById('machine-modal').addEventListener('mousedown', e => { if(e.target === document.getElementById('machine-modal')) closeMachineModal(); });
+document.getElementById('machine-detail-popup').addEventListener('mousedown', e => { if(e.target === document.getElementById('machine-detail-popup')) closeMachineDetailPopup(); });
+document.getElementById('ticket-detail-overlay').addEventListener('mousedown', e => { if(e.target === document.getElementById('ticket-detail-overlay')) closeTicketDetailPopup(); });
+
+/* ==========================================================================
+   INIT
+   ========================================================================== */
+(async function init(){
+  const s = Session.require('manager');
+  if(!s) return;
+  const un=document.getElementById('sb-user-name'); if(un) un.textContent=s.user_name||'Manager';
+  const lo=document.getElementById('sb-logout'); if(lo) lo.addEventListener('click',e=>{e.preventDefault();Session.clear();window.location.href='/';});
+  try { await reload(); } catch(e){ showToast('Erreur de chargement : '+e.message,'error'); }
+})();
+</script>
+<script src="/static/js/responsive.js"></script>
+</body>
+</html>

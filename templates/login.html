@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion — Stokvis 360</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#1B3A6B; --primary-hover:#244A82; --grey:#58595B;
+  --steel-blue:#4A7FB5; --light-slate:#8FA3BF; --white:#FFFFFF;
+  --off-white:#F5F7FA; --light-grey:#E4E8EE; --status-success:#2D8F5E;
+  --danger:#EF4444;
+  --shadow-card:0 1px 2px rgba(27,58,107,0.06),0 2px 6px rgba(27,58,107,0.07);
+  --shadow-popup:0 16px 40px -8px rgba(27,58,107,0.18),0 6px 14px -6px rgba(27,58,107,0.12);
+  --transition:200ms cubic-bezier(0.4,0,0.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--grey);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;line-height:1.6;
+  background:radial-gradient(1100px 560px at 50% -8%, #E9F0F9 0%, var(--off-white) 58%);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+::selection{background:rgba(74,127,181,0.22);color:var(--primary);}
+.shell{width:100%;max-width:780px;}
+.brand{text-align:center;margin-bottom:30px;}
+.brand-logo-img{height:54px;width:auto;object-fit:contain;display:inline-block;}
+.brand-logo{font-family:'Inter',system-ui,sans-serif;font-size:32px;font-weight:700;color:var(--primary);letter-spacing:-0.5px;}
+.brand-logo span{font-weight:400;opacity:.5;}
+.brand-sub{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--light-slate);margin-top:8px;font-weight:600;}
+.intro{text-align:center;color:var(--light-slate);margin-bottom:24px;font-size:14px;}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:8px;}
+@media(max-width:640px){.cards{grid-template-columns:1fr;}}
+.card{background:var(--white);border:1.5px solid var(--light-grey);border-radius:16px;padding:26px 18px;
+  cursor:pointer;transition:var(--transition);text-align:center;box-shadow:var(--shadow-card);}
+.card:hover{border-color:var(--steel-blue);transform:translateY(-3px);box-shadow:var(--shadow-popup);}
+.card.active{border-color:var(--primary);box-shadow:var(--shadow-popup);}
+.card-icon{width:52px;height:52px;border-radius:14px;background:var(--off-white);display:flex;align-items:center;
+  justify-content:center;margin:0 auto 14px;font-size:24px;transition:var(--transition);}
+.card:hover .card-icon{background:#E9F0F9;}
+.card.active .card-icon{background:var(--primary);transform:scale(1.04);}
+.card-title{font-weight:600;color:var(--primary);font-size:16px;}
+.card-desc{font-size:12px;color:var(--light-slate);margin-top:5px;line-height:1.4;}
+
+.picker{background:var(--white);border:1px solid var(--light-grey);border-radius:16px;box-shadow:var(--shadow-card);padding:24px;
+  margin-top:18px;display:none;}
+.picker.show{display:block;animation:fade .25s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.picker label{display:block;font-size:12px;font-weight:600;color:var(--grey);text-transform:uppercase;
+  letter-spacing:.4px;margin-bottom:8px;}
+select{width:100%;padding:13px 14px;border:1.5px solid var(--light-grey);border-radius:10px;font-size:14px;
+  color:var(--primary);background:var(--white);font-family:inherit;outline:none;
+  transition:border-color var(--transition),box-shadow var(--transition);}
+select:focus{border-color:var(--steel-blue);box-shadow:0 0 0 3px rgba(74,127,181,0.18);}
+.hint{font-size:12px;color:var(--light-slate);margin-top:10px;}
+.go{margin-top:18px;width:100%;padding:14px;border:none;border-radius:10px;background:var(--primary);
+  color:#fff;font-weight:600;font-size:15px;font-family:inherit;transition:var(--transition);}
+.go:hover{background:var(--primary-hover);box-shadow:0 6px 18px rgba(27,58,107,0.25);}
+.go:active{transform:scale(0.99);}
+.go:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;}
+.err{color:var(--danger);font-size:13px;text-align:center;margin-top:12px;min-height:18px;}
+.note{text-align:center;font-size:11px;color:var(--light-slate);margin-top:22px;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="brand">
+    <img src="/static/stokvis360.png" alt="Stokvis 360" class="brand-logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div class="brand-logo" style="display:none">STOKVIS <span>360</span></div>
+    <div class="brand-sub">Service Après-Vente</div>
+  </div>
+  <p class="intro">Prototype — choisissez un portail pour commencer.</p>
+
+  <div class="cards">
+    <div class="card" data-role="manager">
+      <div class="card-icon">🗂️</div>
+      <div class="card-title">Manager</div>
+      <div class="card-desc">Tickets, parc, clients, techniciens, catalogue</div>
+    </div>
+    <div class="card" data-role="technicien">
+      <div class="card-icon">🔧</div>
+      <div class="card-title">Technicien</div>
+      <div class="card-desc">Mes tickets assignés</div>
+    </div>
+    <div class="card" data-role="client">
+      <div class="card-icon">🏢</div>
+      <div class="card-title">Client</div>
+      <div class="card-desc">Mes tickets & ouverture</div>
+    </div>
+  </div>
+
+  <div class="picker" id="picker">
+    <div id="picker-field">
+      <label id="picker-label">Sélectionner</label>
+      <select id="picker-select"><option value="">Chargement…</option></select>
+      <p class="hint" id="picker-hint"></p>
+    </div>
+    <button class="go" id="go" disabled>Entrer</button>
+    <div class="err" id="err"></div>
+  </div>
+
+  <p class="note">Aucune authentification réelle dans ce prototype — sélection libre du rôle.</p>
+</div>
+
+<script src="/static/js/api.js"></script>
+<script>
+let selectedRole = null;
+let cacheTechs = null, cacheClients = null;
+
+const cards = document.querySelectorAll(".card");
+const picker = document.getElementById("picker");
+const label = document.getElementById("picker-label");
+const select = document.getElementById("picker-select");
+const hint = document.getElementById("picker-hint");
+const goBtn = document.getElementById("go");
+const errBox = document.getElementById("err");
+
+cards.forEach(c => c.addEventListener("click", () => selectRole(c.dataset.role, c)));
+
+async function selectRole(role, cardEl) {
+  selectedRole = role;
+  cards.forEach(c => c.classList.remove("active"));
+  cardEl.classList.add("active");
+  errBox.textContent = "";
+  picker.classList.add("show");
+
+  if (role === "manager") {
+    // Pas de sélection nécessaire : un seul manager dans le prototype.
+    document.getElementById("picker-field").style.display = "none";
+    goBtn.disabled = false;
+    goBtn.textContent = "Entrer comme Manager";
+    return;
+  }
+
+  document.getElementById("picker-field").style.display = "block";
+  goBtn.textContent = "Entrer";
+  goBtn.disabled = true;
+  select.innerHTML = '<option value="">Chargement…</option>';
+
+  try {
+    if (role === "technicien") {
+      label.textContent = "Choisir un technicien";
+      hint.textContent = "Les techniciens archivés n'ont pas accès au portail.";
+      if (!cacheTechs) cacheTechs = await API.techniciens(false); // exclut les archivés
+      fillSelect(cacheTechs.map(t => ({
+        value: t.id,
+        text: t.prenom + " " + t.nom + "  ·  " + t.disponibilite + "  ·  " + t.active_tickets + " actif(s)",
+        name: t.prenom + " " + t.nom
+      })));
+    } else {
+      label.textContent = "Choisir un client";
+      hint.textContent = "Vous verrez uniquement les tickets et machines de ce client.";
+      // Les clients archivés (compte désactivé) ne peuvent pas se connecter.
+      if (!cacheClients) cacheClients = (await API.clients()).filter(c => !c.archived);
+      fillSelect(cacheClients.map(c => ({
+        value: c.id,
+        text: c.raison_sociale + "  ·  " + c.machine_count + " machine(s)  ·  " + c.ticket_count + " ticket(s)",
+        name: c.raison_sociale
+      })));
+    }
+  } catch (e) {
+    errBox.textContent = "Impossible de charger la liste. Le serveur est-il démarré ? (" + e.message + ")";
+  }
+}
+
+function fillSelect(items) {
+  select.innerHTML = '<option value="">— Sélectionner —</option>';
+  items.forEach(it => {
+    const o = document.createElement("option");
+    o.value = it.value; o.textContent = it.text; o.dataset.name = it.name;
+    select.appendChild(o);
+  });
+  select.onchange = () => { goBtn.disabled = !select.value; };
+}
+
+goBtn.addEventListener("click", async () => {
+  if (!selectedRole) return;
+  let userId = null, userName = null;
+  if (selectedRole !== "manager") {
+    userId = select.value;
+    if (!userId) { errBox.textContent = "Veuillez sélectionner."; return; }
+    userName = select.options[select.selectedIndex].dataset.name;
+  } else {
+    userName = "Manager";
+  }
+  // Validation serveur : un compte archivé est refusé (401 "Compte désactivé").
+  try {
+    await API.login(selectedRole, userId);
+  } catch (e) {
+    errBox.textContent = e.message.indexOf("désactivé") !== -1
+      ? "Compte désactivé" : "Connexion refusée : " + e.message;
+    return;
+  }
+  Session.set(selectedRole, userId, userName);
+  const dest = {
+    manager: "/manager/tous-les-tickets",
+    technicien: "/technicien/mes-tickets",
+    client: "/client/tickets-en-cours"
+  }[selectedRole];
+  window.location.href = dest;
+});
+</script>
+</body>
+</html>

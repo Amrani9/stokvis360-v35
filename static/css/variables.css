@@ -1,0 +1,82 @@
+/* =========================================================================
+ * variables.css — Variables CSS PARTAGÉES (source unique de la charte).
+ *
+ * Inclure AVANT le <style> de chaque page :
+ *     <link rel="stylesheet" href="/static/css/variables.css">
+ *
+ * POURQUOI : chaque template redéclarait son propre :root quasi identique ;
+ * les divergences accidentelles (couleurs de statut, ombres) venaient de là.
+ * Une page ne doit redéclarer dans son :root QUE ce qui diffère réellement
+ * (ex. ouvrir_un_ticket utilise une palette de gris plus claire).
+ *
+ * --sidebar-width : 256px (au lieu de 240px) pour que "Gestion des
+ * Techniciens" tienne sur une ligne dans la navigation.
+ *
+ * NB couleurs de statut : la source unique RÉELLE est TicketTable.STATUS_STYLE
+ * (static/js/ticket_table.js). Les --status-* ci-dessous reflètent ces valeurs ;
+ * ne pas les modifier sans aligner le JS.
+ * ====================================================================== */
+
+:root {
+  /* Marque ----------------------------------------------------------------- */
+  --primary: #1B3A6B;
+  --primary-hover: #244A82;
+  --primary-soft: #EEF3FA;          /* fond bleuté très clair (badges, hovers) */
+  --steel-blue: #4A7FB5;
+  --light-slate: #8FA3BF;
+
+  /* Sidebar (dégradé bleu de la barre latérale) ---------------------------- */
+  --sidebar-bg-top: #21477F;        /* haut, légèrement plus clair */
+  --sidebar-bg-bottom: #16315C;     /* bas, plus profond */
+  --sidebar-accent: #6FA0D6;        /* indicateur actif / hover */
+
+  /* Neutres ---------------------------------------------------------------- */
+  --grey: #58595B;
+  --grey-soft: #6B7280;
+  --white: #FFFFFF;
+  --off-white: #F5F7FA;
+  --light-grey: #E4E8EE;
+  --hairline: #EDF0F4;              /* séparateur très discret */
+  --dark-charcoal: #2D2D2D;
+  --ink: #1F2937;                   /* texte fort, légèrement bleuté */
+
+  /* États ------------------------------------------------------------------ */
+  --status-success: #2D8F5E;
+  --status-progress: #E8A817;
+  --status-waiting: #D4780A;
+  --status-assigned: #4A7FB5;
+  --danger: #EF4444;
+  --danger-hover: #DC2626;
+  --danger-bg: #FEF2F2;
+  --warning: #D97706;
+  --warning-bg: #FEF3C7;
+  --success-bg: #ECFDF3;
+
+  /* Layout ----------------------------------------------------------------- */
+  --sidebar-width: 256px;
+  --topbar-height: 64px;
+
+  /* Rayons ----------------------------------------------------------------- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  /* Échelle d'espacement (rythme 4px) -------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* Effets / ombres (douces, en couches, teintées navy) -------------------- */
+  --shadow-card: 0 1px 2px rgba(27, 58, 107, 0.06), 0 2px 6px rgba(27, 58, 107, 0.07);
+  --shadow-md: 0 4px 6px -1px rgba(27, 58, 107, 0.08), 0 2px 4px -2px rgba(27, 58, 107, 0.06);
+  --shadow-popup: 0 16px 40px -8px rgba(27, 58, 107, 0.18), 0 6px 14px -6px rgba(27, 58, 107, 0.12);
+  --shadow-dropdown: 0 6px 22px rgba(15, 23, 42, 0.14);
+  --focus-ring: 0 0 0 3px rgba(74, 127, 181, 0.22);
+  --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}

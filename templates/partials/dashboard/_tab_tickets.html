@@ -1,0 +1,1553 @@
+  <!-- ============================================================
+       PANEL: TICKETS
+       Self-contained tab (HTML + <style> + <script>) — consumes the
+       global ticket cache (_pipTickets) and the shared filter bar via
+       pipGetFilters()/pipMatchesFilter(); hooks pipRefresh()/activateTab()
+       so it re-renders on every filter change, 5 s poll and tab open.
+       No other file is touched.
+       ============================================================ -->
+  <div class="dash-panel" id="panel-tickets">
+
+    <!-- ROW 1 — KPI CARDS -->
+    <div class="tk-kpi-row">
+      <div class="tk-kpi">
+        <span class="tk-kpi-label">Total tickets depuis création</span>
+        <span class="tk-kpi-val" id="tk-kpi-total">—</span>
+        <span class="tk-kpi-sub">Toutes périodes confondues</span>
+      </div>
+      <div class="tk-kpi">
+        <span class="tk-kpi-label">Tickets créés sur la période</span>
+        <span class="tk-kpi-val" id="tk-kpi-created">—</span>
+        <span class="tk-kpi-sub" id="tk-kpi-created-sub">Selon les filtres actifs</span>
+      </div>
+      <div class="tk-kpi">
+        <span class="tk-kpi-label">Tickets actifs <span class="ov-live-pill"><span class="dot"></span>LIVE</span></span>
+        <span class="tk-kpi-val" id="tk-kpi-active">—</span>
+        <span class="tk-kpi-sub">En cours en ce moment</span>
+      </div>
+      <div class="tk-kpi">
+        <span class="tk-kpi-label">Temps moyen de résolution</span>
+        <span class="tk-kpi-val" id="tk-kpi-restime">—</span>
+        <div class="tk-toggle-row">
+          <div class="pip-metric-toggle tk-mini-toggle" id="tk-kpi-metric">
+            <button class="active" data-metric="mean">Moy.</button>
+            <button data-metric="median">Méd.</button>
+            <button data-metric="trimmed">Tronq.</button>
+          </div>
+          <div class="tk-trim-wrapper pip-hidden" id="tk-kpi-trim-wrap">
+            <input type="number" id="tk-kpi-trim" value="10" min="0" max="49">
+            <span>%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2 — TREND GRAPHS -->
+    <div class="ov-row">
+      <!-- Volume créés vs résolus -->
+      <div class="ov-card">
+        <div class="ov-card-header">
+          <div class="ov-card-hgroup">
+            <span class="ov-card-title">Volume créés vs résolus</span>
+            <span class="tk-legend"><i class="tk-dot" style="background:var(--steel-blue)"></i>Créés <i class="tk-dot" style="background:var(--status-success);margin-left:8px"></i>Résolus</span>
+          </div>
+          <div class="tk-card-tools">
+            <div class="pip-metric-toggle tk-mini-toggle tk-unit-toggle" data-target="vol"></div>
+            <button class="tk-expand-btn" data-chart="vol" title="Agrandir">⤢</button>
+          </div>
+        </div>
+        <div class="tk-chart" id="tk-chart-vol"></div>
+      </div>
+      <!-- Temps moyen de résolution dans le temps -->
+      <div class="ov-card">
+        <div class="ov-card-header">
+          <div class="ov-card-hgroup">
+            <span class="ov-card-title">Temps moyen de résolution dans le temps</span>
+            <span class="tk-legend"><i class="tk-dot" style="background:var(--primary)"></i>Durée moyenne</span>
+          </div>
+          <div class="tk-card-tools">
+            <div class="tk-toggle-row">
+              <div class="pip-metric-toggle tk-mini-toggle" id="tk-time-metric">
+                <button class="active" data-metric="mean">Moy.</button>
+                <button data-metric="median">Méd.</button>
+                <button data-metric="trimmed">Tronq.</button>
+              </div>
+              <div class="tk-trim-wrapper pip-hidden" id="tk-time-trim-wrap">
+                <input type="number" id="tk-time-trim" value="10" min="0" max="49">
+                <span>%</span>
+              </div>
+            </div>
+            <div class="pip-metric-toggle tk-mini-toggle tk-unit-toggle" data-target="time"></div>
+            <button class="tk-expand-btn" data-chart="time" title="Agrandir">⤢</button>
+          </div>
+        </div>
+        <div class="tk-chart" id="tk-chart-time"></div>
+      </div>
+    </div>
+
+    <!-- ROW 3 — STAGE TABLE -->
+    <div class="ov-card ov-card-full">
+      <div class="ov-card-header">
+        <div class="ov-card-hgroup">
+          <span class="ov-card-title">Temps moyen passé à chaque étape</span>
+          <span class="tk-hint">Période actuelle vs période précédente de même durée — clic sur une ligne pour l'évolution</span>
+        </div>
+        <div class="tk-toggle-row">
+          <div class="pip-metric-toggle tk-mini-toggle" id="tk-stage-metric">
+            <button class="active" data-metric="mean">Moyenne</button>
+            <button data-metric="median">Médiane</button>
+            <button data-metric="trimmed">Moy. tronquée</button>
+          </div>
+          <div class="tk-trim-wrapper pip-hidden" id="tk-stage-trim-wrap">
+            <input type="number" id="tk-stage-trim" value="10" min="0" max="49">
+            <span>%</span>
+          </div>
+        </div>
+      </div>
+      <table class="tk-stage-table">
+        <thead><tr>
+          <th>Étape</th>
+          <th class="tk-num">Période actuelle</th>
+          <th class="tk-num">Période précédente</th>
+          <th class="tk-num">Évolution</th>
+          <th class="tk-num">Tickets</th>
+        </tr></thead>
+        <tbody id="tk-stage-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- ROW 4 — DISTRIBUTION + HEATMAP -->
+    <div class="ov-row">
+      <!-- Histogramme durées de résolution -->
+      <div class="ov-card">
+        <div class="ov-card-header">
+          <div class="ov-card-hgroup">
+            <span class="ov-card-title">Distribution des durées de résolution</span>
+          </div>
+          <div class="pill-toggle" id="tk-hist-mode">
+            <button class="active" data-mode="count">Nombre</button>
+            <button data-mode="pct">%</button>
+          </div>
+        </div>
+        <div class="tk-card-body">
+          <div class="tk-hist" id="tk-hist"></div>
+        </div>
+      </div>
+      <!-- Heatmap arrivée des tickets -->
+      <div class="ov-card">
+        <div class="ov-card-header">
+          <div class="ov-card-hgroup">
+            <span class="ov-card-title">Matrice croisée</span>
+            <span class="tk-hint">Tickets par croisement de dimensions</span>
+          </div>
+          <div class="tk-heat-controls">
+            <label class="tk-heat-label" for="tk-heat-preset">Dimensions</label>
+            <select id="tk-heat-preset" class="tk-heat-preset-select">
+              <option value="heure-jour" selected>Heure × Jour</option>
+              <option value="jour-semaine">Jour × Semaine</option>
+              <option value="semaine-mois">Semaine × Mois</option>
+              <option value="mois-trimestre">Mois × Trimestre</option>
+              <option value="mois-an">Mois × Année</option>
+              <option value="trimestre-an">Trimestre × Année</option>
+            </select>
+          </div>
+        </div>
+        <div class="tk-card-body tk-card-body--flush">
+          <div class="tk-heat" id="tk-heat"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 5 — TOP LISTS -->
+    <div class="ov-row">
+      <!-- Top tickets par durée -->
+      <div class="ov-card">
+        <div class="ov-card-header">
+          <div class="ov-card-hgroup">
+            <span class="ov-card-title">Top 5 tickets par durée</span>
+            <button class="ov-voir-tous-btn" id="tk-voir-top">Voir tous</button>
+          </div>
+          <div class="pill-toggle" id="tk-top-mode">
+            <button class="active" data-mode="long">Plus longs</button>
+            <button data-mode="short">Plus courts</button>
+          </div>
+        </div>
+        <div class="ov-table-wrap">
+          <table class="ov-table">
+            <thead><tr>
+              <th style="width:40px">#</th>
+              <th>ID</th>
+              <th>Client</th>
+              <th>Réf. machine</th>
+              <th style="text-align:right">Durée</th>
+            </tr></thead>
+            <tbody id="tk-top-list"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Top annuleurs -->
+      <div class="ov-card">
+        <div class="ov-card-header">
+          <div class="ov-card-hgroup">
+            <span class="ov-card-title">Top 5 annuleurs</span>
+            <button class="ov-voir-tous-btn" id="tk-voir-annul">Voir tous</button>
+          </div>
+          <div class="pill-toggle" id="tk-annul-mode">
+            <button class="active" data-mode="technicien">Technicien</button>
+            <button data-mode="client">Client</button>
+            <button data-mode="manager">Manager</button>
+          </div>
+        </div>
+        <div class="ov-table-wrap">
+          <table class="ov-table">
+            <thead><tr>
+              <th style="width:40px">#</th>
+              <th>Nom</th>
+              <th>Rôle</th>
+              <th style="text-align:right">Annulations</th>
+            </tr></thead>
+            <tbody id="tk-annul-list"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 6 — DONUTS -->
+    <div class="ov-row">
+      <!-- Classification -->
+      <div class="ov-card">
+        <div class="ov-card-header">
+          <div class="ov-card-hgroup">
+            <span class="ov-card-title">Classification des tickets</span>
+          </div>
+          <div class="pill-toggle tk-toggle-4" id="tk-class-mode">
+            <button class="active" data-mode="pole">Pôle</button>
+            <button data-mode="marque">Marque</button>
+            <button data-mode="categorie">Catégorie</button>
+            <button data-mode="reference">Référence</button>
+          </div>
+        </div>
+        <div class="tk-donut-wrap" id="tk-donut-class"></div>
+      </div>
+      <!-- Statut qualitatif -->
+      <div class="ov-card">
+        <div class="ov-card-header">
+          <div class="ov-card-hgroup">
+            <span class="ov-card-title">Statut qualitatif</span>
+          </div>
+          <div class="pill-toggle tk-toggle-4" id="tk-qual-mode">
+            <button class="active" data-mode="via">Terrain / Distance</button>
+            <button data-mode="rapport">Rapport</button>
+            <button data-mode="eval">Évaluation</button>
+            <button data-mode="raison">Annulation</button>
+          </div>
+        </div>
+        <div class="tk-donut-wrap" id="tk-donut-qual"></div>
+      </div>
+    </div>
+
+    <!-- ROW 7 — NOTES DISTRIBUTION -->
+    <div class="ov-row">
+      <div class="ov-card">
+        <div class="ov-card-header">
+          <div class="ov-card-hgroup">
+            <span class="ov-card-title">Distribution des notes</span>
+          </div>
+        </div>
+        <div class="tk-notes" id="tk-notes"></div>
+      </div>
+      <div class="tk-spacer"></div>
+    </div>
+
+  </div><!-- end panel-tickets -->
+
+  <!-- ============================================================
+       RÉPARTITION COMPLÈTE MODAL
+       Uses .ov-modal-overlay CSS classes (same design as overview)
+       ============================================================ -->
+  <div class="ov-modal-overlay" id="tkrm-overlay">
+    <div class="ov-modal" id="tkrm-modal">
+      <div class="ov-modal-head">
+        <div>
+          <h3 id="tkrm-title">Répartition complète</h3>
+          <p id="tkrm-subtitle" style="font-size:12px;color:var(--light-slate);margin:4px 0 0;line-height:1.4"></p>
+        </div>
+        <button class="ov-modal-close" id="tkrm-close" title="Fermer">&#x2715;</button>
+      </div>
+      <div class="ov-modal-filters" id="tkrm-filters"></div>
+      <div class="ov-modal-body">
+        <table class="ov-table" style="min-width:640px">
+          <thead id="tkrm-thead"></thead>
+          <tbody id="tkrm-tbody"><tr><td class="ov-empty">Chargement…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="ov-modal-footer" id="tkrm-footer"></div>
+    </div>
+  </div>
+
+  <!-- Generic Ticket-tab modal (chart expand + Voir tous) -->
+  <div class="tk-modal-overlay" id="tk-modal-overlay">
+    <div class="tk-modal">
+      <div class="tk-modal-head">
+        <h3 id="tk-modal-title">—</h3>
+        <div class="tk-modal-tools" id="tk-modal-tools"></div>
+        <button class="tk-modal-close" id="tk-modal-close" title="Fermer">&#x2715;</button>
+      </div>
+      <div class="tk-modal-body" id="tk-modal-body"></div>
+    </div>
+  </div>
+
+<style>
+/* ===== ROW 1 — KPI cards ===== */
+#panel-tickets .tk-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-4);}
+#panel-tickets .tk-kpi{background:var(--white);border:1px solid var(--light-grey);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-card);padding:16px 18px;display:flex;flex-direction:column;gap:6px;min-height:104px;}
+#panel-tickets .tk-kpi-label{font-size:12px;font-weight:600;color:var(--grey-soft);display:flex;align-items:center;gap:8px;line-height:1.3;}
+#panel-tickets .tk-kpi-val{font-size:28px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;line-height:1;}
+#panel-tickets .tk-kpi-sub{font-size:11px;color:var(--light-slate);font-weight:500;margin-top:auto;}
+
+/* ===== shared bits ===== */
+#panel-tickets .tk-card-tools{display:flex;align-items:center;gap:8px;}
+#panel-tickets .tk-mini-toggle{flex-shrink:0;}
+#panel-tickets .tk-mini-toggle button{font-size:11px;padding:4px 9px;}
+#panel-tickets .tk-unit-toggle button{padding:4px 7px;}
+#panel-tickets .tk-toggle-4 button{padding:5px 9px;font-size:11px;}
+#panel-tickets .tk-legend{font-size:11px;font-weight:500;color:var(--grey-soft);display:inline-flex;align-items:center;}
+#panel-tickets .tk-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;}
+#panel-tickets .tk-hint{font-size:11px;color:var(--light-slate);font-weight:500;}
+#panel-tickets .tk-expand-btn{background:var(--off-white);border:1px solid var(--light-grey);border-radius:var(--radius-sm);
+  width:28px;height:28px;cursor:pointer;color:var(--grey-soft);font-size:15px;line-height:1;flex-shrink:0;transition:var(--transition);}
+#panel-tickets .tk-expand-btn:hover{background:var(--primary-soft);color:var(--primary);border-color:var(--steel-blue);}
+#panel-tickets .tk-spacer{}
+
+/* ===== per-toggle trim wrapper ===== */
+#panel-tickets .tk-toggle-row{display:flex;align-items:center;gap:8px;margin-top:auto;}
+#panel-tickets .tk-trim-wrapper{display:flex;align-items:center;gap:5px;background:var(--white);
+  padding:3px 9px;border-radius:6px;border:1px solid var(--light-grey);animation:tk-fade-in .15s ease;}
+#panel-tickets .tk-trim-wrapper label{font-size:11px;font-weight:600;color:var(--grey);white-space:nowrap;}
+#panel-tickets .tk-trim-wrapper input{width:34px;height:20px;border:1px solid var(--light-grey);border-radius:4px;
+  text-align:center;font-size:12px;font-weight:600;color:var(--ink);padding:0;}
+#panel-tickets .tk-trim-wrapper input:focus{outline:none;border-color:var(--steel-blue);}
+#panel-tickets .tk-trim-wrapper span{font-size:11px;color:var(--grey);}
+@keyframes tk-fade-in{from{opacity:0;transform:translateX(-4px);}to{opacity:1;transform:translateX(0);}}
+
+/* ===== charts (sticky-Y + horizontal scroll) ===== */
+#panel-tickets .ov-card .tk-chart{height:240px;margin:10px 14px 14px;}
+.tk-chart{position:relative;height:240px;margin-top:6px;}
+.tk-chart-yaxis{position:absolute;left:0;top:0;bottom:0;width:64px;z-index:2;pointer-events:none;
+  background:linear-gradient(to right,var(--white) 75%,transparent);}
+.tk-chart-yaxis span{position:absolute;right:8px;transform:translateY(-50%);font-size:10px;color:var(--light-slate);font-weight:500;white-space:nowrap;}
+.tk-chart-scroll{position:absolute;left:64px;right:0;top:0;bottom:0;overflow-x:auto;overflow-y:hidden;}
+.tk-chart svg{display:block;}
+.tk-chart .tk-grid{stroke:var(--hairline);stroke-width:1;}
+.tk-chart .tk-xlabel{font-size:10px;fill:var(--light-slate);font-weight:500;}
+.tk-chart .tk-area{opacity:0.14;}
+.tk-chart .tk-line{fill:none;stroke-width:2;}
+.tk-chart .tk-pt{stroke:var(--white);stroke-width:1.5;}
+.tk-empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--light-slate);font-size:13px;}
+
+/* ===== chart tooltip ===== */
+.tk-chart-tip{position:absolute;z-index:20;pointer-events:none;background:var(--ink);color:#fff;
+  border-radius:10px;padding:10px 14px;font-size:12px;box-shadow:0 6px 24px rgba(0,0,0,.22);
+  white-space:nowrap;line-height:1.5;border:1px solid rgba(255,255,255,.08);}
+.tk-tip-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.5);margin-bottom:6px;
+  border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:5px;text-align:center;}
+.tk-tip-row{display:flex;align-items:center;gap:7px;padding:1px 0;}
+.tk-tip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.tk-tip-name{flex:1;color:rgba(255,255,255,.75);font-weight:500;}
+.tk-tip-val{font-weight:700;color:#fff;font-variant-numeric:tabular-nums;}
+
+/* ===== card body wrapper ===== */
+#panel-tickets .tk-card-body{padding:18px 20px 22px;}
+#panel-tickets .tk-card-body--flush{padding:0;}
+
+/* ===== histogram ===== */
+.tk-hist{display:flex;flex-direction:column;gap:14px;}
+.tk-hist-row{display:grid;grid-template-columns:72px 1fr 52px;align-items:center;gap:12px;}
+.tk-hist-row .lbl{font-size:12px;font-weight:600;color:var(--grey);white-space:nowrap;}
+.tk-hist-bar{height:24px;background:var(--off-white);border-radius:var(--radius-pill);overflow:hidden;border:1px solid var(--hairline);}
+.tk-hist-fill{height:100%;background:var(--steel-blue);border-radius:var(--radius-pill);min-width:3px;transition:width .35s ease;}
+.tk-hist-row .val{font-size:12px;font-weight:700;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums;}
+
+/* ===== heatmap controls ===== */
+#panel-tickets .tk-heat-controls{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+#panel-tickets .tk-heat-label{font-size:11px;font-weight:600;color:var(--light-slate);white-space:nowrap;}
+
+/* ===== heatmap ===== */
+.tk-heat{padding:16px 20px 20px;overflow-x:auto;}
+.tk-heat-grid{display:grid;gap:5px;}
+.tk-heat-cell{border-radius:6px;min-width:36px;min-height:32px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;color:var(--ink);transition:opacity .15s;cursor:default;}
+.tk-heat-cell:hover{opacity:.75;}
+.tk-heat-hd{font-size:11px;font-weight:600;color:var(--light-slate);text-align:center;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;white-space:nowrap;}
+.tk-heat-rl{font-size:11px;font-weight:600;color:var(--light-slate);display:flex;align-items:center;padding-right:14px;justify-content:flex-end;white-space:nowrap;}
+
+/* ===== lists ===== */
+.tk-list{display:flex;flex-direction:column;}
+.tk-list-row{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid var(--hairline);cursor:pointer;transition:background .15s;}
+.tk-list-row:last-child{border-bottom:none;}
+.tk-list-row:hover{background:var(--off-white);}
+.tk-list-rank{width:22px;height:22px;border-radius:50%;background:var(--primary-soft);color:var(--primary);
+  font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tk-list-main{flex:1;min-width:0;}
+.tk-list-main b{font-size:13px;color:var(--ink);font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tk-list-main small{font-size:11px;color:var(--light-slate);}
+.tk-list-val{font-size:13px;font-weight:700;color:var(--steel-blue);white-space:nowrap;flex-shrink:0;}
+.tk-list-empty{padding:24px;text-align:center;color:var(--light-slate);font-size:13px;}
+
+/* ===== donut ===== */
+.tk-donut-wrap{padding:16px 20px 20px;min-height:200px;}
+.tk-donut-inner{display:flex;align-items:center;gap:20px;}
+.tk-donut-wrap svg{flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(27,58,107,0.10));}
+.tk-donut-center{font-size:20px;font-weight:700;fill:var(--ink);}
+.tk-donut-center-sub{font-size:10px;font-weight:600;fill:var(--light-slate);}
+.tk-donut-legend{flex:1;display:flex;flex-direction:column;min-width:0;border:1px solid var(--hairline);border-radius:8px;overflow:hidden;}
+.tk-donut-leg{display:flex;align-items:center;gap:8px;font-size:12px;padding:7px 10px;border-bottom:1px solid var(--hairline);transition:background .12s;}
+.tk-donut-leg:last-child{border-bottom:none;}
+.tk-donut-leg:hover{background:var(--off-white);}
+.tk-donut-leg .sw{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.tk-donut-leg .rk{width:16px;font-size:10px;font-weight:700;color:var(--light-slate);flex-shrink:0;text-align:right;}
+.tk-donut-leg .nm{flex:1;color:var(--grey);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;}
+.tk-donut-leg .ct{font-weight:700;color:var(--ink);font-size:12px;white-space:nowrap;}
+.tk-donut-leg .pc{color:var(--light-slate);font-size:11px;width:34px;text-align:right;flex-shrink:0;}
+.tk-donut-leg--autres{background:var(--off-white);}
+.tk-donut-leg--autres .nm{color:var(--light-slate);font-style:italic;}
+.tk-donut-leg--autres .ct{color:var(--grey-soft);}
+.tk-donut-voir-btn{font-size:10px;font-weight:600;color:var(--primary);background:var(--white);border:1px solid var(--light-grey);border-radius:4px;padding:2px 7px;cursor:pointer;flex-shrink:0;white-space:nowrap;line-height:1.5;transition:all .15s;}
+.tk-donut-voir-btn:hover{background:var(--primary-soft);border-color:var(--steel-blue);}
+
+/* ===== notes ===== */
+.tk-notes{display:flex;flex-direction:column;gap:9px;padding:14px 4px 6px;}
+.tk-notes-row{display:grid;grid-template-columns:42px 1fr 52px;align-items:center;gap:10px;}
+.tk-notes-row .st{font-size:12px;font-weight:700;color:var(--status-progress);white-space:nowrap;}
+.tk-notes-bar{height:18px;background:var(--off-white);border-radius:var(--radius-pill);overflow:hidden;}
+.tk-notes-fill{height:100%;background:var(--status-progress);border-radius:var(--radius-pill);min-width:2px;transition:width .3s;}
+.tk-notes-row .ct{font-size:12px;font-weight:700;color:var(--ink);text-align:right;}
+
+/* ===== Ticket-tab modal ===== */
+.tk-modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:1000;display:none;align-items:center;justify-content:center;padding:24px;}
+.tk-modal-overlay.open{display:flex;}
+.tk-modal{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow-popup);width:min(1400px,98vw);max-height:94vh;display:flex;flex-direction:column;}
+.tk-modal-head{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--light-grey);}
+.tk-modal-head h3{font-size:16px;font-weight:700;color:var(--ink);margin:0;flex-shrink:0;}
+.tk-modal-tools{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap;}
+.tk-modal-close{background:none;border:none;font-size:18px;color:var(--grey-soft);cursor:pointer;line-height:1;padding:4px;}
+.tk-modal-close:hover{color:var(--danger);}
+.tk-modal-body{padding:18px 20px;overflow:auto;flex:1;}
+.tk-modal-body .tk-chart{height:clamp(300px,calc(70vh - 100px),540px);}
+.tk-modal-table{width:100%;border-collapse:collapse;}
+.tk-modal-table th{text-align:left;font-size:11px;font-weight:600;color:var(--light-slate);text-transform:uppercase;
+  letter-spacing:.4px;padding:8px 10px;border-bottom:1px solid var(--light-grey);position:sticky;top:0;background:var(--white);}
+.tk-modal-table th.tk-num,.tk-modal-table td.tk-num{text-align:right;}
+.tk-modal-table td{padding:9px 10px;border-bottom:1px solid var(--hairline);font-size:13px;color:var(--grey);}
+.tk-modal-table tr[data-id]{cursor:pointer;}
+.tk-modal-table tr[data-id]:hover td{background:var(--off-white);}
+
+/* ===== stage table ===== */
+.tk-stage-table{width:100%;border-collapse:collapse;margin-top:4px;}
+.tk-stage-table th{text-align:left;font-size:11px;font-weight:600;color:var(--light-slate);text-transform:uppercase;
+  letter-spacing:.4px;padding:9px 12px;border-bottom:1px solid var(--light-grey);}
+.tk-stage-table th.tk-num{text-align:right;}
+.tk-stage-table td{padding:10px 12px;border-bottom:1px solid var(--hairline);font-size:13px;color:var(--grey);}
+.tk-stage-table td.tk-num{text-align:right;font-variant-numeric:tabular-nums;}
+.tk-stage-table tr.tk-stage-row{cursor:pointer;transition:background .15s;}
+.tk-stage-table tr.tk-stage-row:hover td{background:var(--off-white);}
+.tk-stage-table .tk-stage-name{font-weight:600;color:var(--ink);}
+.tk-stage-table .tk-stage-val{font-weight:700;color:var(--ink);}
+.tk-stage-group td{background:var(--off-white);font-size:11px;font-weight:700;color:var(--grey-soft);
+  text-transform:uppercase;letter-spacing:.5px;padding:6px 12px;}
+.tk-delta-up{color:var(--danger);font-weight:700;}
+.tk-delta-down{color:var(--status-success);font-weight:700;}
+.tk-delta-flat{color:var(--light-slate);}
+
+@media(max-width:1100px){
+  #panel-tickets .tk-kpi-row{grid-template-columns:repeat(2,1fr);}
+  /* stack the side-by-side cards (trend charts, lists, donuts…) on narrow viewports */
+  #panel-tickets .ov-row{grid-template-columns:1fr;}
+  #panel-tickets .tk-spacer{display:none;}
+}
+@media(max-width:560px){
+  #panel-tickets .tk-kpi-row{grid-template-columns:1fr;}
+  /* let card headers wrap so titles + toggles never overflow */
+  #panel-tickets .ov-card-header{flex-wrap:wrap;row-gap:8px;}
+  #panel-tickets .tk-card-tools{flex-wrap:wrap;}
+  .tk-chart{height:200px;}
+}
+
+/* ===== Répartition complète modal sizing ===== */
+#tkrm-modal{
+  width:min(1280px,96vw);
+  max-width:none;
+  max-height:92vh;
+}
+#tkrm-overlay .ov-modal-filters{
+  gap:10px;
+  row-gap:10px;
+}
+#tkrm-overlay .ov-mf-group{
+  flex:1 1 160px;
+  min-width:140px;
+}
+#tkrm-overlay .ov-mf-group.grow{
+  flex:2 1 220px;
+}
+#tkrm-overlay .ov-modal-body{
+  overflow-x:auto;
+}
+#tkrm-overlay .ov-table{
+  min-width:560px;
+}
+@media(max-width:900px){
+  #tkrm-modal{width:100vw;max-height:100vh;border-radius:0;}
+  #tkrm-overlay{padding:0;}
+}
+</style>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- local toggle state ---- */
+  var tkKpiMetric='mean', tkTimeMetric='mean', tkStageMetric='mean', tkStageModalMetric='mean', tkStageModalUnit='jour';
+  var tkVolUnit='auto', tkTimeUnit='auto';   // 'auto' picks granularity from period span
+  var tkHistMode='count', tkHeatRange='3months';
+  var tkTopMode='long', tkAnnulMode='technicien';
+  var tkClassMode='pole', tkQualMode='via';
+
+  var TK_UNITS=[
+    {key:'heure',label:'Heure'},{key:'jour',label:'Jour'},{key:'semaine',label:'Sem.'},
+    {key:'mois',label:'Mois'},{key:'trimestre',label:'Trim.'},{key:'annee',label:'Année'}
+  ];
+  var TK_ACTIVE=['Envoyé','Assigné','Attente pièce','En route','En Réparation','Maintenance à distance'];
+  var TK_DONUT_COLORS=['#1B3A6B','#4A7FB5','#2D8F5E','#E8A817','#D4780A','#8FA3BF','#6FA0D6','#EF4444','#9CA3AF'];
+
+  /* =========================================================
+     Helpers — reuse global pip* infrastructure
+     ========================================================= */
+  function tkReady(){ return typeof _pipTickets!=='undefined' && _pipTickets && _pipTickets._loaded; }
+  function tkPanelActive(){ var p=document.getElementById('panel-tickets'); return p && p.classList.contains('active'); }
+
+  function tkFilters(noPeriod){ var f=pipGetFilters(); if(noPeriod){ f.dateStart=null; f.dateEnd=null; } return f; }
+  function tkMatched(noPeriod){ var f=tkFilters(noPeriod); return _pipTickets.filter(function(t){ return pipMatchesFilter(t,f); }); }
+  function tkPeriod(){
+    return { start:(document.getElementById('date-start')||{}).value||null,
+             end:(document.getElementById('date-end')||{}).value||null };
+  }
+  function tkTermineTs(t){
+    var tl=(t.timeline||[]).slice().reverse(), e=tl.find(function(x){return x.status==='Terminé';});
+    return e?e.timestamp:null;
+  }
+  /* Compute stats locally so each toggle uses its own trim % input.
+     Falls back to the global pip-trim-input if no local input is found. */
+  function tkCalcStats(arr, trimInputId){
+    if(!arr||!arr.length) return {mean:null,median:null,trimmed:null};
+    var s=arr.slice().sort(function(a,b){return a-b;});
+    var mean=s.reduce(function(a,v){return a+v;},0)/s.length;
+    var mid=Math.floor(s.length/2);
+    var median=s.length%2?s[mid]:(s[mid-1]+s[mid])/2;
+    var pctEl=document.getElementById(trimInputId)||document.getElementById('pip-trim-input');
+    var pct=parseInt(pctEl?pctEl.value:'10',10)/100;
+    var cut=Math.floor(s.length*pct);
+    var sub=cut*2<s.length?s.slice(cut,s.length-cut):s;
+    var trimmed=sub.reduce(function(a,v){return a+v;},0)/sub.length;
+    return {mean:Math.round(mean),median:Math.round(median),trimmed:Math.round(trimmed)};
+  }
+  /* trimInputId map: which input id to use for each toggle */
+  var TK_TRIM_MAP={'mean':null,'median':null,'trimmed':null};
+  function tkMetricOf(arr,metric,trimInputId){
+    var id=trimInputId||null;
+    var stats=tkCalcStats(arr,id);
+    return stats[metric];
+  }
+
+  /* Resolve 'auto' to a sensible granularity for the active period span so a
+     long period doesn't generate thousands of mostly-empty buckets. */
+  function tkAutoUnit(){
+    var per=tkPeriod(); if(!per.start||!per.end) return 'jour';
+    var days=Math.round((new Date(per.end)-new Date(per.start))/86400000)+1;
+    if(days<=2) return 'heure';
+    if(days<=45) return 'jour';
+    if(days<=180) return 'semaine';
+    if(days<=900) return 'mois';
+    return 'trimestre';
+  }
+  function tkResolveUnit(u){ return u==='auto'?tkAutoUnit():u; }
+
+  /* =========================================================
+     Time bucketing for trend charts
+     ========================================================= */
+  function tkFloor(d,unit){
+    var x=new Date(d);
+    if(unit==='heure'){ x.setMinutes(0,0,0); }
+    else if(unit==='jour'){ x.setHours(0,0,0,0); }
+    else if(unit==='semaine'){ x.setHours(0,0,0,0); var day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); }
+    else if(unit==='mois'){ x.setHours(0,0,0,0); x.setDate(1); }
+    else if(unit==='trimestre'){ x.setHours(0,0,0,0); x.setDate(1); x.setMonth(Math.floor(x.getMonth()/3)*3); }
+    else if(unit==='annee'){ x.setHours(0,0,0,0); x.setMonth(0,1); }
+    return x;
+  }
+  function tkNext(d,unit){
+    var x=new Date(d);
+    if(unit==='heure') x.setHours(x.getHours()+1);
+    else if(unit==='jour') x.setDate(x.getDate()+1);
+    else if(unit==='semaine') x.setDate(x.getDate()+7);
+    else if(unit==='mois') x.setMonth(x.getMonth()+1);
+    else if(unit==='trimestre') x.setMonth(x.getMonth()+3);
+    else if(unit==='annee') x.setFullYear(x.getFullYear()+1);
+    return x;
+  }
+  function tkLabel(d,unit){
+    var p=function(n){return String(n).padStart(2,'0');};
+    if(unit==='heure') return p(d.getDate())+'/'+p(d.getMonth()+1)+' '+p(d.getHours())+'h';
+    if(unit==='jour') return p(d.getDate())+'/'+p(d.getMonth()+1);
+    if(unit==='semaine') return p(d.getDate())+'/'+p(d.getMonth()+1);
+    if(unit==='mois') return p(d.getMonth()+1)+'/'+String(d.getFullYear()).slice(2);
+    if(unit==='trimestre') return 'T'+(Math.floor(d.getMonth()/3)+1)+' '+String(d.getFullYear()).slice(2);
+    return String(d.getFullYear());
+  }
+  /* Build ordered buckets spanning [start,end]; falls back to data extent. */
+  function tkBuckets(unit,fallbackDates){
+    var per=tkPeriod(), s, e;
+    if(per.start) s=new Date(per.start+'T00:00:00');
+    if(per.end) e=new Date(per.end+'T23:59:59');
+    if((!s||!e) && fallbackDates && fallbackDates.length){
+      var ts=fallbackDates.map(function(d){return d.getTime();});
+      if(!s) s=new Date(Math.min.apply(null,ts));
+      if(!e) e=new Date(Math.max.apply(null,ts));
+    }
+    if(!s||!e) return [];
+    var cur=tkFloor(s,unit), out=[], guard=0;
+    while(cur<=e && guard<6000){ out.push({key:cur.getTime(),label:tkLabel(cur,unit),start:new Date(cur)}); cur=tkNext(cur,unit); guard++; }
+    return out;
+  }
+  function tkBucketIndex(buckets,unit,date){
+    var k=tkFloor(date,unit).getTime();
+    for(var i=0;i<buckets.length;i++) if(buckets[i].key===k) return i;
+    return -1;
+  }
+  /* Trim leading/trailing empty buckets AND compress interior empty runs into
+     a single gap marker. Returns a processed bucket array where each entry is
+     either a real data point {label,isGap:false,origIdx} or a compressed gap
+     {label:'from–to',isGap:true,count}. Series values arrays should have null
+     at gap positions so the line breaks cleanly across the gap. */
+  var TK_GAP_W=36;
+  function tkCompressGaps(buckets,isEmpty){
+    var n=buckets.length, lo=0, hi=n-1;
+    while(lo<=hi && isEmpty(lo)) lo++;
+    while(hi>=lo && isEmpty(hi)) hi--;
+    if(lo>hi) return [];
+    var proc=[], i=lo;
+    while(i<=hi){
+      if(!isEmpty(i)){
+        proc.push({label:buckets[i].label,isGap:false,origIdx:i});
+        i++;
+      } else {
+        var gs=i;
+        while(i<=hi && isEmpty(i)) i++;
+        var ge=i-1;
+        proc.push({label:buckets[gs].label+(ge>gs?'–'+buckets[ge].label:''),isGap:true,count:ge-gs+1});
+      }
+    }
+    return proc;
+  }
+
+  /* =========================================================
+     Generic SVG line/area chart (sticky Y + horizontal scroll)
+     ========================================================= */
+  function tkDrawChart(mount,opts){
+    var YAX_W=64;
+
+    // Save scroll before rebuild
+    var prevScroll=0;
+    var prevEl=mount.querySelector('.tk-chart-scroll');
+    if(prevEl) prevScroll=prevEl.scrollLeft;
+
+    mount.innerHTML='';
+    var buckets=opts.buckets||[], series=opts.series||[];
+    if(!buckets.length||!series.some(function(s){return s.values.some(function(v){return v!=null;});})){
+      mount.innerHTML='<div class="tk-empty">Aucune donnée sur cette période</div>'; return;
+    }
+    var H=opts.height||240, padT=14, padB=48, plotH=H-padT-padB;
+    var stepMin=opts.big?56:40;
+    var avail=mount.clientWidth-YAX_W;
+    if(avail<10) avail=300;
+
+    var dataCount=buckets.filter(function(b){return !b.isGap;}).length||1;
+    var step=Math.max(stepMin, avail/dataCount);
+
+    var xStarts=[], totalW=0;
+    buckets.forEach(function(b){ xStarts.push(totalW); totalW+=b.isGap?TK_GAP_W:step; });
+    var plotW=Math.max(avail,totalW);
+
+    var cx=function(i){ return xStarts[i]+(buckets[i].isGap?TK_GAP_W/2:step/2); };
+    var yFmt=opts.yFmt||function(v){return String(v);};
+
+    var max=0;
+    series.forEach(function(s){ s.values.forEach(function(v){ if(v!=null&&v>max) max=v; }); });
+    if(max<=0) max=1;
+    var niceMax=max; var pow=Math.pow(10,Math.floor(Math.log10(max)));
+    niceMax=Math.ceil(max/pow)*pow; if(niceMax===max) niceMax=max*1.1||1;
+    var cyFn=function(v){ return padT+plotH-(v/niceMax)*plotH; };
+
+    // Y axis overlay (inline width so it always matches avail)
+    var yax='<div class="tk-chart-yaxis" style="width:'+YAX_W+'px;bottom:0">';
+    for(var g=0;g<=4;g++){ var val=niceMax*(1-g/4); var yy=padT+plotH*(g/4); yax+='<span style="top:'+yy+'px">'+yFmt(val)+'</span>'; }
+    yax+='</div>';
+
+    var axY=padT+plotH;
+    var svg='<svg width="'+plotW+'" height="'+H+'" viewBox="0 0 '+plotW+' '+H+'">';
+    // Horizontal grid lines
+    for(var g2=0;g2<=4;g2++){ var gy=padT+plotH*(g2/4); svg+='<line class="tk-grid" x1="0" y1="'+gy+'" x2="'+plotW+'" y2="'+gy+'"/>'; }
+    // X-axis baseline
+    svg+='<line x1="0" y1="'+axY+'" x2="'+plotW+'" y2="'+axY+'" stroke="var(--light-grey)" stroke-width="1.5"/>';
+
+    // Gap zones: shaded + // marks + range label
+    buckets.forEach(function(b,i){
+      if(!b.isGap) return;
+      var gx=xStarts[i], gw=TK_GAP_W, mx=gx+gw/2;
+      svg+='<rect x="'+gx+'" y="'+padT+'" width="'+gw+'" height="'+plotH+'" fill="var(--off-white)" opacity="0.9"/>';
+      var s1=mx-5, s2=mx+4;
+      svg+='<line x1="'+(s1-3)+'" y1="'+(axY+5)+'" x2="'+(s1+4)+'" y2="'+(axY-13)+'" stroke="var(--light-slate)" stroke-width="1.5" stroke-linecap="round"/>';
+      svg+='<line x1="'+(s2-3)+'" y1="'+(axY+5)+'" x2="'+(s2+4)+'" y2="'+(axY-13)+'" stroke="var(--light-slate)" stroke-width="1.5" stroke-linecap="round"/>';
+      svg+='<text x="'+mx+'" y="'+(H-4)+'" text-anchor="middle" font-size="8" fill="var(--light-slate)" font-family="Inter,system-ui,sans-serif">'+xe(b.label)+'</text>';
+    });
+
+    // Tick marks + thinned X labels for data buckets
+    var dataArr=buckets.filter(function(b){return !b.isGap;});
+    var everyX=Math.max(1,Math.ceil(dataArr.length/(plotW/72)));
+    var di=0;
+    buckets.forEach(function(b,i){
+      if(b.isGap){return;}
+      svg+='<line x1="'+cx(i)+'" y1="'+axY+'" x2="'+cx(i)+'" y2="'+(axY+5)+'" stroke="var(--light-grey)" stroke-width="1"/>';
+      if(di%everyX===0||di===dataArr.length-1){
+        svg+='<text class="tk-xlabel" x="'+cx(i)+'" y="'+(H-28)+'" text-anchor="middle">'+xe(b.label)+'</text>';
+      }
+      di++;
+    });
+
+    // Series — break into segments at null/gap positions
+    series.forEach(function(s){
+      var segments=[], cur=[];
+      s.values.forEach(function(v,i){ if(v==null){if(cur.length){segments.push(cur);cur=[];} return;} cur.push({x:cx(i),y:cyFn(v)}); });
+      if(cur.length) segments.push(cur);
+      segments.forEach(function(seg){
+        var dpath='';
+        seg.forEach(function(p,j){ dpath+=(j===0?'M':'L')+p.x+' '+p.y+' '; });
+        if(s.area&&seg.length){
+          var ap=dpath+'L'+seg[seg.length-1].x+' '+axY+' L'+seg[0].x+' '+axY+' Z';
+          svg+='<path class="tk-area" d="'+ap+'" fill="'+s.color+'"/>';
+        }
+        svg+='<path class="tk-line" d="'+dpath+'" stroke="'+s.color+'"/>';
+        seg.forEach(function(p){ svg+='<circle class="tk-pt" cx="'+p.x+'" cy="'+p.y+'" r="'+(opts.big?4:3)+'" fill="'+s.color+'"/>'; });
+      });
+    });
+
+    svg+='</svg>';
+    mount.innerHTML=yax+'<div class="tk-chart-scroll" style="left:'+YAX_W+'px">'+svg+'</div>';
+
+    // Restore scroll
+    var scrollEl=mount.querySelector('.tk-chart-scroll');
+    if(prevScroll>0&&scrollEl) scrollEl.scrollLeft=prevScroll;
+
+    // Build tooltip anchors (one per data bucket x, all series values)
+    var anchorList=[];
+    buckets.forEach(function(b,bi){
+      if(b.isGap) return;
+      var rows=[];
+      series.forEach(function(s){ var v=s.values[bi]; if(v!=null) rows.push({v:v,color:s.color,name:s.name||''}); });
+      if(!rows.length) return;
+      var minY=Math.min.apply(null,rows.map(function(r){return cyFn(r.v);}));
+      anchorList.push({x:cx(bi),y:minY,label:b.label,rows:rows});
+    });
+    if(!anchorList.length||!scrollEl) return;
+
+    // Tooltip div (sibling inside position:relative mount)
+    var tip=document.createElement('div');
+    tip.className='tk-chart-tip';
+    tip.style.display='none';
+    mount.appendChild(tip);
+
+    var threshold=Math.max(step*0.65,22);
+    scrollEl.addEventListener('mousemove',function(e){
+      var mRect=mount.getBoundingClientRect();
+      var mx_mount=e.clientX-mRect.left;
+      var mx_svg=mx_mount-YAX_W+scrollEl.scrollLeft;
+      var best=null, bestD=Infinity;
+      anchorList.forEach(function(a){ var d=Math.abs(a.x-mx_svg); if(d<bestD){bestD=d;best=a;} });
+      if(!best||bestD>threshold){tip.style.display='none';return;}
+      var html='<div class="tk-tip-label">'+xe(best.label)+'</div>';
+      best.rows.forEach(function(r){
+        html+='<div class="tk-tip-row">'
+          +'<span class="tk-tip-dot" style="background:'+r.color+'"></span>'
+          +(r.name?'<span class="tk-tip-name">'+xe(r.name)+'</span>':'')
+          +'<span class="tk-tip-val">'+yFmt(r.v)+'</span>'
+          +'</div>';
+      });
+      tip.innerHTML=html;
+      tip.style.display='block';
+      var tw=tip.offsetWidth, th=tip.offsetHeight;
+      var tipTop=best.y-th-12;
+      if(tipTop<4) tipTop=best.y+(opts.big?5:4)+10;
+      tipTop=Math.max(4,Math.min(H-th-4,tipTop));
+      var tipLeft=Math.max(tw/2+4,Math.min(mount.clientWidth-tw/2-4,mx_mount));
+      tip.style.top=tipTop+'px';
+      tip.style.left=(tipLeft-tw/2)+'px';
+    });
+    scrollEl.addEventListener('mouseleave',function(){tip.style.display='none';});
+  }
+
+  /* =========================================================
+     ROW 1 — KPI cards
+     ========================================================= */
+  function tkRenderKpis(){
+    var since=tkMatched(true);                 // ignore period
+    var period=tkMatched(false);               // respect period
+    document.getElementById('tk-kpi-total').textContent=since.length;
+    document.getElementById('tk-kpi-created').textContent=period.length;
+    var active=since.filter(function(t){return TK_ACTIVE.indexOf(t.status)>=0;}).length;
+    document.getElementById('tk-kpi-active').textContent=active;
+    var resTimes=period.filter(function(t){return t.status==='Terminé';}).map(pipTotalTime).filter(function(v){return v!=null;});
+    document.getElementById('tk-kpi-restime').textContent=resTimes.length?pipFmt(tkMetricOf(resTimes,tkKpiMetric,'tk-kpi-trim')):'—';
+  }
+
+  /* =========================================================
+     ROW 2 — trend charts
+     ========================================================= */
+  function tkBuildVol(unit,big,mountId){
+    unit=tkResolveUnit(unit);
+    var m=tkMatched(false);
+    var created=m.map(function(t){return t.created_at?new Date(t.created_at):null;}).filter(Boolean);
+    var resolved=m.filter(function(t){return t.status==='Terminé';}).map(tkTermineTs).filter(Boolean).map(function(s){return new Date(s);});
+    var buckets=tkBuckets(unit, created.concat(resolved));
+    var cv=buckets.map(function(){return 0;}), rv=buckets.map(function(){return 0;});
+    created.forEach(function(d){ var i=tkBucketIndex(buckets,unit,d); if(i>=0) cv[i]++; });
+    resolved.forEach(function(d){ var i=tkBucketIndex(buckets,unit,d); if(i>=0) rv[i]++; });
+    var pb=tkCompressGaps(buckets,function(i){return cv[i]===0&&rv[i]===0;});
+    var pcv=pb.map(function(b){return b.isGap?null:cv[b.origIdx];});
+    var prv=pb.map(function(b){return b.isGap?null:rv[b.origIdx];});
+    tkDrawChart(document.getElementById(mountId),{buckets:pb,height:big?380:240,big:big,
+      yFmt:function(v){return Math.round(v);},
+      series:[{color:'var(--steel-blue)',values:pcv,area:true,name:'Créés'},{color:'var(--status-success)',values:prv,area:false,name:'Résolus'}]});
+  }
+  function tkBuildTime(unit,big,mountId){
+    unit=tkResolveUnit(unit);
+    var m=tkMatched(false).filter(function(t){return t.status==='Terminé';});
+    var withTs=m.map(function(t){var ts=tkTermineTs(t);return ts?{d:new Date(ts),v:pipTotalTime(t)}:null;}).filter(function(o){return o&&o.v!=null;});
+    var buckets=tkBuckets(unit, withTs.map(function(o){return o.d;}));
+    var groups=buckets.map(function(){return [];});
+    withTs.forEach(function(o){ var i=tkBucketIndex(buckets,unit,o.d); if(i>=0) groups[i].push(o.v); });
+    var vals=groups.map(function(arr){ return arr.length?tkMetricOf(arr,tkTimeMetric,'tk-time-trim'):null; });
+    var pb=tkCompressGaps(buckets,function(i){return vals[i]==null;});
+    var pvals=pb.map(function(b){return b.isGap?null:vals[b.origIdx];});
+    tkDrawChart(document.getElementById(mountId),{buckets:pb,height:big?380:240,big:big,
+      yFmt:function(v){return pipFmt(v);},
+      series:[{color:'var(--primary)',values:pvals,area:true,name:'Durée moy.'}]});
+  }
+  function tkRenderTrends(){ tkSyncUnitToggles(); tkBuildVol(tkVolUnit,false,'tk-chart-vol'); tkBuildTime(tkTimeUnit,false,'tk-chart-time'); }
+
+  /* =========================================================
+     ROW 3 — stage table
+     ========================================================= */
+  var TK_STAGES=[
+    {group:'Flux commun'},
+    {name:'Assignation (Envoyé→Assigné)',type:'trans',a:'Envoyé',b:'Assigné'},
+    {name:'Assigné',type:'dur',status:'Assigné'},
+    {group:'Chemin terrain'},
+    {name:'Attente pièce',type:'dur',status:'Attente pièce'},
+    {name:'En route',type:'dur',status:'En route'},
+    {name:'En Réparation',type:'dur',status:'En Réparation'},
+    {name:'Résolution terrain (total)',type:'total',via:'terrain'},
+    {group:'Chemin distance'},
+    {name:'Maintenance à distance',type:'dur',status:'Maintenance à distance'},
+    {name:'Résolution distance (total)',type:'total',via:'distance'}
+  ];
+  function tkStageValues(set,stage){
+    var arr=[];
+    if(stage.type==='trans'){ set.forEach(function(t){var v=pipTransition(t,stage.a,stage.b); if(v!=null) arr.push(v);}); }
+    else if(stage.type==='dur'){ set.forEach(function(t){var v=pipDurationIn(t,stage.status); if(v!=null) arr.push(v);}); }
+    else if(stage.type==='total'){ set.filter(function(t){return t.status==='Terminé'&&t.termine_via===stage.via;})
+        .forEach(function(t){var v=pipTotalTime(t); if(v!=null) arr.push(v);}); }
+    return arr;
+  }
+  function tkShiftedSet(){
+    var per=tkPeriod(); if(!per.start||!per.end) return null;
+    var s=new Date(per.start+'T00:00:00'), e=new Date(per.end+'T00:00:00');
+    var lenDays=Math.round((e-s)/86400000)+1;
+    var ps=new Date(s); ps.setDate(ps.getDate()-lenDays);
+    var pe=new Date(s); pe.setDate(pe.getDate()-1);
+    var fmt=function(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+    var f=tkFilters(false); f.dateStart=fmt(ps); f.dateEnd=fmt(pe);
+    return _pipTickets.filter(function(t){return pipMatchesFilter(t,f);});
+  }
+  function tkRenderStageTable(){
+    var cur=tkMatched(false), prev=tkShiftedSet();
+    var rows='';
+    TK_STAGES.forEach(function(st,idx){
+      if(st.group){ rows+='<tr class="tk-stage-group"><td colspan="5">'+xe(st.group)+'</td></tr>'; return; }
+      var cArr=tkStageValues(cur,st), pArr=prev?tkStageValues(prev,st):[];
+      var cv=cArr.length?tkMetricOf(cArr,tkStageMetric,'tk-stage-trim'):null;
+      var pv=pArr.length?tkMetricOf(pArr,tkStageMetric,'tk-stage-trim'):null;
+      var delta='<span class="tk-delta-flat">—</span>';
+      if(cv!=null && pv!=null && pv>0){
+        var pct=Math.round((cv-pv)/pv*100);
+        if(pct>0) delta='<span class="tk-delta-up">▲ +'+pct+'%</span>';
+        else if(pct<0) delta='<span class="tk-delta-down">▼ '+pct+'%</span>';
+        else delta='<span class="tk-delta-flat">0%</span>';
+      }
+      rows+='<tr class="tk-stage-row" data-stage="'+idx+'">'+
+        '<td class="tk-stage-name">'+xe(st.name)+'</td>'+
+        '<td class="tk-num tk-stage-val">'+(cv!=null?pipFmt(cv):'—')+'</td>'+
+        '<td class="tk-num" style="color:var(--grey-soft)">'+(pv!=null?pipFmt(pv):'—')+'</td>'+
+        '<td class="tk-num">'+delta+'</td>'+
+        '<td class="tk-num">'+cArr.length+'</td>'+
+        '</tr>';
+    });
+    var tb=document.getElementById('tk-stage-tbody'); tb.innerHTML=rows;
+    tb.querySelectorAll('tr.tk-stage-row').forEach(function(tr){
+      tr.addEventListener('click',function(){ tkOpenStageModal(parseInt(tr.dataset.stage,10)); });
+    });
+  }
+
+  /* =========================================================
+     ROW 4 — histogram + heatmap
+     ========================================================= */
+  var TK_HIST_BUCKETS=[['< 1j',0,1440],['1–2j',1440,2880],['2–7j',2880,10080],['7–14j',10080,20160],['> 14j',20160,Infinity]];
+  function tkRenderHist(){
+    var done=tkMatched(false).filter(function(t){return t.status==='Terminé';}).map(pipTotalTime).filter(function(v){return v!=null;});
+    var counts=TK_HIST_BUCKETS.map(function(b){return done.filter(function(v){return v>=b[1]&&v<b[2];}).length;});
+    var max=Math.max.apply(null,counts.concat([1])), total=done.length||1;
+    var html=TK_HIST_BUCKETS.map(function(b,i){
+      var c=counts[i], w=Math.round(c/max*100), disp=tkHistMode==='pct'?(Math.round(c/total*100)+'%'):c;
+      return '<div class="tk-hist-row"><span class="lbl">'+b[0]+'</span>'+
+        '<div class="tk-hist-bar"><div class="tk-hist-fill" style="width:'+w+'%"></div></div>'+
+        '<span class="val">'+disp+'</span></div>';
+    }).join('');
+    document.getElementById('tk-hist').innerHTML=html;
+  }
+  var TK_DAYS=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  var TK_SLOTS=[['00–06',0,6],['06–09',6,9],['09–12',9,12],['12–14',12,14],['14–17',14,17],['17–20',17,20],['20–24',20,24]];
+  var TK_MONTHS=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
+  var TK_QUARTERS=['T1','T2','T3','T4'];
+
+  function tkGetWeek(d) {
+    var date = new Date(d);
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+    var week1 = new Date(date.getFullYear(), 0, 4);
+    return 'S' + (1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7));
+  }
+
+  var TK_DIMS = {
+    heure: {
+      get: function(t) { 
+        if(!t.created_at)return null; var h=new Date(t.created_at).getHours(); 
+        for(var i=0;i<TK_SLOTS.length;i++){ if(h>=TK_SLOTS[i][1]&&h<TK_SLOTS[i][2]) return TK_SLOTS[i][0]; }
+        return null;
+      },
+      domain: TK_SLOTS.map(function(s){return s[0];})
+    },
+    jour: {
+      get: function(t) { if(!t.created_at)return null; var d=(new Date(t.created_at).getDay()+6)%7; return TK_DAYS[d]; },
+      domain: TK_DAYS
+    },
+    semaine: {
+      get: function(t) { if(!t.created_at)return null; return tkGetWeek(t.created_at); }
+    },
+    mois: {
+      get: function(t) { if(!t.created_at)return null; return TK_MONTHS[new Date(t.created_at).getMonth()]; },
+      domain: TK_MONTHS
+    },
+    trimestre: {
+      get: function(t) { if(!t.created_at)return null; return TK_QUARTERS[Math.floor(new Date(t.created_at).getMonth()/3)]; },
+      domain: TK_QUARTERS
+    },
+    an: {
+      get: function(t) { if(!t.created_at)return null; return String(new Date(t.created_at).getFullYear()); }
+    }
+  };
+
+  function tkRenderHeat(){
+    var f=tkFilters(false);
+    var set=_pipTickets.filter(function(t){return pipMatchesFilter(t,f);});
+    
+    var preset = document.getElementById('tk-heat-preset').value;
+    var parts = preset.split('-');
+    
+    var dimA = TK_DIMS[parts[0]];
+    var dimB = TK_DIMS[parts[1]];
+    
+    var countsA = {};
+    var countsB = {};
+    
+    set.forEach(function(t){
+      var va = dimA.get(t);
+      var vb = dimB.get(t);
+      if(va != null && vb != null) {
+        countsA[va] = (countsA[va]||0) + 1;
+        countsB[vb] = (countsB[vb]||0) + 1;
+      }
+    });
+    
+    var domA = dimA.domain || Object.keys(countsA).sort(function(a,b){return a.localeCompare(b, 'fr', {numeric:true});});
+    var domB = dimB.domain || Object.keys(countsB).sort(function(a,b){return a.localeCompare(b, 'fr', {numeric:true});});
+    
+    // Automatically assign the dimension with the most elements to the X-axis
+    var domY, domX, dimY, dimX;
+    if (domB.length > domA.length) {
+      domX = domB; dimX = dimB;
+      domY = domA; dimY = dimA;
+    } else {
+      domX = domA; dimX = dimA;
+      domY = domB; dimY = dimB;
+    }
+    
+    if(!domY.length) domY = ['—'];
+    if(!domX.length) domX = ['—'];
+
+    var grid={};
+    domY.forEach(function(dy){ domX.forEach(function(dx){ grid[dy+'|'+dx] = 0; }); });
+    
+    var max = 0;
+    set.forEach(function(t){
+      var vy = dimY.get(t);
+      var vx = dimX.get(t);
+      if(vy != null && vx != null) {
+        var k = vy+'|'+vx;
+        if(grid[k] !== undefined) {
+          grid[k]++;
+          if(grid[k] > max) max = grid[k];
+        }
+      }
+    });
+    max = max || 1;
+    
+    var html='<div class="tk-heat-grid" style="grid-template-columns:auto repeat('+domX.length+',minmax(40px,1fr)); grid-template-rows:28px repeat('+domY.length+', minmax(0,1fr));">';
+    html+='<div class="tk-heat-hd"></div>';
+    domX.forEach(function(dx){ 
+      var lbl = dx.length > 12 ? dx.substring(0,10)+'…' : dx;
+      html+='<div class="tk-heat-hd" title="'+xe(dx)+'">'+xe(lbl)+'</div>'; 
+    });
+    
+    domY.forEach(function(dy){
+      var lblY = dy.length > 15 ? dy.substring(0,13)+'…' : dy;
+      html+='<div class="tk-heat-rl" title="'+xe(dy)+'">'+xe(lblY)+'</div>';
+      domX.forEach(function(dx){
+        var c = grid[dy+'|'+dx];
+        var a = c/max;
+        var bg = c===0 ? 'var(--off-white)' : 'rgba(74,127,181,'+(0.12+a*0.78).toFixed(2)+')';
+        var col = a>0.55 ? '#fff' : 'var(--ink)';
+        var title = c+' ticket'+(c>1?'s':'')+' ('+dy+' × '+dx+')';
+        html+='<div class="tk-heat-cell" title="'+xe(title)+'" style="background:'+bg+';color:'+col+'">'+(c||'')+'</div>';
+      });
+    });
+    html+='</div>';
+    document.getElementById('tk-heat').innerHTML=html;
+  }
+
+  /* =========================================================
+     ROW 5 — top lists
+     ========================================================= */
+  function tkTopTickets(limit){
+    var done=tkMatched(false).filter(function(t){return t.status==='Terminé';})
+      .map(function(t){return {t:t,v:pipTotalTime(t)};}).filter(function(o){return o.v!=null;});
+    done.sort(function(a,b){return tkTopMode==='long'?b.v-a.v:a.v-b.v;});
+    return done.slice(0,limit);
+  }
+  function tkRenderTopList(){
+    var rows=tkTopTickets(5);
+    var el=document.getElementById('tk-top-list');
+    if(!rows.length){ el.innerHTML='<tr><td colspan="5" class="ov-empty">Aucun ticket résolu</td></tr>'; return; }
+    el.innerHTML=rows.map(function(o,i){
+      return '<tr style="cursor:pointer" data-id="'+xe(o.t.id)+'">'+
+        '<td><span class="tk-list-rank" style="margin:0">'+(i+1)+'</span></td>'+
+        '<td><strong>'+xe(o.t.id)+'</strong></td>'+
+        '<td>'+xe(ovClientName(o.t.client_id))+'</td>'+
+        '<td>'+xe(o.t.reference||o.t.instance_id||'—')+'</td>'+
+        '<td style="text-align:right; font-weight:700; color:var(--steel-blue);">'+pipFmt(o.v)+'</td>'+
+        '</tr>';
+    }).join('');
+    el.querySelectorAll('tr[data-id]').forEach(function(r){
+      r.addEventListener('click',function(){ TicketDetail.open(r.dataset.id,{role:'manager'}); });
+    });
+  }
+  function tkAnnulRanking(){
+    var cancelled=tkMatched(false).filter(function(t){return t.status==='Annulé'&&t.cancellation&&t.cancellation.by_role===tkAnnulMode;});
+    var map={};
+    cancelled.forEach(function(t){
+      var c=t.cancellation, id=c.by_id||c.by_name||'?';
+      if(!map[id]) map[id]={name:c.by_name||id,role:c.by_role,count:0};
+      map[id].count++;
+    });
+    return Object.keys(map).map(function(k){return map[k];}).sort(function(a,b){return b.count-a.count;});
+  }
+  function tkRenderAnnulList(){
+    var rank=tkAnnulRanking();
+    var el=document.getElementById('tk-annul-list');
+    if(!rank.length){ el.innerHTML='<tr><td colspan="4" class="ov-empty">Aucune annulation pour ce rôle</td></tr>'; return; }
+    el.innerHTML=rank.slice(0,5).map(function(r,i){
+      return '<tr>'+
+        '<td><span class="tk-list-rank" style="margin:0">'+(i+1)+'</span></td>'+
+        '<td><strong>'+xe(r.name)+'</strong></td>'+
+        '<td><span style="font-size:11px; color:var(--light-slate); font-weight:500;">'+xe(ovRoleLabel(r.role))+'</span></td>'+
+        '<td style="text-align:right; font-weight:700; color:var(--steel-blue);">'+r.count+' ticket'+(r.count>1?'s':'')+'</td>'+
+        '</tr>';
+    }).join('');
+  }
+
+  /* =========================================================
+     ROW 6 — donuts
+     ========================================================= */
+  function tkDonutRawMap(mode){
+    var m=tkMatched(false), map={};
+    if(mode==='via'||mode==='rapport'||mode==='eval'||mode==='raison'){
+      if(mode==='via'){ var d=m.filter(function(t){return t.status==='Terminé';});
+        map['Terrain']=d.filter(function(t){return t.termine_via==='terrain';}).length;
+        map['Distance']=d.filter(function(t){return t.termine_via==='distance';}).length; }
+      else if(mode==='rapport'){ var dd=m.filter(function(t){return t.status==='Terminé';});
+        map['Rempli']=dd.filter(function(t){return !!t.report;}).length;
+        map['Manquant']=dd.filter(function(t){return !t.report;}).length; }
+      else if(mode==='eval'){ var de=m.filter(function(t){return t.status==='Terminé';});
+        map['Noté']=de.filter(function(t){return t.evaluation&&t.evaluation.note!=null;}).length;
+        map['Non noté']=de.filter(function(t){return !(t.evaluation&&t.evaluation.note!=null);}).length; }
+      else { m.filter(function(t){return t.status==='Annulé'&&t.cancellation;}).forEach(function(t){
+        var r=t.cancellation.raison||'Autre'; map[r]=(map[r]||0)+1; }); }
+    } else {
+      m.forEach(function(t){ var v=t[mode]||'—'; map[v]=(map[v]||0)+1; });
+    }
+    return Object.keys(map).map(function(k){return {name:k,count:map[k]};}).filter(function(o){return o.count>0;})
+      .sort(function(a,b){return b.count-a.count;});
+  }
+  /* Returns sliced data (max 5 items + optional "Autres"); full=true returns all */
+  function tkDonutData(mode, full){
+    var arr=tkDonutRawMap(mode);
+    if(!full && arr.length>5){
+      var tail=arr.slice(5);
+      var head=arr.slice(0,5);
+      head.push({name:'Autres',count:tail.reduce(function(s,o){return s+o.count;},0),_tail:tail});
+      arr=head;
+    }
+    return arr;
+  }
+  function tkRenderDonut(mountId,mode){
+    var data=tkDonutData(mode), el=document.getElementById(mountId);
+    var total=data.reduce(function(s,o){return s+o.count;},0);
+    if(!total){ el.innerHTML='<div class="tk-empty" style="height:200px">Aucune donnée</div>'; return; }
+    var r=54, C=2*Math.PI*r, off=0, segs='';
+    data.forEach(function(o,i){
+      var frac=o.count/total, len=frac*C, col=TK_DONUT_COLORS[i%TK_DONUT_COLORS.length];
+      var tip=xe(o.name)+' : '+o.count+' ticket'+(o.count>1?'s':'')+' ('+Math.round(frac*100)+'%)';
+      segs+='<circle r="'+r+'" cx="70" cy="70" fill="none" stroke="'+col+'" stroke-width="22" '+
+        'stroke-dasharray="'+len.toFixed(2)+' '+(C-len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" '+
+        'transform="rotate(-90 70 70)" style="cursor:default;transition:opacity .15s" '+
+        'onmouseenter="this.style.opacity=\'.7\'" onmouseleave="this.style.opacity=\'1\'">'+
+        '<title>'+tip+'</title></circle>';
+      off+=len;
+    });
+    var svg='<svg width="140" height="140" viewBox="0 0 140 140">'+
+      '<circle r="43" cx="70" cy="70" fill="var(--white)"/>'+segs+
+      '<text class="tk-donut-center" x="70" y="66" text-anchor="middle" dominant-baseline="auto">'+total+'</text>'+
+      '<text class="tk-donut-center-sub" x="70" y="82" text-anchor="middle">tickets</text></svg>';
+    var legend=data.map(function(o,i){
+      var col=TK_DONUT_COLORS[i%TK_DONUT_COLORS.length], pc=Math.round(o.count/total*100);
+      var isAutres=o.name==='Autres'&&o._tail;
+      var cls='tk-donut-leg'+(isAutres?' tk-donut-leg--autres':'');
+      var btn=isAutres?'<button class="tk-donut-voir-btn">Détail</button>':'';
+      return '<div class="'+cls+'" data-idx="'+i+'">' +
+        '<span class="rk">'+(i+1)+'</span>' +
+        '<span class="sw" style="background:'+col+'"></span>' +
+        '<span class="nm" title="'+xe(o.name)+'">'+xe(o.name)+'</span>' +
+        '<span class="ct">'+o.count+'</span>' +
+        '<span class="pc">'+pc+'%</span>' +
+        btn+'</div>';
+    }).join('');
+    el.innerHTML='<div class="tk-donut-inner">'+svg+'<div class="tk-donut-legend">'+legend+'</div></div>';
+    /* wire breakdown button */
+    var btn=el.querySelector('.tk-donut-voir-btn');
+    if(btn){
+      btn.addEventListener('click',function(e){
+        e.stopPropagation();
+        tkOpenDonutBreakdown(mode);
+      });
+    }
+  }
+  /* =========================================================
+     RÉPARTITION COMPLÈTE MODAL  (reuses .ov-modal-overlay design)
+     ========================================================= */
+  var _tkrmMode=null, _tkrmMF={};
+  var TK_DIM_ORDER=['pole','marque','categorie','reference'];
+  var TK_DIM_LABELS={pole:'Pôle',marque:'Marque',categorie:'Catégorie',reference:'Référence',
+    via:'Terrain / Distance',rapport:'Rapport',eval:'Évaluation',raison:'Annulation'};
+
+  function tkOpenDonutBreakdown(mode){
+    _tkrmMode=mode;
+    _tkrmBuildFilters();
+    _tkrmRender();
+    document.getElementById('tkrm-overlay').classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  function _tkrmClose(){
+    document.getElementById('tkrm-overlay').classList.remove('open');
+    document.body.style.overflow='';
+  }
+
+  function _tkrmMkGroup(label,el,width){
+    var d=document.createElement('div');
+    d.className='ov-mf-group'+(width?'':' grow');
+    if(width) d.style.width=width;
+    d.innerHTML='<label class="filter-label">'+label+'</label>';
+    d.appendChild(el);
+    return d;
+  }
+  function _tkrmSearchInput(){
+    var inp=document.createElement('input');
+    inp.id='tkrm-q'; inp.className='ov-mf-search';
+    inp.placeholder='Filtrer…'; inp.autocomplete='off';
+    inp.addEventListener('input',_tkrmRender);
+    return inp;
+  }
+  function _tkrmSelect(placeholder,values){
+    var opts=[{value:'',label:placeholder}].concat(values.map(function(v){return {value:v,label:v};}));
+    return new OvSearchSelect(placeholder,opts,_tkrmRender);
+  }
+
+  function _tkrmBuildFilters(){
+    var fil=document.getElementById('tkrm-filters');
+    fil.innerHTML=''; _tkrmMF={};
+
+    fil.appendChild(_tkrmMkGroup('RECHERCHER',_tkrmSearchInput()));
+
+    var uniq=function(field){
+      return Array.from(new Set(_pipTickets.map(function(t){return t[field];}).filter(Boolean))).sort();
+    };
+    _tkrmMF.pole=_tkrmSelect('Tous les pôles',uniq('pole'));
+    fil.appendChild(_tkrmMkGroup('PÔLE',_tkrmMF.pole.el,'175px'));
+
+    _tkrmMF.marque=_tkrmSelect('Toutes les marques',uniq('marque'));
+    fil.appendChild(_tkrmMkGroup('MARQUE',_tkrmMF.marque.el,'175px'));
+
+    _tkrmMF.categorie=_tkrmSelect('Toutes catégories',uniq('categorie'));
+    fil.appendChild(_tkrmMkGroup('CATÉGORIE',_tkrmMF.categorie.el,'175px'));
+
+    _tkrmMF.reference=_tkrmSelect('Toutes références',uniq('reference'));
+    fil.appendChild(_tkrmMkGroup('RÉFÉRENCE',_tkrmMF.reference.el,'175px'));
+  }
+
+  function _tkrmFilteredBase(){
+    var f=tkFilters(false);
+    var fP=_tkrmMF.pole?_tkrmMF.pole.getValue():'';
+    var fM=_tkrmMF.marque?_tkrmMF.marque.getValue():'';
+    var fC=_tkrmMF.categorie?_tkrmMF.categorie.getValue():'';
+    var fR=_tkrmMF.reference?_tkrmMF.reference.getValue():'';
+    return _pipTickets.filter(function(t){
+      if(!pipMatchesFilter(t,f)) return false;
+      if(fP && t.pole!==fP) return false;
+      if(fM && t.marque!==fM) return false;
+      if(fC && t.categorie!==fC) return false;
+      if(fR && t.reference!==fR) return false;
+      return true;
+    });
+  }
+
+  function _tkrmRender(){
+    var mode=_tkrmMode;
+    var q=((document.getElementById('tkrm-q')||{}).value||'').toLowerCase();
+    var tickets=_tkrmFilteredBase();
+    var grandTotal=tickets.length||1;
+    var dimIdx=TK_DIM_ORDER.indexOf(mode);
+    var isClassMode=dimIdx>=0;
+
+    /* aggregate by dimension value */
+    var map={};
+    tickets.forEach(function(t){
+      var key=isClassMode?(t[mode]||'—'):'—';
+      if(!map[key]) map[key]={name:key,count:0,poles:{},marques:{},cats:{},refs:{}};
+      map[key].count++;
+      if(t.pole) map[key].poles[t.pole]=true;
+      if(t.marque) map[key].marques[t.marque]=true;
+      if(t.categorie) map[key].cats[t.categorie]=true;
+      if(t.reference) map[key].refs[t.reference]=true;
+    });
+    var rows=Object.values(map).sort(function(a,b){return b.count-a.count;});
+    if(q) rows=rows.filter(function(r){return r.name.toLowerCase().indexOf(q)>=0;});
+
+    /* build column definitions */
+    var cols=[{label:'#',align:'center',w:'40px'}];
+    cols.push({label:TK_DIM_LABELS[mode]||mode,align:'left'});
+    if(isClassMode && mode!=='pole')     cols.push({label:'Pôle',align:'left',dim:'poles'});
+    if(isClassMode && dimIdx>1)          cols.push({label:'Marque',align:'left',dim:'marques'});
+    if(isClassMode && dimIdx>2)          cols.push({label:'Catégorie',align:'left',dim:'cats'});
+    if(isClassMode && dimIdx>3)          cols.push({label:'Référence',align:'left',dim:'refs'});
+    cols.push({label:'Tickets',align:'right'},{label:'%',align:'right'});
+
+    /* thead */
+    var thead='<tr>'+cols.map(function(c){
+      var s='text-align:'+c.align+';'+(c.w?'width:'+c.w+';':'');
+      return '<th style="'+s+'">'+xe(c.label)+'</th>';
+    }).join('')+'</tr>';
+    document.getElementById('tkrm-thead').innerHTML=thead;
+
+    /* tbody */
+    var tbody=rows.length?rows.map(function(r,i){
+      var col=TK_DONUT_COLORS[i%TK_DONUT_COLORS.length];
+      var pc=Math.round(r.count/grandTotal*100);
+      var cells='<td style="text-align:center"><span class="tk-list-rank" style="margin:0;background:'+col+'22;color:'+col+'">'+(i+1)+'</span></td>';
+      cells+='<td><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:'+col+';vertical-align:middle;margin-right:7px;flex-shrink:0"></span><strong>'+xe(r.name)+'</strong></td>';
+      cols.forEach(function(c){
+        if(!c.dim) return;
+        var txt=Object.keys(r[c.dim]).sort().join(', ')||'—';
+        cells+='<td style="color:var(--grey-soft);font-size:12px">'+xe(txt)+'</td>';
+      });
+      cells+='<td style="text-align:right;font-weight:700;color:var(--steel-blue)">'+r.count+'</td>';
+      cells+='<td style="text-align:right;color:var(--light-slate)">'+pc+'%</td>';
+      return '<tr>'+cells+'</tr>';
+    }).join(''):'<tr><td colspan="'+cols.length+'" class="ov-empty">Aucun résultat</td></tr>';
+    document.getElementById('tkrm-tbody').innerHTML=tbody;
+
+    /* title + subtitle + footer */
+    var label=TK_DIM_LABELS[mode]||mode;
+    document.getElementById('tkrm-title').textContent='Répartition complète — '+label;
+    document.getElementById('tkrm-subtitle').textContent=
+      rows.length+' '+(rows.length>1?'valeurs':'valeur')+' · '+tickets.length+' ticket'+(tickets.length>1?'s':'')+' correspondants';
+    document.getElementById('tkrm-footer').innerHTML=
+      '<span class="ov-foot-hint">Filtres actifs de la période et du dashboard appliqués.</span>'+
+      '<span class="ov-foot-count">'+rows.length+' '+label.toLowerCase()+(rows.length>1?'s':'')+
+      ' &nbsp;·&nbsp; '+tickets.length+' ticket'+(tickets.length>1?'s':'')+'</span>';
+  }
+
+  /* =========================================================
+     ROW 7 — notes distribution
+     ========================================================= */
+  function tkRenderNotes(){
+    var notes=tkMatched(false).filter(function(t){return t.evaluation&&t.evaluation.note!=null;})
+      .map(function(t){return Number(t.evaluation.note);}).filter(function(n){return n>=1&&n<=5;});
+    var counts=[0,0,0,0,0]; notes.forEach(function(n){counts[n-1]++;});
+    var max=Math.max.apply(null,counts.concat([1]));
+    var html=[5,4,3,2,1].map(function(n){
+      var c=counts[n-1], w=Math.round(c/max*100);
+      return '<div class="tk-notes-row"><span class="st">'+n+' ★</span>'+
+        '<div class="tk-notes-bar"><div class="tk-notes-fill" style="width:'+w+'%"></div></div>'+
+        '<span class="ct">'+c+'</span></div>';
+    }).join('');
+    document.getElementById('tk-notes').innerHTML=html;
+  }
+
+  /* =========================================================
+     MODALS
+     ========================================================= */
+  var tkModalRenderer=null; // re-render hook for modal tools
+  function tkOpenModal(title,toolsHtml,bodyHtml){
+    document.getElementById('tk-modal-title').textContent=title;
+    document.getElementById('tk-modal-tools').innerHTML=toolsHtml||'';
+    document.getElementById('tk-modal-body').innerHTML=bodyHtml||'';
+    document.getElementById('tk-modal-overlay').classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  function tkCloseModal(){
+    document.getElementById('tk-modal-overlay').classList.remove('open');
+    document.body.style.overflow=''; tkModalRenderer=null;
+  }
+  function tkUnitToggleHtml(active){
+    return '<div class="pip-metric-toggle tk-mini-toggle tk-unit-toggle">'+TK_UNITS.map(function(u){
+      return '<button class="'+(u.key===active?'active':'')+'" data-unit="'+u.key+'">'+u.label+'</button>';}).join('')+'</div>';
+  }
+  function tkMetricToggleHtml(active){
+    var L={mean:'Moy.',median:'Méd.',trimmed:'Tronq.'};
+    return '<div class="pip-metric-toggle tk-mini-toggle">'+['mean','median','trimmed'].map(function(k){
+      return '<button class="'+(k===active?'active':'')+'" data-metric="'+k+'">'+L[k]+'</button>';}).join('')+'</div>';
+  }
+
+  /* Chart expand modal */
+  function tkOpenChartModal(which){
+    var title=which==='vol'?'Volume créés vs résolus':'Temps moyen de résolution dans le temps';
+    var unit=tkResolveUnit(which==='vol'?tkVolUnit:tkTimeUnit);
+    tkOpenModal(title, tkUnitToggleHtml(unit), '<div class="tk-chart" id="tk-modal-chart"></div>');
+    tkModalRenderer=function(){
+      var u=which==='vol'?tkVolUnit:tkTimeUnit;
+      if(which==='vol') tkBuildVol(u,true,'tk-modal-chart'); else tkBuildTime(u,true,'tk-modal-chart');
+    };
+    tkModalRenderer();
+    document.querySelectorAll('#tk-modal-tools .tk-unit-toggle button').forEach(function(b){
+      b.addEventListener('click',function(){
+        document.querySelectorAll('#tk-modal-tools .tk-unit-toggle button').forEach(function(x){x.classList.remove('active');});
+        b.classList.add('active');
+        if(which==='vol') tkVolUnit=b.dataset.unit; else tkTimeUnit=b.dataset.unit;
+        tkModalRenderer(); tkSyncUnitToggles();
+      });
+    });
+  }
+
+  /* Stage evolution modal */
+  function tkOpenStageModal(idx){
+    var st=TK_STAGES[idx]; if(!st||st.group) return;
+    tkStageModalUnit=tkResolveUnit(tkVolUnit); tkStageModalMetric=tkStageMetric;
+    tkOpenModal('Évolution — '+st.name,
+      tkMetricToggleHtml(tkStageModalMetric)+tkUnitToggleHtml(tkStageModalUnit),
+      '<div class="tk-chart" id="tk-modal-chart"></div>');
+    tkModalRenderer=function(){
+      var m=tkMatched(false);
+      var withTs=m.map(function(t){ return {t:t, d:t.created_at?new Date(t.created_at):null }; }).filter(function(o){return o.d;});
+      var buckets=tkBuckets(tkStageModalUnit, withTs.map(function(o){return o.d;}));
+      var groups=buckets.map(function(){return [];});
+      withTs.forEach(function(o){ var i=tkBucketIndex(buckets,tkStageModalUnit,o.d); if(i<0) return;
+        var vals=tkStageValues([o.t],st); if(vals.length) groups[i].push(vals[0]); });
+      var series=groups.map(function(arr){ return arr.length?tkMetricOf(arr,tkStageModalMetric,'tk-stage-trim'):null; });
+      var pb=tkCompressGaps(buckets,function(i){return series[i]==null;});
+      var pvals=pb.map(function(b){return b.isGap?null:series[b.origIdx];});
+      tkDrawChart(document.getElementById('tk-modal-chart'),{buckets:pb,height:360,big:true,
+        yFmt:function(v){return pipFmt(v);},
+        series:[{color:'var(--primary)',values:pvals,area:true,name:st.name}]});
+    };
+    tkModalRenderer();
+    document.querySelectorAll('#tk-modal-tools .tk-unit-toggle button').forEach(function(b){
+      b.addEventListener('click',function(){
+        document.querySelectorAll('#tk-modal-tools .tk-unit-toggle button').forEach(function(x){x.classList.remove('active');});
+        b.classList.add('active'); tkStageModalUnit=b.dataset.unit; tkModalRenderer();
+      });
+    });
+    document.querySelectorAll('#tk-modal-tools .pip-metric-toggle:not(.tk-unit-toggle) button').forEach(function(b){
+      b.addEventListener('click',function(){
+        document.querySelectorAll('#tk-modal-tools .pip-metric-toggle:not(.tk-unit-toggle) button').forEach(function(x){x.classList.remove('active');});
+        b.classList.add('active'); tkStageModalMetric=b.dataset.metric; tkModalRenderer();
+      });
+    });
+  }
+
+  /* Voir tous — annuleurs */
+  function tkOpenAnnulModal(){
+    var rank=tkAnnulRanking();
+    var body='<div class="ov-table-wrap"><table class="ov-table" style="min-width:600px"><thead><tr><th style="width:40px">#</th><th>Nom</th><th>Rôle</th><th style="text-align:right">Annulations</th></tr></thead><tbody>'+
+      (rank.length?rank.map(function(r,i){
+        return '<tr>'+
+          '<td><span class="tk-list-rank" style="margin:0">'+(i+1)+'</span></td>'+
+          '<td><strong>'+xe(r.name)+'</strong></td>'+
+          '<td><span style="font-size:11px; color:var(--light-slate); font-weight:500;">'+xe(ovRoleLabel(r.role))+'</span></td>'+
+          '<td style="text-align:right; font-weight:700; color:var(--steel-blue);">'+r.count+' ticket'+(r.count>1?'s':'')+'</td>'+
+          '</tr>';
+      }).join(''):'<tr><td colspan="4" class="ov-empty">Aucune annulation</td></tr>')+'</tbody></table></div>';
+    tkOpenModal('Classement des annuleurs — '+ovRoleLabel(tkAnnulMode),'',body);
+  }
+
+  /* =========================================================
+     Master render
+     ========================================================= */
+  function tkRenderAll(){
+    if(!tkReady()) return;
+    try{
+      tkRenderKpis(); tkRenderTrends(); tkRenderStageTable();
+      tkRenderHist(); tkRenderHeat();
+      tkRenderTopList(); tkRenderAnnulList();
+      tkRenderDonut('tk-donut-class',tkClassMode); tkRenderDonut('tk-donut-qual',tkQualMode);
+      tkRenderNotes();
+    }catch(e){ console.error('[tickets-tab]',e); }
+  }
+
+  /* =========================================================
+     Toggle wiring
+     ========================================================= */
+  /* Map from toggle id to its paired trim-wrapper id */
+  var TK_TRIM_WRAPPERS={
+    'tk-kpi-metric':'tk-kpi-trim-wrap',
+    'tk-time-metric':'tk-time-trim-wrap',
+    'tk-stage-metric':'tk-stage-trim-wrap'
+  };
+  function tkBindMetric(id,setter){
+    document.querySelectorAll('#'+id+' button').forEach(function(b){
+      b.addEventListener('click',function(){
+        document.querySelectorAll('#'+id+' button').forEach(function(x){x.classList.remove('active');});
+        b.classList.add('active');
+        var val=b.dataset.metric||b.dataset.mode||b.dataset.range;
+        setter(val);
+        /* Show/hide paired trim wrapper */
+        var wrapId=TK_TRIM_WRAPPERS[id];
+        if(wrapId){
+          var wrap=document.getElementById(wrapId);
+          if(wrap) wrap.classList.toggle('pip-hidden', val!=='trimmed');
+        }
+        tkRenderAll();
+      });
+    });
+    /* Wire trim % input for each toggle that has one */
+    var wrapId=TK_TRIM_WRAPPERS[id];
+    if(wrapId){
+      var wrap=document.getElementById(wrapId);
+      if(wrap){
+        var inp=wrap.querySelector('input');
+        if(inp) inp.addEventListener('input',function(){ tkRenderAll(); });
+      }
+    }
+  }
+  function tkSyncUnitToggles(){
+    document.querySelectorAll('.tk-unit-toggle[data-target]').forEach(function(grp){
+      var cur=tkResolveUnit(grp.dataset.target==='vol'?tkVolUnit:tkTimeUnit);
+      grp.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active',b.dataset.unit===cur); });
+    });
+  }
+  function tkBuildUnitToggles(){
+    document.querySelectorAll('.tk-unit-toggle[data-target]').forEach(function(grp){
+      grp.innerHTML=TK_UNITS.map(function(u){return '<button data-unit="'+u.key+'">'+u.label+'</button>';}).join('');
+      grp.querySelectorAll('button').forEach(function(b){
+        b.addEventListener('click',function(){
+          if(grp.dataset.target==='vol') tkVolUnit=b.dataset.unit; else tkTimeUnit=b.dataset.unit;
+          tkSyncUnitToggles(); tkRenderTrends();
+        });
+      });
+    });
+    tkSyncUnitToggles();
+  }
+  function tkInit(){
+    tkBuildUnitToggles();
+    tkBindMetric('tk-kpi-metric',function(v){tkKpiMetric=v;});
+    tkBindMetric('tk-time-metric',function(v){tkTimeMetric=v;});
+    tkBindMetric('tk-stage-metric',function(v){tkStageMetric=v;});
+    tkBindMetric('tk-hist-mode',function(v){tkHistMode=v;});
+    document.getElementById('tk-heat-preset').addEventListener('change', tkRenderHeat);
+    tkBindMetric('tk-top-mode',function(v){tkTopMode=v;});
+    tkBindMetric('tk-annul-mode',function(v){tkAnnulMode=v;});
+    tkBindMetric('tk-class-mode',function(v){tkClassMode=v;});
+    tkBindMetric('tk-qual-mode',function(v){tkQualMode=v;});
+
+    document.querySelectorAll('.tk-expand-btn').forEach(function(b){
+      b.addEventListener('click',function(){ tkOpenChartModal(b.dataset.chart); });
+    });
+    document.getElementById('tk-voir-top').addEventListener('click',function(){ ovOpenModal('top_tickets'); });
+    document.getElementById('tk-voir-annul').addEventListener('click',tkOpenAnnulModal);
+    document.getElementById('tk-modal-close').addEventListener('click',tkCloseModal);
+    document.getElementById('tk-modal-overlay').addEventListener('click',function(e){ if(e.target===this) tkCloseModal(); });
+    document.getElementById('tkrm-close').addEventListener('click',_tkrmClose);
+    document.getElementById('tkrm-overlay').addEventListener('click',function(e){ if(e.target===this) _tkrmClose(); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ tkCloseModal(); _tkrmClose(); } });
+
+    // Re-render charts on resize (debounced) so sticky-Y width recalculates
+    var rz; window.addEventListener('resize',function(){ clearTimeout(rz); rz=setTimeout(function(){
+      if(tkPanelActive()) tkRenderTrends();
+      if(tkModalRenderer) tkModalRenderer();
+    },180); },{passive:true});
+
+    // Hook global refresh (5 s poll + multi-select filters call pipRefresh()
+    // by bare name, so the wrapper catches them even if installed late).
+    if(typeof window.pipRefresh==='function'){
+      var _orig=window.pipRefresh;
+      window.pipRefresh=function(){ var r=_orig.apply(this,arguments); if(tkPanelActive()) tkRenderAll(); if(tkModalRenderer) tkModalRenderer(); return r; };
+    }
+    // Période/date inputs bind pipRefresh directly at boot, capturing the
+    // pre-wrap reference (boot can win the race on localhost). Attach our own
+    // deferred listeners so the date picker's update() writes the inputs first.
+    ['period-select','date-start','date-end'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.addEventListener('change',function(){ setTimeout(function(){ if(tkPanelActive()) tkRenderAll(); if(tkModalRenderer) tkModalRenderer(); },0); });
+    });
+    if(typeof window.activateTab==='function'){
+      var _origA=window.activateTab;
+      window.activateTab=function(id){
+        var r=_origA.apply(this,arguments);
+        if(id==='tickets') requestAnimationFrame(function(){ requestAnimationFrame(tkRenderAll); });
+        return r;
+      };
+    }
+    if(tkPanelActive()) tkRenderAll();
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',tkInit);
+  else tkInit();
+})();
+</script>

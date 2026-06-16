@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tous les Tickets — Stokvis Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/variables.css">
+<link rel="stylesheet" href="/static/css/sidebar.css">
+<link rel="stylesheet" href="/static/css/base.css">
+<style>
+/* ==========================================================================
+   VARIABLES & BASE
+   ========================================================================== */
+/* Variables : voir /static/css/variables.css (aucun override local) */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--grey);background-color:var(--off-white);overflow-x:hidden;line-height:1.6;}
+ul{list-style:none;}
+button{font-family:inherit;cursor:pointer;outline:none;}
+input, select, textarea{font-family:inherit;outline:none;}
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+
+.topbar{position:fixed;top:0;left:var(--sidebar-width);right:0;height:var(--topbar-height);background-color:var(--white);border-bottom:1px solid var(--light-grey);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:90;}
+.topbar-title{font-family: Calibri, system-ui, sans-serif; font-size:18px;font-weight:600;color:var(--dark-charcoal);}
+.topbar-right{display:flex;align-items:center;gap:16px;}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background-color:var(--primary);color:var(--white);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+
+.content{margin-left:var(--sidebar-width);margin-top:var(--topbar-height);padding:32px;max-width:1600px;min-height:calc(100vh - var(--topbar-height));}
+.page-header{margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.page-title{font-family: Calibri, system-ui, sans-serif; font-size:24px;font-weight:700;color:var(--dark-charcoal); display:flex; align-items:center; gap:12px;}
+.page-title span{font-weight:400; color:var(--light-slate);}
+.btn-primary{background-color:var(--primary);color:var(--white);border:none;border-radius:6px;padding:0 20px;height:40px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px;transition:background var(--transition);cursor:pointer;}
+.btn-primary:hover{background-color:var(--primary-hover);}
+.btn-primary svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
+
+/* ==========================================================================
+   STEP NUMBERS (MODAL)
+   ========================================================================== */
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: var(--off-white);
+  color: var(--primary);
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.step-title-wrap {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.step-title-wrap label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dark-charcoal);
+  margin-bottom: 0;
+}
+.step-title-wrap label span {
+  color: var(--danger);
+}
+
+/* ==========================================================================
+   TOOLBAR & FILTERS
+   ========================================================================== */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap;}
+.search-bar{position:relative;width:100%;max-width:400px;}
+.search-bar input{width:100%;height:40px;border:1.5px solid var(--light-grey);border-radius:6px;padding:0 12px 0 36px;font-size:14px;color:var(--dark-charcoal);background:var(--white);transition:border-color var(--transition);}
+.search-bar input:focus{border-color:var(--steel-blue);}
+.search-bar svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--light-slate);fill:none;stroke-width:1.5;}
+
+.filter-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.searchable-filter-wrap { position: relative; min-width: 160px; }
+.searchable-filter-input {
+  width: 100%; height: 36px; border: 1.5px solid var(--light-grey); border-radius: 6px;
+  padding: 0 32px 0 12px; font-size: 13px; color: var(--dark-charcoal);
+  background: var(--white); cursor: text; transition: border-color var(--transition);
+}
+.searchable-filter-input:focus { border-color: var(--steel-blue); outline: none; }
+.searchable-filter-chevron { position: absolute; right: 10px; top: 10px; width: 16px; height: 16px; pointer-events: none; color: var(--light-slate); }
+.searchable-filter-dropdown {
+  position: absolute; top: 100%; left: 0; min-width: 100%;
+  background: var(--white); border: 1px solid var(--light-grey); border-radius: 6px;
+  box-shadow: var(--shadow-popup); margin-top: 4px; max-height: 250px; overflow-y: auto;
+  z-index: 1000; display: none;
+}
+.searchable-filter-dropdown.open { display: block; }
+.filter-opt { padding: 8px 12px; font-size: 13px; cursor: pointer; transition: background var(--transition); white-space: nowrap; }
+.filter-opt:hover { background-color: var(--off-white); color: var(--primary); }
+.filter-opt.empty { color: var(--light-slate); cursor: default; pointer-events: none; }
+
+.tags-container{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.filter-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background-color:var(--off-white);border:1px solid var(--light-grey);border-radius:4px;font-size:12px;font-weight:500;color:var(--dark-charcoal);}
+.filter-tag strong{color:var(--steel-blue);font-weight:600;}
+.filter-tag .tag-close{cursor:pointer;color:var(--light-slate);display:flex;align-items:center;transition:color var(--transition);}
+.filter-tag .tag-close:hover{color:var(--danger);}
+.filter-tag .tag-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;}
+.btn-clear-filters{background:none;border:none;color:var(--steel-blue);font-size:12px;font-weight:600;cursor:pointer;display:none;padding:4px 8px;border-radius:4px;}
+
+.status-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.pill{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--light-grey);background:var(--white);color:var(--grey);transition:all var(--transition);display:inline-flex;align-items:center;gap:6px;}
+.pill:hover{border-color:var(--steel-blue);color:var(--steel-blue);}
+.pill.active{background:var(--primary);color:var(--white);border-color:var(--primary);}
+.pill-count{background:rgba(0,0,0,0.1);padding:2px 6px;border-radius:10px;font-size:11px;}
+.pill.active .pill-count{background:rgba(255,255,255,0.2);}
+
+/* ==========================================================================
+   TABLE
+   ========================================================================== */
+.table-container{background-color:var(--white);border-radius:8px;box-shadow:var(--shadow-card);overflow-x:auto;-webkit-overflow-scrolling:touch; min-height:400px; padding-bottom: 80px;}
+.data-table{width:100%;min-width:1100px;border-collapse:collapse;}
+.data-table th{background-color:var(--off-white);font-size:12px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:0.5px;padding:14px 20px;text-align:left;border-bottom:1px solid var(--light-grey);white-space:nowrap;cursor:pointer;user-select:none;}
+.data-table th:hover{color:var(--primary);}
+.data-table th .sort-icon{display:inline-block;margin-left:4px;opacity:0.4;font-size:10px;}
+.data-table th.sorted .sort-icon{opacity:1;color:var(--primary);}
+.data-table td{padding:16px 20px;font-size:13px;color:var(--dark-charcoal);border-bottom:1px solid var(--light-grey);vertical-align:middle;}
+.data-table tbody tr{cursor:pointer;}
+.data-table tbody tr:hover{background-color:rgba(74,127,181,0.09);}
+
+.col-id{font-weight:700;color:var(--primary);white-space:nowrap;}
+.col-date{white-space:nowrap;}
+.col-date span{display:block;font-size:11px;color:var(--light-slate);margin-top:2px;}
+.col-title{max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500;}
+.col-machine span{font-family:'SFMono-Regular', Consolas, monospace; font-size:12px; background:var(--off-white); padding:2px 6px; border-radius:4px; border:1px solid var(--light-grey);}
+
+.status-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;}
+.status-badge.warning { background-color: #FEF3C7; color: #D97706; }
+
+.actions-cell{display:flex;align-items:center;gap:6px;}
+.btn-icon{width:32px;height:32px;border-radius:6px;background:none;border:1px solid var(--light-grey);color:var(--steel-blue);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all var(--transition);}
+.btn-icon:hover{background-color:var(--off-white);border-color:var(--primary);color:var(--primary);}
+.btn-icon.danger{color:var(--danger);border-color:rgba(239,68,68,0.25);}
+.btn-icon.danger:hover{background-color:var(--danger-bg);border-color:var(--danger);color:var(--danger);}
+.btn-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+
+.empty-state{text-align:center;padding:64px 24px;color:var(--light-slate);font-size:14px;border-bottom:none;cursor:default;}
+
+/* Animation déplacement de ligne lors d'une réassignation */
+.data-table tbody tr.row-moving {
+  position: relative;
+  z-index: 5;
+}
+@keyframes rowAssignedFlash {
+  0%   { background-color: rgba(74,127,181,0.15); }
+  100% { background-color: transparent; }
+}
+.data-table tbody tr.row-assigned-flash {
+  animation: rowAssignedFlash 1.2s ease forwards;
+}
+/* Désactiver le survol pendant l'animation de déplacement */
+.data-table tbody.animating tr:hover {
+  background-color: transparent !important;
+  cursor: default;
+}
+
+/* Shake du dropdown quand des changements sont en attente */
+@keyframes dropShake {
+  0%,100% { transform: translateX(0); }
+  15%     { transform: translateX(-7px); }
+  30%     { transform: translateX(7px); }
+  45%     { transform: translateX(-5px); }
+  60%     { transform: translateX(5px); }
+  75%     { transform: translateX(-3px); }
+  90%     { transform: translateX(3px); }
+}
+#global-tech-dropdown.shake {
+  animation: dropShake 0.45s ease;
+}
+/* Pulse sur le bouton Enregistrer lors du shake */
+@keyframes btnPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(27,58,107,0.4); }
+  50%     { box-shadow: 0 0 0 6px rgba(27,58,107,0); }
+}
+#global-tech-dropdown.shake #btn-enregistrer-tech {
+  animation: btnPulse 0.45s ease;
+}
+
+/* Lignes de tickets annulés */
+.data-table tbody tr.row-annule {
+  opacity: 0.55;
+  background-color: var(--off-white);
+}
+.data-table tbody tr.row-annule:hover {
+  opacity: 0.7;
+}
+
+/* ==========================================================================
+   GLOBAL TECH DROPDOWN
+   ========================================================================== */
+.tech-cell-trigger{
+  display:inline-flex;align-items:center;justify-content:space-between;
+  width:100%; min-width: 140px; padding:6px 10px; background:var(--white); 
+  border:1.5px solid var(--light-grey); border-radius:6px; font-size:13px;
+  cursor:pointer; transition:all var(--transition);
+}
+.tech-cell-trigger:hover { border-color:var(--steel-blue); }
+.tech-cell-trigger .arrow { width:14px; height:14px; stroke:var(--light-slate); }
+.tech-cell-trigger.unassigned { color: var(--light-slate); font-style: italic; }
+
+#global-tech-dropdown {
+  position: absolute; width: 260px; background: var(--white);
+  border: 1px solid var(--light-grey); border-radius: 8px; box-shadow: var(--shadow-dropdown);
+  z-index: 2000; display: none; flex-direction: column; overflow: hidden;
+}
+#global-tech-dropdown.open { display: flex; }
+#tech-drop-footer {
+  padding: 8px 10px; border-top: 1px solid var(--light-grey); background: var(--off-white);
+  display: none;
+}
+#tech-drop-footer.visible { display: block; }
+#btn-enregistrer-tech {
+  width: 100%; height: 34px; background: var(--primary); color: var(--white);
+  border: none; border-radius: 6px; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: background var(--transition);
+}
+#btn-enregistrer-tech:hover { background: var(--primary-hover); }
+.tech-drop-search { padding: 8px; border-bottom: 1px solid var(--light-grey); }
+.tech-drop-search input { width: 100%; height: 32px; border: 1px solid var(--light-grey); border-radius: 4px; padding: 0 8px; font-size: 12px; }
+.tech-drop-list { max-height: 250px; overflow-y: auto; padding: 4px 0; }
+.tech-separator { font-size: 11px; font-weight: 700; color: var(--light-slate); text-transform: uppercase; padding: 10px 12px 4px; background: var(--white); position: sticky; top: 0; }
+.tech-opt { 
+  display: flex; align-items: flex-start; gap: 10px; padding: 8px 12px; 
+  cursor: pointer; transition: background var(--transition);
+}
+.tech-opt:hover { background: var(--off-white); }
+.tech-opt input[type="checkbox"] { margin-top: 3px; cursor: pointer; }
+.tech-opt-info { flex: 1; display: flex; flex-direction: column; }
+.tech-opt-name { font-size: 13px; font-weight: 600; color: var(--dark-charcoal); }
+.tech-opt-meta { font-size: 11px; color: var(--light-slate); margin-top: 2px; }
+.tech-status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; }
+.dot-service { background: var(--status-success); }
+.dot-pause { background: var(--steel-blue); }
+.dot-hors { background: var(--danger); }
+
+/* ==========================================================================
+   MODALS
+   ========================================================================== */
+.modal-overlay{position:fixed;inset:0;background:rgba(27,58,107,0.5);backdrop-filter:blur(4px);z-index:3000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;padding:24px;}
+.modal-overlay.vis{opacity:1;pointer-events:auto;}
+.modal-content{background:var(--white);border-radius:12px;box-shadow:var(--shadow-popup);width:96%;max-width:1100px;max-height:90vh;display:flex;flex-direction:column;transform:scale(0.98);transition:transform 0.3s;overflow:hidden;}
+.modal-overlay.vis .modal-content{transform:scale(1);}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--light-grey);display:flex;align-items:center;justify-content:space-between;background:var(--off-white);}
+.modal-title{font-size:16px;font-weight:700;color:var(--dark-charcoal);}
+.modal-close{background:none;border:none;color:var(--grey);cursor:pointer;padding:4px;border-radius:4px;}
+.modal-close:hover{background:var(--light-grey);color:var(--dark-charcoal);}
+.modal-body{padding:32px;overflow-y:auto;flex:1;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--light-grey);display:flex;justify-content:flex-end;gap:12px;background:var(--off-white);}
+
+/* 2-column layout inside modal body */
+.modal-columns { display: flex; gap: 40px; }
+.modal-col { flex: 1; display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+
+@media (max-width: 992px) {
+  .modal-columns { gap: 24px; }
+  .modal-body { padding: 24px; }
+}
+
+@media (max-width: 768px) {
+  .modal-overlay { padding: 12px; }
+  .modal-content { width: 100%; max-height: 95vh; }
+  .modal-columns { flex-direction: column; gap: 20px; }
+  .modal-body { padding: 16px; }
+  .modal-header { padding: 16px; }
+  .modal-footer { padding: 16px; }
+}
+
+.form-group{display:flex;flex-direction:column;gap:8px;}
+.form-group label{font-size:13px;font-weight:600;color:var(--dark-charcoal);}
+.form-group label span{color:var(--danger);}
+.form-control{width:100%;height:40px;border:1.5px solid var(--light-grey);border-radius:6px;padding:0 12px;font-size:14px;transition:border-color var(--transition);}
+.form-control:focus{border-color:var(--steel-blue);}
+textarea.form-control{height:auto;padding:12px;resize:vertical;min-height:90px;}
+
+.checklist-container{border:1.5px solid var(--light-grey);border-radius:6px;overflow:hidden;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid var(--light-grey);background:var(--white);}
+.check-item:last-child{border-bottom:none;}
+.check-item input[type="checkbox"]{margin-top:2px;width:16px;height:16px;accent-color:var(--primary);}
+.check-item-label{font-size:14px;color:var(--dark-charcoal);flex:1;font-weight:500;}
+.check-item-input{margin-top:8px;width:100%;display:none;}
+.check-item input:checked ~ .check-item-input{display:block;}
+
+.dropzone{border:2px dashed var(--light-slate);border-radius:8px;padding:24px;text-align:center;cursor:pointer;background:var(--off-white);transition:all var(--transition);}
+.dropzone:hover{border-color:var(--primary);background:rgba(27,58,107,0.05);}
+.dropzone p{font-size:13px;color:var(--grey);margin-top:8px;font-style:italic;}
+.image-preview-grid{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;}
+.img-thumb-wrap{position:relative;width:80px;height:80px;}
+.img-thumb{width:100%;height:100%;object-fit:cover;border-radius:6px;border:1px solid var(--light-grey);}
+.img-remove{position:absolute;top:-6px;right:-6px;width:20px;height:20px;background:var(--danger);color:white;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.2);}
+
+.btn-secondary{background:var(--white);color:var(--grey);border:1px solid var(--light-grey);border-radius:6px;padding:0 20px;height:40px;font-size:14px;font-weight:600;cursor:pointer;transition:all var(--transition);}
+.btn-secondary:hover{background:var(--off-white);color:var(--dark-charcoal);}
+.btn-danger{background:var(--danger);color:var(--white);border:none;border-radius:6px;padding:0 20px;height:40px;font-size:14px;font-weight:600;cursor:pointer;transition:background var(--transition);}
+.btn-danger:hover{background:var(--danger-hover);}
+
+/* ==========================================================================
+   TOAST
+   ========================================================================== */
+.toast-container{position:fixed;top:20px;right:24px;z-index:4000;display:flex;flex-direction:column;gap:10px;}
+.toast{display:flex;align-items:center;gap:12px;padding:14px 18px;background-color:#fff;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.1);min-width:280px;max-width:360px;border-left:4px solid var(--status-success);animation:slideInRight 0.3s ease;}
+@keyframes slideInRight{from{opacity:0;transform:translateX(100%);}to{opacity:1;transform:translateX(0);}}
+</style>
+<link rel="stylesheet" href="/static/css/responsive.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+{% set active_nav = 'tous-les-tickets' %}{% include 'partials/_sidebar_manager.html' %}
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-title">Tous les Tickets</div>
+  <div class="topbar-right">
+    <div class="topbar-avatar">A</div>
+  </div>
+</header>
+
+<!-- CONTENT -->
+<main class="content">
+  <div class="page-header">
+    <h1 class="page-title">
+      Tous les tickets <span id="page-counts">— 0</span>
+    </h1>
+    <button class="btn-primary" onclick="openNewTicketModal()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nouveau ticket
+    </button>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search-input" placeholder="Recherche globale (ID, Client, Machine, Statut...)">
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="searchable-filter-wrap" id="wrap-client">
+      <input type="text" class="searchable-filter-input" id="inp-client" placeholder="Client..." autocomplete="off">
+      <svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+      <div class="searchable-filter-dropdown" id="drop-client"></div>
+    </div>
+    <div class="searchable-filter-wrap" id="wrap-tech">
+      <input type="text" class="searchable-filter-input" id="inp-tech" placeholder="Technicien..." autocomplete="off">
+      <svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+      <div class="searchable-filter-dropdown" id="drop-tech"></div>
+    </div>
+    <div class="searchable-filter-wrap" id="wrap-ref">
+      <input type="text" class="searchable-filter-input" id="inp-ref" placeholder="Référence..." autocomplete="off">
+      <svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+      <div class="searchable-filter-dropdown" id="drop-ref"></div>
+    </div>
+    <div class="searchable-filter-wrap" id="wrap-marque">
+      <input type="text" class="searchable-filter-input" id="inp-marque" placeholder="Marque..." autocomplete="off">
+      <svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+      <div class="searchable-filter-dropdown" id="drop-marque"></div>
+    </div>
+    <div class="searchable-filter-wrap" id="wrap-cat">
+      <input type="text" class="searchable-filter-input" id="inp-cat" placeholder="Catégorie..." autocomplete="off">
+      <svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+      <div class="searchable-filter-dropdown" id="drop-cat"></div>
+    </div>
+    
+    <div class="tags-container" id="active-tags"></div>
+    <button class="btn-clear-filters" id="btn-clear-filters" onclick="clearFilters()">Tout effacer</button>
+  </div>
+
+  <div class="status-pills" id="status-pills">
+    <!-- Dynamically populated -->
+  </div>
+
+  <div class="table-container">
+    <table class="data-table" id="tickets-table">
+      <thead>
+        <tr>
+          <th onclick="sortTable('id')" id="th-id">ID <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('date')" id="th-date">Date / Heure <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('title')" id="th-title">Titre <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('client')" id="th-client">Client <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('machine')" id="th-machine">Machine <span class="sort-icon">↕</span></th>
+          <th style="width:200px;">Technicien(s)</th>
+          <th onclick="sortTable('status')" id="th-status">État <span class="sort-icon">↕</span></th>
+          <th style="width:100px;text-align:center;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tickets-tbody"></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- GLOBAL TECH DROPDOWN OVERLAY -->
+<div id="global-tech-dropdown">
+  <div class="tech-drop-search">
+    <input type="text" id="tech-search-input" placeholder="Rechercher..." oninput="filterTechDropdown(this.value)">
+  </div>
+  <div class="tech-drop-list" id="tech-drop-list"></div>
+  <div id="tech-drop-footer">
+    <div id="tech-drop-warning" style="font-size:12px;color:var(--danger);font-weight:500;margin-bottom:6px;display:none;">
+      Veuillez enregistrer avant de continuer.
+    </div>
+    <button id="btn-enregistrer-tech" onclick="saveTechAssignment()">Enregistrer</button>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRM REMOVE TECH -->
+<div class="modal-overlay" id="confirm-remove-modal">
+  <div class="modal-content" style="max-width:450px;">
+    <div class="modal-header">
+      <div class="modal-title">Retrait du technicien</div>
+      <button class="modal-close" onclick="closeConfirmRemoveModal()">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom: 16px; font-size:14px; color:var(--dark-charcoal);" id="confirm-remove-msg"></p>
+      
+      <div style="background:var(--off-white); padding:16px; border-radius:8px; border:1px solid var(--light-grey);">
+        <div style="font-weight:700; color:var(--primary); margin-bottom:4px;" id="confirm-remove-tid"></div>
+        <div style="font-weight:600; font-size:13px; margin-bottom:8px; color:var(--dark-charcoal);" id="confirm-remove-title"></div>
+        <div style="font-size:12px; color:var(--grey);">
+          Client : <span id="confirm-remove-client" style="font-weight:600; color:var(--dark-charcoal);"></span><br>
+          Machine : <span id="confirm-remove-machine" style="font-family:'SFMono-Regular', Consolas, monospace; font-weight:600; color:var(--dark-charcoal);"></span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeConfirmRemoveModal()">Annuler</button>
+      <button class="btn-danger" id="btn-confirm-remove">Retirer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NEW TICKET -->
+<div class="modal-overlay" id="new-ticket-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">Créer un nouveau ticket</div>
+      <button class="modal-close" onclick="closeNewTicketModal()">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="nt-form-body">
+      <div class="modal-columns">
+        <!-- LEFT COLUMN -->
+        <div class="modal-col">
+          <div class="form-group">
+            <div class="step-title-wrap">
+              <span class="step-number">1</span>
+              <label>Client <span>*</span></label>
+            </div>
+            <select class="form-control" id="nt-client" onchange="onClientSelect()">
+              <option value="">Sélectionner un client...</option>
+            </select>
+          </div>
+
+          <div id="nt-left-dynamic" style="display:none; flex-direction:column; gap:24px;">
+            <div class="form-group">
+              <div class="step-title-wrap">
+                <span class="step-number">2</span>
+                <label>Référence machine <span>*</span></label>
+              </div>
+              <select class="form-control" id="nt-ref" onchange="onRefSelect()">
+                <option value="">Sélectionner une référence...</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <div class="step-title-wrap">
+                <span class="step-number">3</span>
+                <label>ID Instance <span>*</span></label>
+              </div>
+              <select class="form-control" id="nt-idInstance" onchange="onInstanceSelect()">
+                <option value="">Sélectionner l'ID...</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="nt-loc-group" style="display:none;">
+              <div class="step-title-wrap">
+                <span class="step-number">4</span>
+                <label>Localisation <span>*</span></label>
+              </div>
+              <input type="text" class="form-control" id="nt-loc" placeholder="Lien Google Maps ou adresse précise...">
+              <div id="nt-loc-error" style="color:var(--danger); font-size:12px; display:none; margin-top:4px;">La localisation est requise.</div>
+            </div>
+
+            <div class="form-group" id="nt-pannes-group" style="display:none;">
+              <div class="step-title-wrap">
+                <span class="step-number">5</span>
+                <label>Pannes signalées <span>*</span></label>
+              </div>
+              <div class="checklist-container" id="nt-checklist"></div>
+              <div id="nt-check-error" style="color:var(--danger); font-size:12px; display:none; margin-top:4px;">Veuillez sélectionner au moins une panne.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="modal-col" id="nt-right-col" style="display:none;">
+          <div class="form-group">
+            <div class="step-title-wrap">
+              <span class="step-number">6</span>
+              <label>Description</label>
+            </div>
+            <textarea class="form-control" id="nt-desc" placeholder="Détails supplémentaires..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <div class="step-title-wrap">
+              <span class="step-number">7</span>
+              <label>Photos</label>
+            </div>
+            <div class="dropzone" onclick="document.getElementById('nt-file-upload').click()">
+              <svg viewBox="0 0 24 24" width="24" height="24" stroke="var(--light-slate)" fill="none" stroke-width="2" style="margin-bottom:8px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <div><strong>Ajouter une photo</strong></div>
+              <p>Merci de fournir une ou plusieurs photos illustrant le problème (ex: code d'erreur, pièce endommagée).</p>
+            </div>
+            <input type="file" id="nt-file-upload" accept="image/*" multiple style="display:none;" onchange="handleFileUpload(event)">
+            <div class="image-preview-grid" id="nt-image-preview"></div>
+          </div>
+
+          <div class="form-group" style="flex:1; display:flex; flex-direction:column;">
+            <div class="step-title-wrap">
+              <span class="step-number">8</span>
+              <label>Assignation Technicien</label>
+            </div>
+            <div style="display:flex; flex-direction:column; border:1px solid var(--light-grey); border-radius:6px; flex:1; overflow:hidden; min-height: 250px;">
+              <div class="tech-drop-search" style="background:var(--off-white); padding:10px; border-bottom:1px solid var(--light-grey);">
+                <input type="text" id="nt-tech-search" placeholder="Rechercher un technicien..." oninput="filterNtTech(this.value)" style="width:100%; height:36px; border:1px solid var(--light-grey); border-radius:4px; padding:0 12px; font-size:13px; outline:none; transition: border-color var(--transition);">
+              </div>
+              <div style="overflow-y:auto; padding:4px 0; flex:1; background:var(--white);" id="nt-tech-list">
+                 <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeNewTicketModal()">Annuler</button>
+      <button class="btn-primary" onclick="submitNewTicket()" id="btn-submit-ticket" disabled>Créer le ticket</button>
+    </div>
+  </div>
+</div>
+
+<!-- Le modal d'annulation est désormais le composant partagé TicketTable.openCancelModal
+     (voir /static/js/ticket_table.js) : identique sur toutes les pages. -->
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/ticket_table.js"></script>
+<script src="/static/js/ticket_detail.js"></script>
+<script src="/static/js/ui.js"></script>
+<script>
+/* ==========================================================================
+   MOCK DATA & STATE
+   ========================================================================== */
+// ==========================================================================
+// DONNÉES — alimentées par l'API (voir /static/js/api.js). On conserve les
+// MÊMES noms de variables que le prototype d'origine pour ne PAS toucher au
+// rendu, au tri ni aux filtres : seul un adaptateur remplit ces tableaux.
+// ==========================================================================
+let CLIENTS = [];
+let MACHINES = [];
+let CATALOGUE = {};
+let TECHS = [];
+let TICKETS = [];
+let RAW_TICKETS = {}; // id -> ticket enrichi complet (pour le popup Détails)
+
+function mapTicket(t) {
+  RAW_TICKETS[t.id] = t;
+  return {
+    id: t.id, date: t.date, time: t.time, timestamp: t.timestamp,
+    titre: t.titre,  // titre serveur (intègre le titre du rapport technicien) — prime
+    checklist: (t.items || [])
+      .filter(it => it.type === 'panne' && it.checked && !it.system)
+      .map(it => ({ label: it.label })),
+    clientId: t.client_id, machineId: t.instance_id, techIds: t.technicien_ids,
+    usageReadings: t.usage_readings || [],
+    status: t.status,
+    termine_via: t.termine_via
+  };
+}
+
+function applyBootstrap(data) {
+  CLIENTS = data.clients.map(c => ({ id: c.id, name: c.raison_sociale }));
+  MACHINES = data.parc.map(m => ({
+    idInstance: m.instance_id, ref: m.reference, pole: m.pole,
+    marque: m.marque, cat: m.categorie, clientId: m.assignation
+  }));
+  TECHS = data.techniciens.map(t => ({
+    id: t.id, name: (t.prenom + ' ' + (t.nom ? t.nom : '')).trim(),
+    activeTickets: t.active_tickets, status: t.disponibilite, archived: t.archived
+  }));
+  CATALOGUE = {};
+  Object.values(data.catalogue.nodes).forEach(n => {
+    if (n.level === 4) {
+      CATALOGUE[n.name] = (n.pannes || [])
+        .filter(p => !p.system)
+        .map((p, i) => ({ id: 'i' + i, label: p.label, type: p.type, required: !!p.required }));
+    }
+  });
+  TICKETS = data.tickets.map(mapTicket);
+}
+
+async function reload() {
+  const data = await API.bootstrap();
+  applyBootstrap(data);
+  renderMain();
+}
+
+let activeFilters = { status: 'Tous', client: [], tech: [], ref: [], marque: [], cat: [] };
+let searchQuery = '';
+let sortCol = 'default'; 
+let sortDir = 'asc';
+
+let currentTicketForTech = null;
+let pendingRemoveTechId = null;
+let pendingAddTechIds = [];   // techs checked but not yet saved
+let lastSavedTicketId = null; // ticket to flash after move
+let ntUploadedFiles = [];
+let ntSelectedTechs = [];
+
+/* ==========================================================================
+   UTILITIES & GLOBAL EVENT LISTENERS
+   ========================================================================== */
+function showToast(msg, type = 'success') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  const iconHtml = type === 'error' ? '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>' : '<polyline points="20 6 9 17 4 12"/>';
+  t.innerHTML = `<div style="width:20px;height:20px;flex-shrink:0;color:${type==='error'?'var(--danger)':'var(--status-success)'}"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">${iconHtml}</svg></div><div style="flex:1;font-size:13px;font-weight:500;">${xe(msg)}</div>`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3000);
+}
+
+// Nouvelle fonction de tri de priorité pour les techniciens
+function sortTechsByPriority(a, b) {
+  // 1. Tri par charge de travail (nombre de tickets actifs) - Priorité au plus bas
+  if (a.activeTickets !== b.activeTickets) return a.activeTickets - b.activeTickets;
+  
+  // 2. Tri par statut (En cas d'égalité sur le nombre de tickets)
+  const statusOrder = { 'En service': 1, 'En pause': 2, 'Hors service': 3 };
+  const pA = statusOrder[a.status] || 99;
+  const pB = statusOrder[b.status] || 99;
+  if (pA !== pB) return pA - pB;
+  
+  // 3. Tri par ordre alphabétique
+  return a.name.localeCompare(b.name);
+}
+
+/* --- Shake helper : bloque la fermeture si des ajouts sont en attente --- */
+function shakeDropdown() {
+  const drop = document.getElementById('global-tech-dropdown');
+  drop.classList.remove('shake');
+  void drop.offsetWidth; // reset animation
+  drop.classList.add('shake');
+  setTimeout(() => drop.classList.remove('shake'), 500);
+  const warn = document.getElementById('tech-drop-warning');
+  warn.style.display = 'block';
+}
+
+function tryCloseTechDropdown() {
+  if (pendingAddTechIds.length > 0) {
+    shakeDropdown();
+    return; // bloqué
+  }
+  closeTechDropdown();
+}
+
+// Global UI Listeners (Close Modals & Dropdowns)
+document.addEventListener('mousedown', e => {
+  // Close searchable filter dropdowns
+  document.querySelectorAll('.searchable-filter-wrap').forEach(wrap => {
+    if(!wrap.contains(e.target)) {
+      const drop = wrap.querySelector('.searchable-filter-dropdown');
+      if(drop.classList.contains('open')){ drop.classList.remove('open'); wrap.querySelector('input').value = ''; }
+    }
+  });
+
+  // Close tech dropdown — bloqué si des ajouts sont en attente
+  const techDrop = document.getElementById('global-tech-dropdown');
+  if(techDrop.classList.contains('open') && !techDrop.contains(e.target) && !e.target.closest('.tech-cell-trigger') && !e.target.closest('#confirm-remove-modal')){
+    tryCloseTechDropdown();
+  }
+
+  // Close modals on overlay click
+  if(e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('vis');
+    if(e.target.id === 'confirm-remove-modal') pendingRemoveTechId = null;
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.vis').forEach(m => m.classList.remove('vis'));
+    tryCloseTechDropdown(); // bloqué si en attente
+    pendingRemoveTechId = null;
+  }
+});
+
+// Garde globale (phase capture) : tant que des ajouts ne sont pas enregistrés,
+// tout clic hors du dropdown est bloqué (autre dropdown, détails, sidebar, etc.)
+document.addEventListener('click', e => {
+  if (pendingAddTechIds.length === 0) return;
+  const drop = document.getElementById('global-tech-dropdown');
+  if (drop.contains(e.target) || e.target.closest('#confirm-remove-modal')) return;
+  e.preventDefault();
+  e.stopPropagation();
+  shakeDropdown();
+}, true);
+
+// Bloquer la navigation hors page si des ajouts sont en attente
+window.addEventListener('beforeunload', e => {
+  if (pendingAddTechIds.length > 0) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+// Bloquer les liens de la sidebar si des ajouts sont en attente
+document.querySelector('.sidebar-nav').addEventListener('click', e => {
+  const link = e.target.closest('a');
+  if (!link) return;
+  if (pendingAddTechIds.length > 0) {
+    e.preventDefault();
+    shakeDropdown();
+    // Scroller jusqu'au dropdown pour qu'il soit visible
+    const drop = document.getElementById('global-tech-dropdown');
+    const rect = drop.getBoundingClientRect();
+    if (rect.bottom > window.innerHeight - 8 || rect.top < 0) {
+      drop.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+});
+
+// Palette = source unique partagée (ticket_table.js), consommée aussi par le popup.
+const STATUS_STYLE = TicketTable.STATUS_STYLE;
+
+/* Titre : délègue à genTitle (source unique dans static/js/ui.js). */
+function getTicketTitle(t) { return genTitle(t); }
+
+function getEnrichedTicket(t) {
+  const c = CLIENTS.find(x => x.id === t.clientId) || {name: 'Inconnu'};
+  // Solid fallback to avoid mapping errors if machine doesn't exist anymore
+  const m = MACHINES.find(x => x.idInstance === t.machineId) || {ref: 'N/A', pole: 'N/A', marque: 'N/A', cat: 'N/A'};
+  const techs = t.techIds.map(tid => TECHS.find(x => x.id === tid)).filter(Boolean);
+  return { ...t, clientName: c.name, machineRef: m.ref, pole: m.pole, marque: m.marque, cat: m.cat, techs, titleStr: getTicketTitle(t) };
+}
+
+function usageSubHtml(readings) {
+  if (!readings || !readings.length) return '';
+  const parts = readings.map(u => `${xe(u.value)}${u.unit ? ' ' + xe(u.unit) : ''}`);
+  return `<div style="font-size:11px;color:#6B7280;font-weight:500;margin-top:2px;white-space:nowrap;">${parts.join(' · ')}</div>`;
+}
+
+/* ==========================================================================
+   TABS & FILTERS INIT
+   ========================================================================== */
+function updatePills() {
+  const container = document.getElementById('status-pills');
+  container.innerHTML = '';
+  
+  const filteredForPills = TICKETS.map(getEnrichedTicket).filter(t => matchesSearch(t) && matchesDropdownFilters(t));
+  
+  const counts = { 'Tous': filteredForPills.length };
+  filteredForPills.forEach(t => { counts[t.status] = (counts[t.status] || 0) + 1; });
+
+  const statuses = Object.keys(counts).filter(k => k !== 'Tous' && counts[k] > 0);
+  
+  if(statuses.length <= 1 && counts['Tous'] === counts[statuses[0]]) {
+    container.style.display = 'none';
+    activeFilters.status = 'Tous';
+    return;
+  }
+  container.style.display = 'flex';
+
+  const makePill = (label, count) => {
+    const d = document.createElement('div');
+    d.className = `pill ${activeFilters.status === label ? 'active' : ''}`;
+    d.innerHTML = `${label} <span class="pill-count">${count}</span>`;
+    d.onclick = () => { activeFilters.status = label; updatePills(); renderTable(); };
+    container.appendChild(d);
+  };
+
+  makePill('Tous', counts['Tous']);
+  statuses.forEach(s => makePill(s, counts[s]));
+}
+
+function initDropdownFilters() {
+  const visibleEnriched = TICKETS.map(getEnrichedTicket).filter(t => matchesSearch(t) && (activeFilters.status === 'Tous' || t.status === activeFilters.status));
+  
+  const unique = (arr) => [...new Set(arr)].filter(Boolean);
+  
+  const filterData = {
+    client: unique(visibleEnriched.map(t => t.clientName)),
+    tech: unique(visibleEnriched.flatMap(t => t.techs.map(x => x.name))),
+    ref: unique(visibleEnriched.map(t => t.machineRef)),
+    marque: unique(visibleEnriched.map(t => t.marque)),
+    cat: unique(visibleEnriched.map(t => t.cat))
+  };
+
+  ['client', 'tech', 'ref', 'marque', 'cat'].forEach(type => {
+    setupFilterDropdown(type, filterData[type]);
+  });
+}
+
+function setupFilterDropdown(type, options) {
+  const inp = document.getElementById('inp-' + type);
+  const drop = document.getElementById('drop-' + type);
+  const wrap = document.getElementById('wrap-' + type);
+  
+  if(options.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+
+  const renderList = (filterTxt = '') => {
+    const lFilter = filterTxt.toLowerCase();
+    drop.innerHTML = '';
+    const filtered = options.filter(o => o.toLowerCase().includes(lFilter));
+    
+    if (filtered.length === 0) {
+      drop.innerHTML = '<div class="filter-opt empty">Aucun résultat</div>';
+    } else {
+      filtered.forEach(opt => {
+        const div = document.createElement('div');
+        div.className = 'filter-opt'; div.textContent = opt;
+        div.onmousedown = () => selectFilter(type, opt);
+        drop.appendChild(div);
+      });
+    }
+  };
+
+  inp.onfocus = () => { renderList(inp.value); drop.classList.add('open'); };
+  inp.oninput = e => { renderList(e.target.value); drop.classList.add('open'); };
+}
+
+function selectFilter(type, val) {
+  if(!activeFilters[type].includes(val)) {
+    activeFilters[type].push(val);
+    renderTags();
+    renderMain();
+  }
+  const inp = document.getElementById('inp-' + type);
+  inp.value = ''; inp.blur();
+}
+
+function removeFilter(type, val) {
+  activeFilters[type] = activeFilters[type].filter(v => v !== val);
+  renderTags(); renderMain();
+}
+
+function clearFilters() {
+  ['client', 'tech', 'ref', 'marque', 'cat'].forEach(k => activeFilters[k] = []);
+  activeFilters.status = 'Tous';
+  document.getElementById('search-input').value = '';
+  searchQuery = '';
+  renderTags(); renderMain();
+}
+
+function renderTags() {
+  const container = document.getElementById('active-tags');
+  container.innerHTML = '';
+  let count = 0;
+  const labels = { client:'Client', tech:'Tech', ref:'Réf', marque:'Marque', cat:'Cat' };
+  
+  for(const [type, vals] of Object.entries(activeFilters)){
+    if(type === 'status') continue;
+    vals.forEach(val => {
+      count++;
+      const div = document.createElement('div'); div.className = 'filter-tag';
+      div.innerHTML = `<span>${labels[type]}: <strong>${xe(val)}</strong></span><span class="tag-close"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>`;
+      div.querySelector('.tag-close').onclick = () => removeFilter(type, val);
+      container.appendChild(div);
+    });
+  }
+  document.getElementById('btn-clear-filters').style.display = count > 0 ? 'inline-block' : 'none';
+}
+
+document.getElementById('search-input').addEventListener('input', e => { 
+  searchQuery = e.target.value.toLowerCase(); 
+  renderMain();
+});
+
+/* ==========================================================================
+   TABLE RENDER & LOGIC
+   ========================================================================== */
+function matchesSearch(t) {
+  if(!searchQuery) return true;
+  // Recherche globale englobant toutes les métadonnées utiles
+  const searchStr = `
+    ${t.id} ${t.clientName} ${t.machineRef} ${t.machineId} 
+    ${t.titleStr} ${t.status} ${t.date} ${t.time}
+    ${t.techs.map(x=>x.name).join(' ')}
+  `.toLowerCase();
+  
+  return searchStr.includes(searchQuery);
+}
+
+function matchesDropdownFilters(t) {
+  if(activeFilters.client.length && !activeFilters.client.includes(t.clientName)) return false;
+  if(activeFilters.ref.length && !activeFilters.ref.includes(t.machineRef)) return false;
+  if(activeFilters.marque.length && !activeFilters.marque.includes(t.marque)) return false;
+  if(activeFilters.cat.length && !activeFilters.cat.includes(t.cat)) return false;
+  
+  if(activeFilters.tech.length) {
+    const tNames = t.techs.map(x => x.name);
+    if(!activeFilters.tech.some(n => tNames.includes(n))) return false;
+  }
+  return true;
+}
+
+// Priorité de statut : déléguée à l'utilitaire partagé (source unique).
+function getPriority(t) { return TicketTable.getPriority(t); }
+
+function sortTable(col) {
+  if(sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  else { sortCol = col; sortDir = 'asc'; }
+  ['id','date','title','client','machine','status'].forEach(c => {
+    TicketTable.renderSortHeader(document.getElementById('th-' + c), c, sortCol, sortDir);
+  });
+  renderTable();
+}
+
+function renderMain() {
+  updatePills();
+  initDropdownFilters();
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tickets-tbody');
+
+  // FLIP step 1 — snapshot every row's vertical position before wiping
+  const prevTops = new Map();
+  tbody.querySelectorAll('tr[data-id]').forEach(tr => {
+    prevTops.set(tr.dataset.id, tr.getBoundingClientRect().top);
+  });
+
+  tbody.innerHTML = '';
+
+  let enriched = TICKETS.map(getEnrichedTicket).filter(t => {
+    if(!matchesSearch(t)) return false;
+    if(activeFilters.status !== 'Tous' && t.status !== activeFilters.status) return false;
+    if(!matchesDropdownFilters(t)) return false;
+    return true;
+  });
+
+  // Tri : délégué à l'utilitaire partagé (mêmes règles sur toutes les pages).
+  enriched = sortCol === 'default'
+    ? TicketTable.defaultSort(enriched)
+    : TicketTable.sortBy(enriched, sortCol, sortDir);
+
+  document.getElementById('page-counts').textContent = `— ${enriched.length}`;
+
+  if(enriched.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Aucun ticket trouvé avec ces critères.</td></tr>';
+    return;
+  }
+
+  enriched.forEach(t => {
+    const tr = document.createElement('tr');
+    tr.dataset.id = t.id;
+    if (t.status === 'Annulé') {
+      tr.classList.add('row-annule');
+    }
+    
+    const st = STATUS_STYLE[t.status] || {bg:'#eee', color:'#333'};
+    
+    let techHtml = '';
+    if(t.techs.length === 0) {
+      techHtml = `<div class="tech-cell-trigger unassigned" onclick="openTechDropdown(event, '${t.id}')">Non assigné <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>`;
+    } else {
+      // Premier technicien + badge "+N tech" (même rendu que TicketTable.renderTechCell).
+      const moreBadge = t.techs.length > 1
+        ? ` <span style="display:inline-block;background:#F4F6F9;border:1px solid #E2E6EC;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:600;color:#4A7FB5;white-space:nowrap;flex-shrink:0;">+${t.techs.length - 1} tech</span>`
+        : '';
+      techHtml = `<div class="tech-cell-trigger" onclick="openTechDropdown(event, '${t.id}')"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${xe(t.techs[0].name)}</span>${moreBadge} <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>`;
+    }
+
+    // Les deux Terminé sont différenciés à l'affichage (Terrain / à Distance).
+    let statusHtml = `<span class="status-badge" style="background:${st.bg};color:${st.color};">${xe(TicketTable.displayStatus(t))}</span>`;
+    if(t.techIds.length === 0 && t.status !== 'Terminé' && t.status !== 'Annulé') {
+      statusHtml = `<span class="status-badge warning">À assigner</span>`;
+    }
+
+    const isDoneOrCancel = t.status === 'Terminé' || t.status === 'Annulé';
+
+    tr.innerHTML = `
+      <td class="col-id">${t.id}</td>
+      <td class="col-date">${t.date}<span>${t.time}</span></td>
+      <td class="col-title" title="${xe(t.titleStr)}">${xe(t.titleStr)}</td>
+      <td>${xe(t.clientName)}</td>
+      <td class="col-machine"><span>${xe(t.machineRef)}</span>${usageSubHtml(t.usageReadings)}</td>
+      <td class="col-tech" onclick="event.stopPropagation()">${techHtml}</td>
+      <td>${statusHtml}</td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn-icon" title="Détails" onclick="openDetails(event, '${t.id}')">
+            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          ${!isDoneOrCancel ? `
+          <button class="btn-icon danger" title="Annuler" onclick="openCancelModal(event, '${t.id}')">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>` : ''}
+        </div>
+      </td>
+    `;
+    
+    tr.onclick = (e) => {
+      if(!e.target.closest('.col-tech') && !e.target.closest('.actions-cell')) {
+        openDetails(e, t.id);
+      }
+    };
+
+    tbody.appendChild(tr);
+  });
+
+  // FLIP step 2 — animate rows that changed position
+  if (prevTops.size > 0) {
+    const savedId = lastSavedTicketId;
+    lastSavedTicketId = null;
+    let flashTarget = null;
+    let flashDeltaY = 0;
+    let flashFinalTopDoc = 0; // position finale (coordonnées document), figée AVANT la transform
+    let animCount = 0;
+
+    tbody.querySelectorAll('tr[data-id]').forEach(tr => {
+      const id = tr.dataset.id;
+      if (!prevTops.has(id)) return;
+      const oldTop = prevTops.get(id);
+      const newTop = tr.getBoundingClientRect().top;
+      const deltaY = oldTop - newTop;
+      if (id === savedId) flashFinalTopDoc = newTop + window.scrollY;
+      if (Math.abs(deltaY) < 4) return;
+
+      animCount++;
+      tr.classList.add('row-moving');
+      tr.style.transition = 'none';
+      tr.style.transform = `translateY(${deltaY}px)`;
+      void tr.offsetHeight; // force reflow
+
+      tr.style.transition = 'transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      tr.style.transform = 'translateY(0)';
+
+      // Nettoyer la transform à la fin — le flash est géré séparément ci-dessous
+      setTimeout(() => {
+        tr.style.transition = '';
+        tr.style.transform = '';
+        tr.classList.remove('row-moving');
+      }, 1550);
+
+      if (id === savedId) { flashTarget = tr; flashDeltaY = deltaY; }
+    });
+
+    // Toujours désactiver le hover dès qu'un ticket vient d'être sauvegardé
+    // OU que des lignes ont bougé — la réactivation se fait toujours en fin de flash.
+    if (savedId || animCount > 0) tbody.classList.add('animating');
+
+    if (flashTarget) {
+      // ── Cas normal : la ligne a physiquement bougé ──
+      const rowH = flashTarget.offsetHeight;
+      const topbarH = (document.querySelector('.topbar') || { offsetHeight: 60 }).offsetHeight;
+
+      // 1. Scroll dès le début du mouvement (200ms)
+      setTimeout(() => {
+        const vph = window.innerHeight;
+        const finalTopVp  = flashFinalTopDoc - window.scrollY;
+        const finalBotVp  = finalTopVp + rowH;
+        if (finalTopVp >= topbarH + rowH && finalBotVp <= vph - rowH) return; // déjà visible
+        const target = flashDeltaY > 0
+          ? flashFinalTopDoc - topbarH - rowH          // monte → marge au-dessus
+          : flashFinalTopDoc + 2 * rowH - vph;         // descend → marge en-dessous
+        window.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+      }, 200);
+
+      // 2. Flash après la fin de l'animation (1600ms)
+      setTimeout(() => {
+        flashTarget.classList.add('row-assigned-flash');
+        // 3. Réactiver hover après la fin du flash
+        setTimeout(() => {
+          flashTarget.classList.remove('row-assigned-flash');
+          tbody.classList.remove('animating');
+        }, 1300);
+      }, 1600);
+
+    } else if (savedId) {
+      // ── Cas particulier : ligne restée en place (deltaY < 4) ──
+      // Sequence : hover désactivé → scroll → flash → hover réactivé
+      const stillTr = tbody.querySelector(`tr[data-id="${savedId}"]`);
+      if (stillTr) {
+        setTimeout(() => stillTr.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+        setTimeout(() => {
+          stillTr.classList.add('row-assigned-flash');
+          setTimeout(() => {
+            stillTr.classList.remove('row-assigned-flash');
+            tbody.classList.remove('animating');
+          }, 1300);
+        }, 300);
+      } else {
+        tbody.classList.remove('animating');
+      }
+
+    } else if (animCount > 0) {
+      // Lignes déplacées sans ticket sauvegardé : nettoyer après animation
+      setTimeout(() => tbody.classList.remove('animating'), 1600);
+    }
+  }
+}
+
+function openDetails(e, id) {
+  if(e) e.stopPropagation();
+  // Popup partagé (manager = lecture seule + chat). Voir /static/js/ticket_detail.js
+  TicketDetail.open(id, { onChange: reload });
+}
+
+/* ==========================================================================
+   GLOBAL TECH DROPDOWN & ASSIGNMENT LOGIC
+   ========================================================================== */
+function openTechDropdown(e, ticketId) {
+  currentTicketForTech = TICKETS.find(t => t.id === ticketId);
+  const trigger = e.currentTarget;
+  const rect = trigger.getBoundingClientRect();
+
+  const drop = document.getElementById('global-tech-dropdown');
+  document.getElementById('tech-search-input').value = '';
+  pendingAddTechIds = [];
+  document.getElementById('tech-drop-footer').classList.remove('visible');
+
+  // Position initiale sous le trigger
+  let top = rect.bottom + window.scrollY + 4;
+  let left = rect.left + window.scrollX;
+  drop.style.top = top + 'px';
+  drop.style.left = left + 'px';
+  drop.classList.add('open');
+
+  renderTechOptions('');
+
+  // Après rendu, vérifier si le dropdown dépasse la fenêtre et ajuster
+  requestAnimationFrame(() => {
+    const dropRect = drop.getBoundingClientRect();
+    const vpH = window.innerHeight;
+    const vpW = window.innerWidth;
+
+    // Débordement en bas → ouvrir au-dessus du trigger
+    if (dropRect.bottom > vpH - 8) {
+      const newTop = rect.top + window.scrollY - drop.offsetHeight - 4;
+      drop.style.top = Math.max(window.scrollY + 8, newTop) + 'px';
+    }
+
+    // Débordement à droite → décaler vers la gauche
+    if (dropRect.right > vpW - 8) {
+      drop.style.left = Math.max(8, vpW - drop.offsetWidth - 8) + 'px';
+    }
+
+    // Scroller la page si le dropdown reste partiellement hors viewport
+    const finalRect = drop.getBoundingClientRect();
+    if (finalRect.bottom > vpH - 8) {
+      const extra = finalRect.bottom - vpH + 16;
+      window.scrollBy({ top: extra, behavior: 'smooth' });
+    }
+  });
+}
+
+function closeTechDropdown() {
+  document.getElementById('global-tech-dropdown').classList.remove('open');
+  document.getElementById('tech-drop-footer').classList.remove('visible');
+  document.getElementById('tech-drop-warning').style.display = 'none';
+  currentTicketForTech = null;
+  pendingAddTechIds = [];
+}
+
+function filterTechDropdown(query) {
+  renderTechOptions(query.toLowerCase());
+}
+
+function createTechOptionHTML(tech, isChecked) {
+  const dotClass = tech.status === 'En service' ? 'dot-service' : (tech.status === 'En pause' ? 'dot-pause' : 'dot-hors');
+  // Pass the name to the function so we can use it in Toasts/Modals easily
+  return `
+    <label class="tech-opt">
+      <input type="checkbox" value="${tech.id}" ${isChecked ? 'checked' : ''} onchange="toggleTechAssign(this, '${tech.id}', '${xe(tech.name.replace(/'/g, "\\'"))}')">
+      <div class="tech-opt-info">
+        <div class="tech-opt-name">${xe(tech.name)}</div>
+        <div class="tech-opt-meta"><span class="tech-status-dot ${dotClass}"></span> ${tech.status} — ${tech.activeTickets} ticket(s)</div>
+      </div>
+    </label>
+  `;
+}
+
+function renderTechOptions(query) {
+  const list = document.getElementById('tech-drop-list');
+  list.innerHTML = '';
+  
+  let available = TECHS.filter(t => !t.archived);
+  
+  if(query) {
+    available = available.filter(t => t.name.toLowerCase().includes(query));
+  }
+
+  let assigned = [];
+  let unassigned = [];
+
+  available.forEach(t => {
+    if (currentTicketForTech && currentTicketForTech.techIds.includes(t.id)) {
+      assigned.push(t);
+    } else {
+      unassigned.push(t);
+    }
+  });
+
+  // Sort by priority: Status, Workload, Alphabetical
+  assigned.sort(sortTechsByPriority);
+  unassigned.sort(sortTechsByPriority);
+
+  if (assigned.length > 0) {
+    const sep = document.createElement('div');
+    sep.className = 'tech-separator';
+    sep.textContent = 'Assignés';
+    list.appendChild(sep);
+
+    assigned.forEach(tech => {
+      list.insertAdjacentHTML('beforeend', createTechOptionHTML(tech, true));
+    });
+  }
+
+  if (unassigned.length > 0) {
+    if (assigned.length > 0) {
+      const sep = document.createElement('div');
+      sep.className = 'tech-separator';
+      sep.textContent = 'Disponibles';
+      sep.style.marginTop = '4px';
+      list.appendChild(sep);
+    }
+    unassigned.forEach(tech => {
+      // Conserver l'état coché des ajouts en attente (non encore enregistrés)
+      list.insertAdjacentHTML('beforeend', createTechOptionHTML(tech, pendingAddTechIds.includes(tech.id)));
+    });
+  }
+
+  if (available.length === 0) {
+    list.innerHTML = '<div style="padding: 12px; font-size: 13px; color: var(--light-slate);">Aucun technicien trouvé</div>';
+  }
+}
+
+function toggleTechAssign(cb, techId, techName) {
+  if(!currentTicketForTech) return;
+  // Toute interaction avec les cases efface l'avertissement rouge
+  document.getElementById('tech-drop-warning').style.display = 'none';
+
+  if(cb.checked) {
+    // AJOUT — mise en attente : on accumule jusqu'à "Enregistrer"
+    if(!pendingAddTechIds.includes(techId)) pendingAddTechIds.push(techId);
+    document.getElementById('tech-drop-footer').classList.add('visible');
+  } else {
+    // Si c'était un ajout en attente, on l'annule simplement
+    if(pendingAddTechIds.includes(techId)) {
+      pendingAddTechIds = pendingAddTechIds.filter(id => id !== techId);
+      if(pendingAddTechIds.length === 0) {
+        document.getElementById('tech-drop-footer').classList.remove('visible');
+      }
+      return;
+    }
+    // RETRAIT d'un tech déjà assigné — modale de confirmation
+    cb.checked = true;
+    pendingRemoveTechId = techId;
+
+    document.getElementById('confirm-remove-msg').textContent = `Êtes-vous sûr de vouloir retirer ${techName} de ce ticket ?`;
+    document.getElementById('confirm-remove-tid').textContent = currentTicketForTech.id;
+
+    const enriched = getEnrichedTicket(currentTicketForTech);
+    document.getElementById('confirm-remove-title').textContent = enriched.titleStr;
+    document.getElementById('confirm-remove-client').textContent = enriched.clientName;
+    document.getElementById('confirm-remove-machine').textContent = enriched.machineRef;
+
+    document.getElementById('btn-confirm-remove').onclick = () => confirmRemoveTech(techId, techName);
+    document.getElementById('confirm-remove-modal').classList.add('vis');
+  }
+}
+
+async function saveTechAssignment() {
+  if(!currentTicketForTech || pendingAddTechIds.length === 0) return;
+  const ticketId = currentTicketForTech.id;
+  const newIds = [...currentTicketForTech.techIds];
+  pendingAddTechIds.forEach(id => { if(!newIds.includes(id)) newIds.push(id); });
+  try {
+    await API.assign(ticketId, newIds);
+    const names = pendingAddTechIds
+      .map(id => TECHS.find(t => t.id === id))
+      .filter(Boolean).map(t => t.name).join(', ');
+    showToast(`${names} assigné au ${ticketId}`);
+    lastSavedTicketId = ticketId;
+  } catch(err) { showToast(err.message, 'error'); return; }
+  closeTechDropdown();
+  await reload();
+}
+
+function closeConfirmRemoveModal() {
+  document.getElementById('confirm-remove-modal').classList.remove('vis');
+  pendingRemoveTechId = null;
+}
+
+async function confirmRemoveTech(techId, techName) {
+  if(!currentTicketForTech) return;
+  const ticketId = currentTicketForTech.id;
+  const newIds = currentTicketForTech.techIds.filter(id => id !== techId);
+  try {
+    await API.assign(ticketId, newIds);  // l'auto-statut Assigné->Envoyé est géré côté serveur
+    showToast(`${techName} retiré du ${ticketId}`);
+    lastSavedTicketId = ticketId;
+  } catch(err) { showToast(err.message, 'error'); }
+  closeConfirmRemoveModal();
+  // Fermer le dropdown : la ligne va se déplacer (re-tri), le dropdown
+  // resterait sinon flottant à une position obsolète.
+  closeTechDropdown();
+  await reload();
+}
+
+
+/* ==========================================================================
+   CANCEL TICKET — composant partagé (raisons radio + commentaire).
+   by_role/by_name/by_id sont dérivés de la session manager par le composant.
+   ========================================================================== */
+function openCancelModal(e, id) {
+  e.stopPropagation();
+  const t = TICKETS.find(x => x.id === id);
+  const enriched = t ? getEnrichedTicket(t) : null;
+  TicketTable.openCancelModal(id, enriched ? {
+    titre: enriched.titleStr,
+    client_name: enriched.clientName,
+    reference: enriched.machineRef
+  } : null, reload, { byRole: 'manager', byName: Session.userName() || 'Manager', byId: 'manager' });
+}
+
+/* ==========================================================================
+   NEW TICKET MODAL & LOGIC
+   ========================================================================== */
+function openNewTicketModal() {
+  const clSelect = document.getElementById('nt-client');
+  clSelect.innerHTML = '<option value="">Sélectionner un client...</option>';
+  CLIENTS.forEach(c => clSelect.innerHTML += `<option value="${c.id}">${xe(c.name)}</option>`);
+  clSelect.value = '';
+  
+  document.getElementById('nt-left-dynamic').style.display = 'none';
+  document.getElementById('nt-loc-group').style.display = 'none';
+  document.getElementById('nt-pannes-group').style.display = 'none';
+  document.getElementById('nt-right-col').style.display = 'none';
+  
+  document.getElementById('nt-desc').value = '';
+  document.getElementById('nt-loc').value = '';
+  document.getElementById('nt-check-error').style.display = 'none';
+  document.getElementById('nt-loc-error').style.display = 'none';
+  if(document.getElementById('nt-tech-search')) document.getElementById('nt-tech-search').value = '';
+  
+  ntUploadedFiles = [];
+  ntSelectedTechs = [];
+  renderThumbnails();
+  document.getElementById('btn-submit-ticket').disabled = true;
+
+  document.getElementById('new-ticket-modal').classList.add('vis');
+}
+
+function closeNewTicketModal() {
+  document.getElementById('new-ticket-modal').classList.remove('vis');
+}
+
+function onClientSelect() {
+  const cId = document.getElementById('nt-client').value;
+  const leftDyn = document.getElementById('nt-left-dynamic');
+  const locGrp = document.getElementById('nt-loc-group');
+  const panGrp = document.getElementById('nt-pannes-group');
+  const rightCol = document.getElementById('nt-right-col');
+  const refSel = document.getElementById('nt-ref');
+  
+  if(!cId) { 
+    leftDyn.style.display = 'none'; 
+    rightCol.style.display = 'none'; 
+    return; 
+  }
+  
+  const cMachines = MACHINES.filter(m => m.clientId === cId);
+  const refs = [...new Set(cMachines.map(m => m.ref))];
+  
+  refSel.innerHTML = '<option value="">Sélectionner une référence...</option>';
+  refs.forEach(r => refSel.innerHTML += `<option value="${r}">${xe(r)}</option>`);
+  
+  document.getElementById('nt-idInstance').innerHTML = '<option value="">Sélectionner l\'ID...</option>';
+  
+  leftDyn.style.display = 'flex';
+  locGrp.style.display = 'none';
+  panGrp.style.display = 'none';
+  rightCol.style.display = 'none';
+}
+
+function onRefSelect() {
+  const cId = document.getElementById('nt-client').value;
+  const ref = document.getElementById('nt-ref').value;
+  const idSel = document.getElementById('nt-idInstance');
+  const rightCol = document.getElementById('nt-right-col');
+  const locGrp = document.getElementById('nt-loc-group');
+  const panGrp = document.getElementById('nt-pannes-group');
+  
+  if(!ref) { 
+    locGrp.style.display = 'none';
+    panGrp.style.display = 'none';
+    rightCol.style.display = 'none'; 
+    return; 
+  }
+  
+  const cMachines = MACHINES.filter(m => m.clientId === cId && m.ref === ref);
+  idSel.innerHTML = '<option value="">Sélectionner l\'ID...</option>';
+  cMachines.forEach(m => idSel.innerHTML += `<option value="${m.idInstance}">${xe(m.idInstance)}</option>`);
+  
+  idSel.disabled = false;
+  if(cMachines.length === 1) {
+    idSel.value = cMachines[0].idInstance;
+    idSel.disabled = true;
+    onInstanceSelect();
+  } else {
+    locGrp.style.display = 'none';
+    panGrp.style.display = 'none';
+    rightCol.style.display = 'none';
+  }
+}
+
+function onInstanceSelect() {
+  const idInst = document.getElementById('nt-idInstance').value;
+  const rightCol = document.getElementById('nt-right-col');
+  const locGrp = document.getElementById('nt-loc-group');
+  const panGrp = document.getElementById('nt-pannes-group');
+
+  if(!idInst) { 
+    locGrp.style.display = 'none';
+    panGrp.style.display = 'none';
+    rightCol.style.display = 'none'; 
+    return; 
+  }
+  
+  const ref = document.getElementById('nt-ref').value;
+  buildChecklist(ref);
+  renderNtTechList('');
+  
+  locGrp.style.display = 'flex';
+  panGrp.style.display = 'flex';
+  rightCol.style.display = 'flex';
+  document.getElementById('btn-submit-ticket').disabled = false;
+}
+
+function buildChecklist(ref) {
+  const cont = document.getElementById('nt-checklist');
+  cont.innerHTML = '';
+  const items = CATALOGUE[ref] || [];
+  
+  let html = '';
+  items.forEach(it => {
+    if(it.type === 'panne') {
+      html += `<label class="check-item"><input type="checkbox" class="nt-chk-item" value="${xe(it.label)}"><div class="check-item-label">${xe(it.label)}</div></label>`;
+    } else {
+      html += `<label class="check-item"><input type="checkbox" class="nt-chk-item" value="${xe(it.label)}"><div class="check-item-label">${xe(it.label)}<input type="text" class="form-control check-item-input" placeholder="Précisez..." ${it.required?'required':''}></div></label>`;
+    }
+  });
+  html += `<label class="check-item"><input type="checkbox" class="nt-chk-item" value="Autre problème"><div class="check-item-label">Autre problème</div></label>`;
+  cont.innerHTML = html;
+}
+
+function filterNtTech(query) {
+  renderNtTechList(query.toLowerCase());
+}
+
+function createNtTechOptionHTML(tech, isChecked) {
+  const dotClass = tech.status === 'En service' ? 'dot-service' : (tech.status === 'En pause' ? 'dot-pause' : 'dot-hors');
+  return `
+    <label class="tech-opt">
+      <input type="checkbox" value="${tech.id}" ${isChecked ? 'checked' : ''} onchange="toggleNtTechAssign(this)">
+      <div class="tech-opt-info">
+        <div class="tech-opt-name">${xe(tech.name)}</div>
+        <div class="tech-opt-meta"><span class="tech-status-dot ${dotClass}"></span> ${tech.status} — ${tech.activeTickets} ticket(s)</div>
+      </div>
+    </label>
+  `;
+}
+
+function renderNtTechList(query) {
+  const list = document.getElementById('nt-tech-list');
+  list.innerHTML = '';
+  
+  let available = TECHS.filter(t => !t.archived);
+  
+  if(query) {
+    available = available.filter(t => t.name.toLowerCase().includes(query));
+  }
+
+  let assigned = [];
+  let unassigned = [];
+
+  available.forEach(t => {
+    if (ntSelectedTechs.includes(t.id)) {
+      assigned.push(t);
+    } else {
+      unassigned.push(t);
+    }
+  });
+
+  // Sort by priority: Status, Workload, Alphabetical
+  assigned.sort(sortTechsByPriority);
+  unassigned.sort(sortTechsByPriority);
+
+  if (assigned.length > 0) {
+    const sep = document.createElement('div');
+    sep.className = 'tech-separator';
+    sep.textContent = 'Sélectionnés';
+    list.appendChild(sep);
+
+    assigned.forEach(tech => {
+      list.insertAdjacentHTML('beforeend', createNtTechOptionHTML(tech, true));
+    });
+  }
+
+  if (unassigned.length > 0) {
+    if (assigned.length > 0) {
+      const sep = document.createElement('div');
+      sep.className = 'tech-separator';
+      sep.textContent = 'Disponibles';
+      sep.style.marginTop = '4px';
+      list.appendChild(sep);
+    }
+    unassigned.forEach(tech => {
+      list.insertAdjacentHTML('beforeend', createNtTechOptionHTML(tech, false));
+    });
+  }
+
+  if (available.length === 0) {
+    list.innerHTML = '<div style="padding: 16px; font-size: 13px; color: var(--light-slate); text-align:center;">Aucun technicien trouvé</div>';
+  }
+}
+
+function toggleNtTechAssign(cb) {
+  const techId = cb.value;
+  if(cb.checked) {
+    if(!ntSelectedTechs.includes(techId)) ntSelectedTechs.push(techId);
+  } else {
+    ntSelectedTechs = ntSelectedTechs.filter(id => id !== techId);
+  }
+  
+  renderNtTechList(document.getElementById('nt-tech-search').value.toLowerCase());
+}
+
+function handleFileUpload(e) {
+  const files = Array.from(e.target.files);
+  files.forEach(f => { if(f.type.startsWith('image/')) ntUploadedFiles.push(f); });
+  renderThumbnails();
+  e.target.value = '';
+}
+
+function renderThumbnails() {
+  const grid = document.getElementById('nt-image-preview');
+  grid.innerHTML = '';
+  ntUploadedFiles.forEach((file, index) => {
+    const url = URL.createObjectURL(file);
+    const wrap = document.createElement('div'); wrap.className = 'img-thumb-wrap';
+    wrap.innerHTML = `
+      <img src="${url}" class="img-thumb" alt="preview">
+      <button class="img-remove" onclick="removeImage(${index})" type="button">&times;</button>
+    `;
+    grid.appendChild(wrap);
+  });
+}
+
+function removeImage(idx) { ntUploadedFiles.splice(idx, 1); renderThumbnails(); }
+
+async function submitNewTicket() {
+  document.getElementById('nt-check-error').style.display = 'none';
+  document.getElementById('nt-loc-error').style.display = 'none';
+
+  const clientId = document.getElementById('nt-client').value;
+  const instId = document.getElementById('nt-idInstance').value;
+  if(!clientId || !instId) return;
+
+  const checks = document.querySelectorAll('.nt-chk-item:checked');
+  if(checks.length === 0) { document.getElementById('nt-check-error').style.display = 'block'; return; }
+
+  let validFields = true;
+  const items = Array.from(checks).map(cb => {
+    const input = cb.closest('.check-item').querySelector('.check-item-input');
+    if(input) {
+      if(input.hasAttribute('required') && !input.value.trim()) { input.style.borderColor='var(--danger)'; validFields=false; }
+      else input.style.borderColor='var(--light-grey)';
+      return { type: 'champ', label: cb.value, value: input.value.trim() };
+    }
+    return { type: 'panne', label: cb.value, checked: true, system: cb.value === 'Autre problème' };
+  });
+  if(!validFields) return showToast('Veuillez remplir les champs obligatoires cochés.', 'error');
+
+  const loc = document.getElementById('nt-loc').value.trim();
+  if(!loc) { document.getElementById('nt-loc-error').style.display = 'block'; return; }
+
+  const payload = {
+    client_id: clientId,
+    instance_id: instId,
+    items: items,
+    description: document.getElementById('nt-desc').value.trim(),
+    localisation: loc,
+    technicien_ids: [...ntSelectedTechs]
+    // NB : les images (ntUploadedFiles) ne sont pas persistées dans ce prototype.
+  };
+
+  let created;
+  try {
+    created = await API.createTicket(payload);
+    showToast(`Ticket ${created.id} créé avec succès.`);
+  } catch(err) { showToast(err.message, 'error'); return; }
+
+  closeNewTicketModal();
+  await reload();
+}
+
+/* ==========================================================================
+   INIT
+   ========================================================================== */
+/* ==========================================================================
+   INIT — session, chargement des données via l'API, polling temps réel
+   ========================================================================== */
+(function init() {
+  const s = Session.require('manager');   // renvoie vers /login si pas manager
+  if (!s) return;
+  document.getElementById('sb-user-name').textContent = s.user_name || 'Manager';
+  document.getElementById('sb-logout').addEventListener('click', function (e) {
+    e.preventDefault(); Session.clear(); window.location.href = '/';
+  });
+
+  reload().catch(err => showToast('Erreur de chargement : ' + err.message, 'error'));
+
+  // Mise à jour temps réel : on ne rafraîchit PAS si une modale/dropdown est ouverte,
+  // ni si le popup Détails est ouvert (pour ne pas perturber une action en cours).
+  API.poll(function (tickets) {
+    const busy = document.querySelector('.modal-overlay.vis, #global-tech-dropdown.open, .tt-cancel-overlay.vis, #tickets-tbody.animating')
+              || (window.TicketDetail && TicketDetail.isOpen && TicketDetail.isOpen());
+    if (busy) return;
+    RAW_TICKETS = {};
+    TICKETS = tickets.map(mapTicket);
+    renderMain();
+  }, 4000);
+})();
+</script>
+<script src="/static/js/responsive.js"></script>
+</body>
+</html>

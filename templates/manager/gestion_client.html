@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion Client — Stokvis SAV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/variables.css">
+<link rel="stylesheet" href="/static/css/sidebar.css">
+<link rel="stylesheet" href="/static/css/base.css">
+<style>
+:root {
+  /* Overrides locaux — le canon vit dans /static/css/variables.css */
+  --shadow-card: 0 4px 6px -1px rgba(27,58,107,0.08), 0 2px 4px -1px rgba(27,58,107,0.04);
+  --shadow-popup: 0 20px 25px -5px rgba(27,58,107,0.1), 0 10px 10px -5px rgba(27,58,107,0.04);
+  --shadow-popup-top: 0 25px 50px -12px rgba(0,0,0,0.25);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--grey);background-color:var(--off-white);overflow-x:hidden;line-height:1.6;}
+ul{list-style:none;}
+button{font-family:inherit;cursor:pointer;outline:none;}
+input{font-family:inherit;outline:none;}
+a{color:var(--steel-blue);text-decoration:none;transition:color var(--transition);}
+a:hover{color:var(--primary);text-decoration:underline;}
+
+
+.topbar{position:fixed;top:0;left:var(--sidebar-width);right:0;height:var(--topbar-height);background-color:var(--white);border-bottom:1px solid var(--light-grey);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:90;}
+.topbar-title{font-size:18px;font-weight:600;color:var(--dark-charcoal);}
+.topbar-right{display:flex;align-items:center;gap:16px;}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background-color:var(--primary);color:var(--white);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+
+.content{margin-left:var(--sidebar-width);margin-top:var(--topbar-height);padding:32px;max-width:1400px;min-height:calc(100vh - var(--topbar-height));}
+.page-header{margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.page-title{font-size:24px;font-weight:700;color:var(--dark-charcoal);}
+
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap;}
+.search-bar{position:relative;width:100%;max-width:340px;}
+.search-bar input{width:100%;height:40px;border:1.5px solid var(--light-grey);border-radius:6px;padding:0 12px 0 36px;font-size:14px;color:var(--dark-charcoal);background:var(--white);transition:border-color var(--transition);}
+.search-bar input:focus{border-color:var(--steel-blue);}
+.search-bar svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--light-slate);fill:none;stroke-width:1.5;}
+.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 20px;font-size:14px;font-weight:600;border-radius:6px;border:none;cursor:pointer;background-color:var(--primary);color:var(--white);transition:all var(--transition);white-space:nowrap;}
+.btn-primary:hover{background-color:var(--primary-hover);box-shadow:0 4px 12px rgba(27,58,107,0.2);}
+.btn-primary:active{transform:scale(0.97);}
+.btn-primary svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
+
+.table-container{background-color:var(--white);border-radius:12px;box-shadow:var(--shadow-card);overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--light-grey);}
+.data-table{width:100%;min-width:1000px;border-collapse:collapse;}
+.data-table th{background-color:var(--off-white);font-size:12px;font-weight:600;color:var(--grey);text-transform:uppercase;letter-spacing:0.5px;padding:14px 20px;text-align:left;border-bottom:1px solid var(--light-grey);white-space:nowrap;cursor:pointer;user-select:none;transition:background-color var(--transition);}
+.data-table th:hover{color:var(--primary);background-color:#E2E6EC;}
+.data-table th .sort-icon{display:inline-block;margin-left:4px;opacity:0.4;font-size:10px;}
+.data-table th.sorted .sort-icon{opacity:1;color:var(--primary);}
+.data-table td{padding:16px 20px;font-size:14px;color:var(--dark-charcoal);border-bottom:1px solid var(--light-grey);vertical-align:middle;}
+.data-table tbody tr{transition:background-color var(--transition);cursor:pointer;}
+.data-table tbody tr:hover{background-color:#F8FAFC;}
+.data-table tbody tr:last-child td{border-bottom:none;}
+
+.col-id{font-weight:700;color:var(--primary);letter-spacing:0.5px;white-space:nowrap;}
+.col-company{font-weight:600;color:var(--dark-charcoal);}
+.col-email{font-size:13px;color:var(--grey);}
+.col-phone{font-size:13px;white-space:nowrap;}
+
+.count-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:16px;font-size:14px;font-weight:700;}
+.badge-blue{background-color:#E8F0FE;color:var(--steel-blue);}
+.badge-grey{background-color:var(--off-white);color:var(--light-slate);}
+
+.actions-cell{display:flex;align-items:center;gap:6px;justify-content:flex-end;}
+.btn-icon{width:32px;height:32px;border-radius:6px;background:none;border:1px solid var(--light-grey);color:var(--steel-blue);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all var(--transition);flex-shrink:0;}
+.btn-icon:hover{background-color:var(--off-white);border-color:var(--primary);color:var(--primary);}
+.btn-icon.danger{color:var(--danger);border-color:rgba(239,68,68,0.25);}
+.btn-icon.danger:hover{background-color:var(--danger-bg);border-color:var(--danger);color:var(--danger);}
+.btn-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+
+.empty-state-row td{text-align:center;padding:64px 24px;color:var(--light-slate);font-size:14px;border-bottom:none;cursor:default;}
+.empty-state-icon{width:40px;height:40px;stroke:var(--light-grey);fill:none;stroke-width:1.5;margin:0 auto 12px;display:block;}
+
+.modal-overlay{position:fixed;inset:0;background-color:rgba(27,58,107,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;padding:24px;}
+.modal-overlay.vis{opacity:1;pointer-events:auto;}
+.modal-box{background-color:var(--white);border-radius:12px;box-shadow:var(--shadow-popup);width:540px;max-width:100%;max-height:100%;display:flex;flex-direction:column;transform:scale(0.97) translateY(8px);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);overflow:hidden;}
+.modal-overlay.vis .modal-box{transform:scale(1) translateY(0);}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;border-bottom:1px solid var(--light-grey);flex-shrink:0;}
+.modal-title{font-size:16px;font-weight:700;color:var(--dark-charcoal);}
+.modal-close{width:32px;height:32px;border:none;background:none;color:var(--grey);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all var(--transition);}
+.modal-close:hover{background-color:var(--off-white);color:var(--dark-charcoal);transform:rotate(90deg);}
+.modal-close svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;}
+.modal-body{padding:28px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;}
+.modal-footer{padding:20px 28px;border-top:1px solid var(--light-grey);display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-shrink:0;}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:13px;font-weight:600;color:var(--dark-charcoal);}
+.form-label span{color:var(--danger);margin-left:2px;}
+.form-control{width:100%;height:42px;border:1.5px solid var(--light-grey);border-radius:6px;padding:0 14px;font-size:14px;color:var(--dark-charcoal);background:var(--white);transition:border-color var(--transition),box-shadow var(--transition);}
+.form-control:focus{border-color:var(--steel-blue);box-shadow:0 0 0 3px rgba(74,127,181,0.12);}
+.form-control.error{border-color:var(--danger);}
+.field-error{font-size:12px;color:var(--danger);display:none;margin-top:2px;}
+.field-error.vis{display:block;}
+
+.password-wrap{position:relative;}
+.password-wrap .form-control{padding-right:44px;}
+.password-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--light-slate);display:flex;align-items:center;justify-content:center;transition:color var(--transition);}
+.password-toggle:hover{color:var(--grey);}
+.password-toggle svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;}
+
+.btn-secondary{display:inline-flex;align-items:center;height:40px;padding:0 20px;font-size:14px;font-weight:600;border-radius:6px;border:1.5px solid var(--light-grey);cursor:pointer;background-color:var(--white);color:var(--grey);transition:all var(--transition);}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary);}
+
+.popup-overlay{position:fixed;inset:0;background-color:rgba(27,58,107,0.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;padding:20px;}
+.popup-overlay.vis{opacity:1;pointer-events:auto;}
+
+/* Dimension de Niveau 1 (Fiche Client) - La plus grande */
+#fiche-client-popup .popup-modal{
+    width: 1400px;
+    max-width: 96vw;
+    height: 94vh;
+    background-color:var(--white);border-radius:12px;box-shadow:var(--shadow-popup-top);
+    display:flex;flex-direction:column;transform:scale(0.98);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);overflow:hidden;
+}
+
+/* Dimension de Niveau 2 (Fiche Machine) - Légèrement plus petite */
+#fiche-machine-popup{z-index: 650;}
+#fiche-machine-popup .popup-modal{
+    width: 1200px;
+    max-width: 88vw;
+    height: 86vh;
+    background-color:var(--white);border-radius:12px;box-shadow:var(--shadow-popup-top);border: 1px solid rgba(0,0,0,0.1);
+    display:flex;flex-direction:column;transform:scale(0.98);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);overflow:hidden;
+}
+
+.popup-overlay.vis .popup-modal{transform:scale(1);}
+
+.popup-header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--light-grey);flex-shrink:0;gap:16px;}
+.popup-logo{font-size:18px;font-weight:700;color:var(--primary);letter-spacing:-0.5px;flex-shrink:0;}
+.popup-logo span{font-weight:400;color:var(--light-slate);}
+.popup-header-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;}
+.popup-title{font-size:13px;font-weight:700;color:var(--primary);letter-spacing:1px;text-transform:uppercase;}
+.popup-close{width:32px;height:32px;border:none;background:none;color:var(--grey);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all var(--transition);flex-shrink:0;}
+.popup-close:hover{background-color:var(--off-white);color:var(--dark-charcoal);transform:rotate(90deg);}
+.popup-close svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;}
+
+.popup-subheader{padding:14px 28px;background-color:var(--off-white);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--light-grey);}
+.popup-client-info{display:flex;flex-direction:column;gap:2px;}
+.popup-client-name{font-size:15px;font-weight:700;color:var(--dark-charcoal);}
+.popup-client-meta{font-size:12px;color:var(--light-slate);}
+
+.popup-body{overflow-y:auto;flex:1;}
+
+.tabs-nav { display:flex; border-bottom:1px solid var(--light-grey); padding: 0 28px; background:var(--off-white); flex-shrink: 0; }
+.tab-btn { padding:14px 24px; border:none; background:none; font-size:13px; font-weight:600; color:var(--light-slate); cursor:pointer; border-bottom:2px solid transparent; transition:all var(--transition); margin-bottom:-1px;}
+.tab-btn:hover { color:var(--dark-charcoal); }
+.tab-btn.active { color:var(--primary); border-bottom-color:var(--primary); }
+.tab-content { display:none; padding: 24px 28px; }
+.tab-content.active { display:block; }
+
+.search-bar-small { position:relative; width:100%; max-width:300px; margin-bottom:12px; }
+.search-bar-small input { width:100%; height:36px; border:1.5px solid var(--light-grey); border-radius:6px; padding:0 12px 0 32px; font-size:13px; transition:border-color var(--transition); }
+.search-bar-small input:focus { border-color:var(--steel-blue); }
+.search-bar-small svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); width:14px; height:14px; stroke:var(--light-slate); fill:none; stroke-width:1.5; }
+
+.filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;margin-top:4px;}
+.searchable-filter-wrap{position:relative;flex:1;min-width:140px;max-width:220px;}
+.searchable-filter-input{width:100%;height:36px;border:1.5px solid var(--light-grey);border-radius:6px;padding:0 30px 0 12px;font-size:13px;color:var(--dark-charcoal);background:var(--white);cursor:text;transition:border-color var(--transition);}
+.searchable-filter-input:focus{border-color:var(--steel-blue);}
+.searchable-filter-chevron{position:absolute;right:9px;top:10px;width:16px;height:16px;pointer-events:none;color:var(--light-slate);stroke:currentColor;fill:none;stroke-width:2;}
+.searchable-filter-dropdown{position:absolute;top:100%;left:0;min-width:100%;background:var(--white);border:1px solid var(--light-grey);border-radius:6px;box-shadow:var(--shadow-popup);margin-top:4px;max-height:220px;overflow-y:auto;z-index:1000;display:none;}
+.searchable-filter-dropdown.open{display:block;}
+.filter-opt{padding:8px 12px;font-size:13px;cursor:pointer;transition:background var(--transition);white-space:nowrap;}
+.filter-opt:hover{background-color:var(--off-white);color:var(--primary);}
+.filter-opt.empty{color:var(--light-slate);cursor:default;pointer-events:none;}
+.tags-container{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+.filter-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background-color:var(--off-white);border:1px solid var(--light-grey);border-radius:4px;font-size:12px;font-weight:500;color:var(--dark-charcoal);}
+.filter-tag strong{color:var(--steel-blue);font-weight:600;}
+.filter-tag .tag-close{cursor:pointer;color:var(--light-slate);display:flex;transition:color var(--transition);}
+.filter-tag .tag-close:hover{color:var(--danger);}
+.filter-tag .tag-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;}
+.btn-clear-filters{background:none;border:none;color:var(--steel-blue);font-size:12px;font-weight:600;cursor:pointer;display:none;padding:4px 8px;}
+.btn-clear-filters.vis{display:inline-block;}
+
+.popup-table-wrapper { width: 100%; overflow-x: auto; border: 1px solid var(--light-grey); border-radius: 8px; }
+.popup-table{width:100%;border-collapse:collapse;min-width:780px;}
+.popup-table th{background-color:var(--off-white);font-size:11px;font-weight:700;color:var(--grey);text-transform:uppercase;letter-spacing:0.5px;padding:12px 20px;text-align:left;border-bottom:1px solid var(--light-grey);white-space:nowrap;position:sticky;top:0;z-index:1; cursor:pointer;}
+.popup-table th:hover{color:var(--primary);}
+.popup-table td{padding:14px 20px;font-size:13px;color:var(--dark-charcoal);border-bottom:1px solid var(--light-grey);vertical-align:middle;}
+.popup-table tbody tr{transition:background-color var(--transition);cursor:pointer;}
+.popup-table tbody tr:hover{background-color:#EDF1F7;}
+.popup-table tbody tr.ticket-annule{opacity:0.55;}
+.popup-table tbody tr.ticket-annule:hover{opacity:0.8;}
+.popup-table tbody tr:last-child td{border-bottom:none;}
+
+.status-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;}
+.col-machine-tag{font-family:monospace;font-size:12px;background-color:var(--off-white);padding:3px 7px;border-radius:4px;border:1px solid var(--light-grey);white-space:nowrap;}
+.col-tech-cell{font-size:13px;white-space:nowrap;}
+.col-tech-cell span{display:block;font-size:12px;color:var(--light-slate);margin-top:2px;}
+.col-titre-cell{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.col-date-cell{font-size:13px;white-space:nowrap;}
+.col-date-cell span{display:block;font-size:12px;color:var(--light-slate);margin-top:2px;}
+.col-id-cell{font-weight:700;color:var(--primary);letter-spacing:0.5px;white-space:nowrap;font-size:13px;}
+
+.machine-info-grid { display:grid; grid-template-columns:repeat(5, 1fr); gap:16px; padding: 20px 28px; border-bottom:1px solid var(--light-grey); background: var(--off-white); flex-shrink: 0;}
+.m-info-item { display:flex; flex-direction:column; gap:4px; }
+.m-info-lbl { font-size:11px; font-weight:700; color:var(--light-slate); text-transform:uppercase; letter-spacing:0.5px; }
+.m-info-val { font-size:14px; font-weight:600; color:var(--primary); }
+.m-info-val.mono { font-family:monospace; }
+
+.toast-container{position:fixed;top:20px;right:24px;z-index:3000;display:flex;flex-direction:column;gap:10px;}
+.toast{display:flex;align-items:center;gap:12px;padding:14px 18px;background-color:#fff;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.1);min-width:280px;max-width:360px;border-left:4px solid var(--status-success);animation:slideInRight 0.3s ease;}
+.toast.error{border-left-color:var(--danger);}
+.toast-icon{width:20px;height:20px;flex-shrink:0;}
+.toast-icon svg{width:20px;height:20px;stroke:var(--status-success);fill:none;stroke-width:2;}
+.toast.error .toast-icon svg{stroke:var(--danger);}
+.toast-msg{font-size:14px;font-weight:500;color:var(--dark-charcoal);flex:1;}
+.toast-dismiss{background:none;border:none;color:var(--light-slate);cursor:pointer;font-size:18px;line-height:1;padding:0;}
+@keyframes slideInRight{from{opacity:0;transform:translateX(100%);}to{opacity:1;transform:translateX(0);}}
+
+@media (max-width: 768px) {
+    /* Sidebar (tiroir), topbar, content, overlays et filtres : pris en charge
+       globalement par responsive.css. On ne garde ici que le spécifique page. */
+    .form-row { grid-template-columns: 1fr; }
+    .machine-info-grid { grid-template-columns: 1fr 1fr; }
+    .popup-header-center { display: none; }
+}
+</style>
+<link rel="stylesheet" href="/static/css/responsive.css">
+</head>
+<body>
+
+{% set active_nav = 'gestion-client' %}{% include 'partials/_sidebar_manager.html' %}
+
+<header class="topbar">
+  <div class="topbar-title">Gestion Client</div>
+  <div class="topbar-right">
+    <div class="topbar-avatar">YM</div>
+  </div>
+</header>
+
+<main class="content">
+  <div class="page-header">
+    <h1 class="page-title">Clients <span id="client-count" style="font-size:16px;font-weight:500;color:var(--light-slate);margin-left:8px;"></span></h1>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search-input" placeholder="Rechercher dans toutes les colonnes...">
+    </div>
+    <button class="btn-primary" onclick="openClientModal()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Ajouter un client
+    </button>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table" id="clients-table">
+      <thead>
+        <tr>
+          <th onclick="sortTable('id')" id="th-id">ID <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('company')" id="th-company">Raison sociale <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('contact')" id="th-contact">Contact principal <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('phone')" id="th-phone">Téléphone <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('email')" id="th-email">Email <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('machines')" id="th-machines">Machines <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('tickets')" id="th-tickets">Tickets <span class="sort-icon">↕</span></th>
+          <th style="text-align:right;cursor:default;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="clients-tbody"></tbody>
+    </table>
+  </div>
+</main>
+
+<div class="modal-overlay" id="client-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Ajouter un client</div>
+      <button class="modal-close" onclick="closeClientModal()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Prénom <span>*</span></label>
+          <input type="text" class="form-control" id="f-prenom" placeholder="ex. Karim">
+          <div class="field-error" id="err-prenom">Champ requis</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Raison sociale <span>*</span></label>
+          <input type="text" class="form-control" id="f-company" placeholder="ex. Somaca SA">
+          <div class="field-error" id="err-company">Champ requis</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Téléphone <span>*</span></label>
+          <input type="text" class="form-control" id="f-phone" placeholder="ex. 06 00 11 22 33">
+          <div class="field-error" id="err-phone">Champ requis</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email <span>*</span></label>
+          <input type="email" class="form-control" id="f-email" placeholder="ex. contact@societe.ma">
+          <div class="field-error" id="err-email">Email invalide</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mot de passe <span>*</span></label>
+        <div class="password-wrap">
+          <input type="password" class="form-control" id="f-password" placeholder="••••••••">
+          <button type="button" class="password-toggle" onclick="togglePassword()" id="pwd-toggle">
+            <svg id="pwd-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="field-error" id="err-password">Champ requis</div>
+      </div>
+      <!-- Archivage : disponible uniquement en MODIFICATION (un nouveau client
+           est toujours actif). Un client archivé ne peut plus se connecter. -->
+      <div class="form-group" id="f-statut-group" style="display:none;">
+        <label class="form-label">Statut du compte</label>
+        <select class="form-control" id="f-statut" onchange="onClientStatutChange()">
+          <option value="actif">Actif</option>
+          <option value="archive">Archivé (compte désactivé)</option>
+        </select>
+        <div id="client-archive-warning" style="display:none;background:#FEF3C7;border:1px solid #FDE68A;border-radius:6px;padding:12px 14px;font-size:12.5px;color:#92400E;line-height:1.5;">
+          Ce compte sera désactivé : le client ne pourra plus se connecter et ne sera
+          plus proposé à l'assignation de machines. Ses tickets et machines sont conservés.
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeClientModal()">Annuler</button>
+      <button class="btn-primary" onclick="submitClientForm()" id="modal-submit-btn">Créer le client</button>
+    </div>
+  </div>
+</div>
+
+<div class="popup-overlay" id="fiche-client-popup">
+  <div class="popup-modal">
+    <div class="popup-header">
+      <div class="popup-logo"><img src="/static/stokvis360.png" alt="Stokvis 360" style="height:28px;width:auto;object-fit:contain;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">STOKVIS <span>360</span></span></div>
+      <div class="popup-header-center">
+        <div class="popup-title">FICHE CLIENT</div>
+      </div>
+      <button class="popup-close" onclick="closeFicheClient()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    
+    <div class="popup-subheader">
+      <div class="popup-client-info">
+        <div class="popup-client-name" id="fc-client-name">—</div>
+        <div class="popup-client-meta" id="fc-client-meta">—</div>
+      </div>
+      <div style="display:flex;gap:16px;">
+        <div id="fc-machine-summary" style="font-size:13px;color:var(--light-slate);font-weight:500;"></div>
+        <div id="fc-ticket-summary" style="font-size:13px;color:var(--light-slate);font-weight:500;"></div>
+      </div>
+    </div>
+
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('fc', 'machines')" id="tab-btn-fc-machines">Parc Machines</button>
+      <button class="tab-btn" onclick="switchTab('fc', 'tickets')" id="tab-btn-fc-tickets">Tickets</button>
+    </div>
+
+    <div class="popup-body">
+      <!-- Onglet Parc Machines -->
+      <div class="tab-content active" id="tab-fc-machines">
+        <div class="search-bar-small">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search-fc-machines" placeholder="Rechercher dans toutes les colonnes...">
+        </div>
+        
+        <div class="filter-bar" id="fcm-filters">
+          <div class="searchable-filter-wrap" id="wrap-fcm-marque"><input type="text" class="searchable-filter-input" id="inp-fcm-marque" placeholder="Marque…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><div class="searchable-filter-dropdown" id="drop-fcm-marque"></div></div>
+          <div class="searchable-filter-wrap" id="wrap-fcm-categorie"><input type="text" class="searchable-filter-input" id="inp-fcm-categorie" placeholder="Catégorie…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><div class="searchable-filter-dropdown" id="drop-fcm-categorie"></div></div>
+          <div class="searchable-filter-wrap" id="wrap-fcm-reference"><input type="text" class="searchable-filter-input" id="inp-fcm-reference" placeholder="Référence…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><div class="searchable-filter-dropdown" id="drop-fcm-reference"></div></div>
+        </div>
+        <div class="tags-container" id="fcm-tags"><button class="btn-clear-filters" onclick="clearFilters('fcm')">Tout effacer</button></div>
+
+        <div class="popup-table-wrapper">
+          <table class="popup-table">
+            <thead>
+              <tr>
+                <th onclick="sortFcmTable('id_instance')" id="fcmth-id_instance">ID Instance <span class="sort-icon">↕</span></th>
+                <th onclick="sortFcmTable('marque')" id="fcmth-marque">Marque <span class="sort-icon">↕</span></th>
+                <th onclick="sortFcmTable('categorie')" id="fcmth-categorie">Catégorie <span class="sort-icon">↕</span></th>
+                <th onclick="sortFcmTable('reference')" id="fcmth-reference">Référence <span class="sort-icon">↕</span></th>
+                <th onclick="sortFcmTable('usage')" id="fcmth-usage">Dernière relevée d'usage <span class="sort-icon">↕</span></th>
+                <th style="text-align:right;cursor:default;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="fc-machines-tbody"></tbody>
+          </table>
+        </div>
+        <div id="fc-machines-empty" style="display:none;text-align:center;padding:40px;color:var(--light-slate);">Aucune machine correspondante.</div>
+      </div>
+
+      <!-- Onglet Tickets -->
+      <div class="tab-content" id="tab-fc-tickets">
+        <div class="search-bar-small">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search-fc-tickets" placeholder="Rechercher dans toutes les colonnes...">
+        </div>
+        
+        <div class="filter-bar" id="fct-filters">
+          <div class="searchable-filter-wrap" id="wrap-fct-reference"><input type="text" class="searchable-filter-input" id="inp-fct-reference" placeholder="Référence machine…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><div class="searchable-filter-dropdown" id="drop-fct-reference"></div></div>
+          <div class="searchable-filter-wrap" id="wrap-fct-tech_name"><input type="text" class="searchable-filter-input" id="inp-fct-tech_name" placeholder="Technicien…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><div class="searchable-filter-dropdown" id="drop-fct-tech_name"></div></div>
+          <div class="searchable-filter-wrap" id="wrap-fct-status"><input type="text" class="searchable-filter-input" id="inp-fct-status" placeholder="État…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><div class="searchable-filter-dropdown" id="drop-fct-status"></div></div>
+        </div>
+        <div class="tags-container" id="fct-tags"><button class="btn-clear-filters" onclick="clearFilters('fct')">Tout effacer</button></div>
+
+        <div class="popup-table-wrapper">
+          <table class="popup-table">
+            <thead>
+              <tr>
+                <th onclick="sortFctTable('id')" id="fctth-id">ID <span class="sort-icon">↕</span></th>
+                <th onclick="sortFctTable('date')" id="fctth-date">Date <span class="sort-icon">↕</span></th>
+                <th onclick="sortFctTable('title')" id="fctth-title">Titre <span class="sort-icon">↕</span></th>
+                <th onclick="sortFctTable('machine')" id="fctth-machine">Machine concernée <span class="sort-icon">↕</span></th>
+                <th onclick="sortFctTable('tech')" id="fctth-tech">Technicien <span class="sort-icon">↕</span></th>
+                <th onclick="sortFctTable('status')" id="fctth-status">État <span class="sort-icon">↕</span></th>
+                <th style="text-align:right;cursor:default;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="fc-tickets-tbody"></tbody>
+          </table>
+        </div>
+        <div id="fc-tickets-empty" style="display:none;text-align:center;padding:40px;color:var(--light-slate);">Aucun ticket correspondant.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="popup-overlay" id="fiche-machine-popup">
+  <div class="popup-modal">
+    <div class="popup-header">
+      <div class="popup-logo"><img src="/static/stokvis360.png" alt="Stokvis 360" style="height:28px;width:auto;object-fit:contain;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span style="display:none">STOKVIS <span>360</span></span></div>
+      <div class="popup-header-center">
+        <div class="popup-title">FICHE MACHINE</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span id="fm-assign-badge" class="status-badge" style="background:rgba(74,127,181,0.12);color:var(--status-assigned);">—</span>
+        <button class="popup-close" onclick="closeFicheMachine()">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    
+    <div class="machine-info-grid" style="grid-template-columns:repeat(6,1fr);">
+      <div class="m-info-item"><span class="m-info-lbl">ID Instance</span><span class="m-info-val mono" id="fm-id-instance">—</span></div>
+      <div class="m-info-item"><span class="m-info-lbl">Référence</span><span class="m-info-val mono" id="fm-ref">—</span></div>
+      <div class="m-info-item"><span class="m-info-lbl">Pôle</span><span class="m-info-val" id="fm-pole">—</span></div>
+      <div class="m-info-item"><span class="m-info-lbl">Marque</span><span class="m-info-val" id="fm-marque">—</span></div>
+      <div class="m-info-item"><span class="m-info-lbl">Catégorie</span><span class="m-info-val" id="fm-cat">—</span></div>
+      <div class="m-info-item"><span class="m-info-lbl">Dernière relevée d'usage</span><span id="fm-last-usage">—</span></div>
+    </div>
+
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('fm', 'tickets')" id="tab-btn-fm-tickets">Tickets</button>
+      <button class="tab-btn" onclick="switchTab('fm', 'releves')" id="tab-btn-fm-releves">Relevés d'usage</button>
+    </div>
+
+    <div class="popup-body">
+      <!-- Onglet Tickets -->
+      <div class="tab-content active" id="tab-fm-tickets">
+        <div class="search-bar-small">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search-fm-tickets" placeholder="Rechercher dans toutes les colonnes...">
+        </div>
+
+        <div class="filter-bar" id="fmt-filters">
+            <div class="searchable-filter-wrap" id="wrap-fmt-tech_name"><input type="text" class="searchable-filter-input" id="inp-fmt-tech_name" placeholder="Technicien…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><div class="searchable-filter-dropdown" id="drop-fmt-tech_name"></div></div>
+            <div class="searchable-filter-wrap" id="wrap-fmt-status"><input type="text" class="searchable-filter-input" id="inp-fmt-status" placeholder="État…" autocomplete="off"><svg class="searchable-filter-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg><div class="searchable-filter-dropdown" id="drop-fmt-status"></div></div>
+        </div>
+        <div class="tags-container" id="fmt-tags"><button class="btn-clear-filters" onclick="clearFilters('fmt')">Tout effacer</button></div>
+
+        <div class="popup-table-wrapper">
+          <table class="popup-table" id="fmt-table">
+            <thead>
+              <tr>
+                <th onclick="sortFmtTable('id')" id="fmtth-id">ID <span class="sort-icon">↕</span></th>
+                <th onclick="sortFmtTable('date')" id="fmtth-date">Date <span class="sort-icon">↕</span></th>
+                <th onclick="sortFmtTable('title')" id="fmtth-title">Titre <span class="sort-icon">↕</span></th>
+                <th onclick="sortFmtTable('tech')" id="fmtth-tech">Technicien <span class="sort-icon">↕</span></th>
+                <th onclick="sortFmtTable('status')" id="fmtth-status">État <span class="sort-icon">↕</span></th>
+                <th style="text-align:right;cursor:default;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="fm-tickets-tbody"></tbody>
+          </table>
+        </div>
+        <div id="fm-tickets-empty" style="display:none;text-align:center;padding:40px;color:var(--light-slate);border:1px dashed var(--light-grey);border-radius:8px;">Aucun ticket correspondant lié à cette machine.</div>
+      </div>
+
+      <!-- Onglet Relevés d'usage : agrégés depuis les tickets de la machine -->
+      <div class="tab-content" id="tab-fm-releves">
+        <div id="fm-releves-list" style="max-height:260px;overflow-y:auto;border:1px solid var(--light-grey);border-radius:8px;">
+          <div style="padding:24px;text-align:center;color:var(--light-slate);">Chargement…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/ticket_table.js"></script>
+<script src="/static/js/ticket_detail.js"></script>
+<script src="/static/js/ui.js"></script>
+<script>
+const NOW = new Date();
+function offsetDate(h) {
+  const dt = new Date(NOW.getTime() + h * 3600000);
+  const dd = n => ('0'+n).slice(-2);
+  return { d: dd(dt.getDate())+'/'+dd(dt.getMonth()+1)+'/'+dt.getFullYear(), t: dd(dt.getHours())+':'+dd(dt.getMinutes()), str: dd(dt.getDate())+'/'+dd(dt.getMonth()+1)+'/'+dt.getFullYear()+' '+dd(dt.getHours())+':'+dd(dt.getMinutes()) };
+}
+const t1=offsetDate(-5),t2=offsetDate(-10),t3=offsetDate(-40),t4=offsetDate(-55),t5=offsetDate(-24),t6=offsetDate(-100),t6r=offsetDate(-80),t7=offsetDate(-200),t7r=offsetDate(-100);
+
+let CLIENTS = [];
+
+function mapClientTicket(t){
+  const tech = (t.techs && t.techs.length) ? t.techs[0] : null;
+  return { id: t.id, id_instance: t.instance_id, date: t.date, time: t.time,
+           timestamp: t.timestamp, titre: t.titre, client_name: t.client_name,
+           reference: t.reference, tech_name: tech ? tech.name : '—',
+           tech_phone: tech ? tech.telephone : '', status: t.status,
+           techs: t.techs || [], technicien_ids: t.technicien_ids,
+           usageReadings: t.usage_readings || [],
+           checklist: (t.items||[]).filter(it=>it.type==='panne'&&it.checked&&!it.system) };
+}
+
+async function reload(){
+  const data = await API.bootstrap();
+  CLIENTS = data.clients.map(c => {
+    const machines = data.parc.filter(m => m.assignation === c.id).map(m => ({
+      id_instance: m.instance_id, pole: m.pole, marque: m.marque,
+      categorie: m.categorie, reference: m.reference,
+      last_usage: m.last_usage || null   // dernier relevé (CALCULÉ côté serveur)
+    }));
+    const tickets = data.tickets.filter(t => t.client_id === c.id).map(mapClientTicket);
+    return { id: c.id, prenom: c.contact_prenom, company: c.raison_sociale,
+             phone: c.telephone, email: c.email, password: c.password,
+             archived: !!c.archived,
+             machines, tickets };
+  });
+  renderTable(sortClients(getFiltered(document.getElementById('search-input').value)));
+}
+
+/* ── Relevés d'usage : helpers partagés par les deux fiches ──
+   `last_usage` = {readings:[{name,unit,value}], date:'dd/mm/yyyy', ticket_id}. */
+function usageTs(m){
+  if(!m.last_usage) return null;
+  const p = m.last_usage.date.split('/');
+  return new Date(p[2], p[1]-1, p[0]).getTime();
+}
+function lastUsageHtml(m){
+  if(!m.last_usage) return '<span style="color:var(--light-slate);">—</span>';
+  // Empilé verticalement si plusieurs indices ; gris ardoise sobre (#4A5568).
+  return m.last_usage.readings.map(r =>
+    `<div style="color:#4A5568;font-size:12px;font-weight:600;white-space:nowrap;">${xe(r.name)} ${xe(r.value)}${r.unit?' '+xe(r.unit):''} · ${xe(m.last_usage.date)}</div>`
+  ).join('');
+}
+/* Ordre par défaut du parc : jamais relevée d'abord, puis du relevé le plus
+   ancien au plus récent (la machine la moins suivie remonte). */
+function sortMachinesByUsage(machines){
+  return [...machines].sort((a,b)=>{
+    const ta=usageTs(a), tb=usageTs(b);
+    if(ta===null && tb===null) return a.id_instance.localeCompare(b.id_instance);
+    if(ta===null) return -1;
+    if(tb===null) return 1;
+    if(ta!==tb) return ta-tb;
+    return a.id_instance.localeCompare(b.id_instance);
+  });
+}
+
+let editingClientId = null;
+let currentFcClientId = null;
+let currentFmMachineId = null;
+let sortCol = 'tickets';
+let sortDir = 'desc';
+
+const filterState = {
+  fcm: { marque: [], categorie: [], reference: [] },
+  fct: { reference: [], tech_name: [], status: [] },
+  fmt: { tech_name: [], status: [] }
+};
+const filterLabels = { marque:'Marque', categorie:'Catégorie', reference:'Référence', tech_name:'Technicien', status:'État' };
+
+function setupFilter(prefix, key) {
+  const inp = document.getElementById(`inp-${prefix}-${key}`);
+  const drop = document.getElementById(`drop-${prefix}-${key}`);
+  if(!inp || !drop) return;
+  inp.addEventListener('focus', () => { renderDropdown(prefix, key); drop.classList.add('open'); });
+  inp.addEventListener('input', () => { renderDropdown(prefix, key); drop.classList.add('open'); });
+}
+
+['marque','categorie','reference'].forEach(k => setupFilter('fcm', k));
+['reference','tech_name','status'].forEach(k => setupFilter('fct', k));
+['tech_name','status'].forEach(k => setupFilter('fmt', k));
+
+function getFilteredData(prefix, excludeKey = null) {
+  if(!currentFcClientId) return [];
+  const c = CLIENTS.find(x => x.id === currentFcClientId);
+  let data = [];
+  let searchQ = '';
+  
+  if(prefix === 'fcm') {
+    data = c.machines;
+    searchQ = document.getElementById('search-fc-machines').value.toLowerCase();
+    if(searchQ) data = data.filter(m => m.id_instance.toLowerCase().includes(searchQ) || m.reference.toLowerCase().includes(searchQ) || m.marque.toLowerCase().includes(searchQ) || m.categorie.toLowerCase().includes(searchQ));
+  } else if(prefix === 'fct') {
+    data = c.tickets;
+    searchQ = document.getElementById('search-fc-tickets').value.toLowerCase();
+    if(searchQ) data = data.filter(t => t.id.toLowerCase().includes(searchQ) || t.reference.toLowerCase().includes(searchQ) || generateTitle(t).toLowerCase().includes(searchQ) || t.date.toLowerCase().includes(searchQ) || t.tech_name.toLowerCase().includes(searchQ) || t.status.toLowerCase().includes(searchQ));
+  } else if(prefix === 'fmt') {
+    if(!currentFmMachineId) return [];
+    data = c.tickets.filter(t => t.id_instance === currentFmMachineId);
+    searchQ = (document.getElementById('search-fm-tickets').value || '').toLowerCase();
+    if(searchQ) data = data.filter(t => t.id.toLowerCase().includes(searchQ) || generateTitle(t).toLowerCase().includes(searchQ) || t.date.toLowerCase().includes(searchQ) || t.tech_name.toLowerCase().includes(searchQ) || t.status.toLowerCase().includes(searchQ));
+  }
+  
+  const state = filterState[prefix];
+  Object.keys(state).forEach(k => {
+    if(k !== excludeKey && state[k].length > 0) {
+      data = data.filter(item => state[k].includes(item[k]));
+    }
+  });
+  return data;
+}
+
+function renderDropdown(prefix, key) {
+  const drop = document.getElementById(`drop-${prefix}-${key}`);
+  const q = document.getElementById(`inp-${prefix}-${key}`).value.toLowerCase();
+  
+  const data = getFilteredData(prefix, key);
+  let opts = [...new Set(data.map(item => item[key]))].sort();
+  
+  opts = opts.filter(o => !filterState[prefix][key].includes(o));
+  if(q) opts = opts.filter(o => String(o).toLowerCase().includes(q));
+  
+  if(!opts.length) {
+    drop.innerHTML = `<div class="filter-opt empty">Aucune option</div>`;
+  } else {
+    drop.innerHTML = opts.map(o => `<div class="filter-opt" onclick="addFilter('${prefix}','${key}','${xe(o).replace(/'/g,"\\'")}')">${xe(o)}</div>`).join('');
+  }
+}
+
+function addFilter(prefix, key, val) {
+  if(!filterState[prefix][key].includes(val)) filterState[prefix][key].push(val);
+  document.getElementById(`inp-${prefix}-${key}`).value = '';
+  document.getElementById(`drop-${prefix}-${key}`).classList.remove('open');
+  updateTagsAndView(prefix);
+}
+
+function removeFilter(prefix, key, val) {
+  filterState[prefix][key] = filterState[prefix][key].filter(v => v !== val);
+  updateTagsAndView(prefix);
+}
+
+function clearFilters(prefix) {
+  Object.keys(filterState[prefix]).forEach(k => filterState[prefix][k] = []);
+  updateTagsAndView(prefix);
+}
+
+function updateTagsAndView(prefix) {
+  const cont = document.getElementById(`${prefix}-tags`);
+  const state = filterState[prefix];
+  let tags = '';
+  let total = 0;
+  Object.keys(state).forEach(key => {
+    state[key].forEach(v => {
+      total++;
+      tags += `<span class="filter-tag"><strong>${filterLabels[key]}:</strong> ${xe(v)} <span class="tag-close" onclick="removeFilter('${prefix}','${key}','${xe(v).replace(/'/g,"\\'")}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></span>`;
+    });
+  });
+  cont.innerHTML = tags + `<button class="btn-clear-filters${total>0?' vis':''}" onclick="clearFilters('${prefix}')">Tout effacer</button>`;
+  
+  if(prefix === 'fcm') updateFcMachinesView();
+  else if(prefix === 'fct') updateFcTicketsView();
+  else if(prefix === 'fmt') updateFmTicketsView();
+}
+
+function updateFcMachinesView() { renderFcMachines(getFilteredData('fcm')); }
+function updateFcTicketsView() { renderFcTickets(getFilteredData('fct')); }
+function updateFmTicketsView() { renderFmTickets(getFilteredData('fmt')); }
+
+document.getElementById('search-fc-machines').addEventListener('input', updateFcMachinesView);
+document.getElementById('search-fc-tickets').addEventListener('input', updateFcTicketsView);
+document.getElementById('search-fm-tickets').addEventListener('input', updateFmTicketsView);
+
+/* ── Tri des tableaux des fiches (état par tableau, délégué à TicketTable) ── */
+let fcmSort = { col: 'default', dir: 'asc' };   // parc machines (fiche client)
+let fctSort = { col: 'default', dir: 'asc' };   // tickets (fiche client)
+let fmtSort = { col: 'default', dir: 'asc' };   // tickets (fiche machine)
+
+function _applySortHeader(prefix, state, cols){
+  cols.forEach(c => TicketTable.renderSortHeader(
+    document.getElementById(prefix + 'th-' + c), c, state.col, state.dir));
+}
+function sortFcmTable(col){
+  if(fcmSort.col===col) fcmSort.dir = fcmSort.dir==='asc'?'desc':'asc';
+  else { fcmSort.col=col; fcmSort.dir='asc'; }
+  _applySortHeader('fcm', fcmSort, ['id_instance','marque','categorie','reference','usage']);
+  updateFcMachinesView();
+}
+function sortFctTable(col){
+  if(fctSort.col===col) fctSort.dir = fctSort.dir==='asc'?'desc':'asc';
+  else { fctSort.col=col; fctSort.dir='asc'; }
+  _applySortHeader('fct', fctSort, ['id','date','title','machine','tech','status']);
+  updateFcTicketsView();
+}
+function sortFmtTable(col){
+  if(fmtSort.col===col) fmtSort.dir = fmtSort.dir==='asc'?'desc':'asc';
+  else { fmtSort.col=col; fmtSort.dir='asc'; }
+  _applySortHeader('fmt', fmtSort, ['id','date','title','tech','status']);
+  updateFmTicketsView();
+}
+
+function xe(str){
+  if(!str)return'';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+function sortTickets(a, b) {
+  const aAnnule = a.status === 'Annulé' ? 1 : 0;
+  const bAnnule = b.status === 'Annulé' ? 1 : 0;
+  if (aAnnule !== bAnnule) return aAnnule - bAnnule;
+  return parseDate(b.date, b.time).getTime() - parseDate(a.date, a.time).getTime();
+}
+
+const STATUS_COLORS={
+  'Envoyé':{bg:'rgba(143,163,191,0.12)',color:'#58595B'},
+  'Assigné':{bg:'rgba(74,127,181,0.12)',color:'#4A7FB5'},
+  'Attente pièce':{bg:'#FFF9E6',color:'#D97706'},
+  'En route':{bg:'#FFFBEB',color:'#E8A817'},
+  'En Réparation':{bg:'#FEF3F2',color:'#F04438'},
+  'Maintenance à distance':{bg:'#F0FDF4',color:'#16A34A'},
+  'Terminé':{bg:'rgba(45,143,94,0.12)',color:'#2D8F5E'},
+  'Annulé':{bg:'#F1F5F9',color:'#64748B'}
+};
+function getStatusStyle(s){return STATUS_COLORS[s]||{bg:'#F4F6F9',color:'#58595B'};}
+
+/* Titre : délègue à genTitle (source unique dans static/js/ui.js). */
+function generateTitle(t){ return genTitle(t); }
+
+function showToast(msg,type='success'){
+  const c=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className='toast'+(type==='error'?' error':'');
+  t.innerHTML=`<div class="toast-icon"><svg viewBox="0 0 24 24">${type==='error'?'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>':'<polyline points="20 6 9 17 4 12"/>'}</svg></div><div class="toast-msg">${xe(msg)}</div><button class="toast-dismiss" onclick="this.parentElement.remove()">×</button>`;
+  c.appendChild(t);
+  setTimeout(()=>t.remove(),4000);
+}
+
+function getFiltered(q){
+  const lq=q.toLowerCase();
+  return CLIENTS.filter(c=>!lq || 
+    c.id.toLowerCase().includes(lq) || 
+    c.prenom.toLowerCase().includes(lq) || 
+    c.company.toLowerCase().includes(lq) || 
+    c.email.toLowerCase().includes(lq) || 
+    c.phone.toLowerCase().includes(lq) ||
+    c.machines.length.toString().includes(lq) ||
+    c.tickets.length.toString().includes(lq)
+  );
+}
+
+function sortClients(data){
+  return [...data].sort((a,b)=>{
+    let va,vb;
+    if(sortCol==='id'){va=a.id;vb=b.id;}
+    else if(sortCol==='company'){va=a.company.toLowerCase();vb=b.company.toLowerCase();}
+    else if(sortCol==='contact'){va=a.prenom.toLowerCase();vb=b.prenom.toLowerCase();}
+    else if(sortCol==='phone'){va=a.phone;vb=b.phone;}
+    else if(sortCol==='email'){va=a.email.toLowerCase();vb=b.email.toLowerCase();}
+    else if(sortCol==='machines'){va=a.machines.length;vb=b.machines.length;}
+    else if(sortCol==='tickets'){
+      va=a.tickets.length;
+      vb=b.tickets.length;
+      if(va === vb) {
+         return a.id < b.id ? (sortDir==='asc'?-1:1) : (sortDir==='asc'?1:-1);
+      }
+    }
+    else{va=a.id;vb=b.id;}
+    
+    if(va<vb)return sortDir==='asc'?-1:1;
+    if(va>vb)return sortDir==='asc'?1:-1;
+    return 0;
+  });
+}
+
+function sortTable(col){
+  if(sortCol===col){sortDir=sortDir==='asc'?'desc':'asc';}else{sortCol=col;sortDir='asc';}
+  document.querySelectorAll('.data-table th').forEach(th=>th.classList.remove('sorted'));
+  const thEl=document.getElementById('th-'+col);
+  if(thEl){thEl.classList.add('sorted');thEl.querySelector('.sort-icon').textContent=sortDir==='asc'?'↑':'↓';}
+  renderTable(sortClients(getFiltered(document.getElementById('search-input').value)));
+}
+
+function getActiveTicketCount(client){return client.tickets.filter(t=>t.status!=='Terminé'&&t.status!=='Annulé').length;}
+
+function renderTable(data){
+  const tbody=document.getElementById('clients-tbody');
+  document.getElementById('client-count').textContent=`(${data.length})`;
+  tbody.innerHTML='';
+  if(data.length===0){
+    tbody.innerHTML=`<tr class="empty-state-row"><td colspan="8"><svg class="empty-state-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Aucun client trouvé</td></tr>`;
+    return;
+  }
+  data.forEach(c=>{
+    const totMach = c.machines.length;
+    const totTick = c.tickets.length;
+    
+    const badgeMach = `<span class="count-badge ${totMach===0?'badge-grey':'badge-blue'}">${totMach}</span>`;
+    const badgeTick = `<span class="count-badge ${totTick===0?'badge-grey':'badge-blue'}">${totTick}</span>`;
+
+    const tr=document.createElement('tr');
+    tr.onclick = () => openFicheClient(c.id);
+    if(c.archived) tr.style.opacity = '0.55';
+
+    const archivedBadge = c.archived
+      ? ' <span style="font-size:10px;font-weight:700;color:var(--light-slate);background:rgba(143,163,191,0.15);padding:2px 7px;border-radius:8px;vertical-align:middle;">ARCHIVÉ</span>'
+      : '';
+    tr.innerHTML=`
+      <td class="col-id">${xe(c.id)}</td>
+      <td class="col-company" title="${xe(c.company)}">${xe(c.company)}${archivedBadge}</td>
+      <td>${xe(c.prenom)}</td>
+      <td class="col-phone">${xe(c.phone)}</td>
+      <td class="col-email" title="${xe(c.email)}">${xe(c.email)}</td>
+      <td>${badgeMach}</td>
+      <td>${badgeTick}</td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn-icon edit-btn" title="Modifier" onclick="event.stopPropagation();openClientModal('${c.id}')">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn-icon" title="Fiche Client" onclick="event.stopPropagation();openFicheClient('${c.id}')">
+            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+document.getElementById('search-input').addEventListener('input',e=>{
+  renderTable(sortClients(getFiltered(e.target.value)));
+});
+
+function openClientModal(clientId=null){
+  editingClientId=clientId;
+  const isEdit=!!clientId;
+  document.getElementById('modal-title').textContent=isEdit?'Modifier le client':'Ajouter un client';
+  document.getElementById('modal-submit-btn').textContent=isEdit?'Enregistrer':'Créer le client';
+  
+  document.querySelectorAll('.field-error').forEach(e=>e.classList.remove('vis'));
+  document.querySelectorAll('.form-control').forEach(e=>e.classList.remove('error'));
+  if(isEdit){
+    const c=CLIENTS.find(x=>x.id===clientId);
+    document.getElementById('f-prenom').value=c.prenom;
+    document.getElementById('f-company').value=c.company;
+    document.getElementById('f-phone').value=c.phone;
+    document.getElementById('f-email').value=c.email;
+    document.getElementById('f-password').value=c.password;
+    document.getElementById('f-statut').value=c.archived?'archive':'actif';
+  }else{
+    document.getElementById('f-prenom').value='';
+    document.getElementById('f-company').value='';
+    document.getElementById('f-phone').value='';
+    document.getElementById('f-email').value='';
+    document.getElementById('f-password').value='';
+    document.getElementById('f-statut').value='actif';
+  }
+  // Le statut (archivage) n'apparaît qu'en modification.
+  document.getElementById('f-statut-group').style.display=isEdit?'flex':'none';
+  onClientStatutChange();
+  document.getElementById('client-modal').classList.add('vis');
+}
+
+function onClientStatutChange(){
+  document.getElementById('client-archive-warning').style.display=
+    document.getElementById('f-statut').value==='archive'?'block':'none';
+}
+
+function closeClientModal(){
+  document.getElementById('client-modal').classList.remove('vis');
+  editingClientId=null;
+}
+
+function togglePassword(){
+  const inp=document.getElementById('f-password');
+  inp.type=inp.type==='password'?'text':'password';
+}
+
+function submitClientForm(){
+  const prenom=document.getElementById('f-prenom').value.trim();
+  const company=document.getElementById('f-company').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  const password=document.getElementById('f-password').value.trim();
+  let valid=true;
+
+  function setErr(field,errId,show){
+    document.getElementById(field).classList.toggle('error',show);
+    document.getElementById(errId).classList.toggle('vis',show);
+    if(show)valid=false;
+  }
+  setErr('f-prenom','err-prenom',!prenom);
+  setErr('f-company','err-company',!company);
+  setErr('f-phone','err-phone',!phone);
+  setErr('f-email','err-email',!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+  setErr('f-password','err-password',!password);
+
+  if(!valid)return;
+
+  saveClient({prenom,company,phone,email,password,
+              archived:document.getElementById('f-statut').value==='archive'});
+}
+
+async function saveClient(f){
+  try {
+    if(editingClientId){
+      const c=CLIENTS.find(x=>x.id===editingClientId);
+      const pwdChanged = f.password !== c.password;
+      const wasArchived = c.archived;
+      await API.updateClient(editingClientId, {
+        contact_prenom:f.prenom, raison_sociale:f.company, telephone:f.phone,
+        email:f.email, password:f.password, archived:f.archived
+      });
+      if(f.archived&&!wasArchived) showToast('Client archivé — compte désactivé');
+      else if(wasArchived&&!f.archived) showToast('Client réactivé — accès restauré');
+      else showToast(pwdChanged?'Mot de passe modifié avec succès':'Informations mises à jour');
+    } else {
+      // Création : jamais de champ archived — un nouveau client est toujours actif.
+      await API.createClient({
+        contact_prenom:f.prenom, raison_sociale:f.company, telephone:f.phone,
+        email:f.email, password:f.password
+      });
+      showToast('Client créé avec succès');
+    }
+  } catch(e){ showToast('Échec : '+e.message,'error'); return; }
+  closeClientModal();
+  await reload();
+}
+
+function switchTab(prefix, tabName) {
+  document.querySelectorAll(`[id^="tab-btn-${prefix}"]`).forEach(b => b.classList.remove('active'));
+  document.querySelectorAll(`[id^="tab-${prefix}"]`).forEach(c => c.classList.remove('active'));
+  
+  document.getElementById(`tab-btn-${prefix}-${tabName}`).classList.add('active');
+  document.getElementById(`tab-${prefix}-${tabName}`).classList.add('active');
+}
+
+function openFicheClient(clientId){
+  currentFcClientId = clientId;
+  const c = CLIENTS.find(x => x.id === clientId);
+  
+  document.getElementById('fc-client-name').textContent = c.company;
+  document.getElementById('fc-client-meta').textContent = `${c.prenom} — ${c.phone} — ${c.email}`;
+  
+  const mCount = c.machines.length;
+  const tCount = c.tickets.length;
+  document.getElementById('fc-machine-summary').textContent = `${mCount} machine${mCount>1?'s':''} au total`;
+  document.getElementById('fc-ticket-summary').textContent = `${tCount} ticket${tCount>1?'s':''} au total`;
+  
+  switchTab('fc', 'machines');
+  document.getElementById('search-fc-machines').value = '';
+  document.getElementById('search-fc-tickets').value = '';
+  
+  clearFilters('fcm');
+  clearFilters('fct');
+  
+  document.getElementById('fiche-client-popup').classList.add('vis');
+}
+
+function closeFicheClient(){
+  document.getElementById('fiche-client-popup').classList.remove('vis');
+  currentFcClientId = null;
+}
+
+function renderFcMachines(machines) {
+  const tbody = document.getElementById('fc-machines-tbody');
+  const empty = document.getElementById('fc-machines-empty');
+  tbody.innerHTML = '';
+
+  if (machines.length === 0) {
+    empty.style.display = 'block';
+    document.querySelector('#tab-fc-machines .popup-table-wrapper').style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  document.querySelector('#tab-fc-machines .popup-table-wrapper').style.display = 'block';
+
+  // Ordre par défaut : par usage (jamais relevée -> plus ancien -> plus récent).
+  let sorted;
+  if (fcmSort.col === 'default' || fcmSort.col === 'usage') {
+    sorted = sortMachinesByUsage(machines);
+    if (fcmSort.col === 'usage' && fcmSort.dir === 'desc') sorted.reverse();
+  } else {
+    const mul = fcmSort.dir === 'desc' ? -1 : 1;
+    sorted = [...machines].sort((a,b) => {
+      const va = String(a[fcmSort.col]||'').toLowerCase(), vb = String(b[fcmSort.col]||'').toLowerCase();
+      if(va<vb) return -1*mul; if(va>vb) return 1*mul;
+      return a.id_instance.localeCompare(b.id_instance);
+    });
+  }
+
+  sorted.forEach(m => {
+    const tr = document.createElement('tr');
+    tr.onclick = () => openFicheMachine(currentFcClientId, m.id_instance);
+    tr.innerHTML = `
+      <td class="col-id-cell">${xe(m.id_instance)}</td>
+      <td>${xe(m.marque)}</td>
+      <td>${xe(m.categorie)}</td>
+      <td><span class="col-machine-tag">${xe(m.reference)}</span></td>
+      <td>${lastUsageHtml(m)}</td>
+      <td style="text-align:right;">
+        <button class="btn-icon" onclick="event.stopPropagation();openFicheMachine('${currentFcClientId}','${m.id_instance}')" title="Voir la machine">
+          <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* Annulation depuis les fiches : composant partagé (identité manager). */
+function openFicheTicketCancel(ticketId){
+  const c = CLIENTS.find(x => x.id === currentFcClientId);
+  const t = c ? c.tickets.find(x => x.id === ticketId) : null;
+  TicketTable.openCancelModal(ticketId, t ? {
+    titre: generateTitle(t), client_name: t.client_name, reference: t.reference
+  } : null, async () => { await reload(); updateFcTicketsView(); updateFmTicketsView(); },
+  { byRole: 'manager', byName: 'Manager', byId: 'manager' });
+}
+
+function ticketRowActions(t){
+  const isTerminal = t.status === 'Terminé' || t.status === 'Annulé';
+  return `
+    <button class="btn-icon" onclick="event.stopPropagation();TicketDetail.open('${t.id}',{role:'manager',onChange:reload})" title="Voir le détail">
+      <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    </button>
+    ${!isTerminal ? `<button class="btn-icon danger" onclick="event.stopPropagation();openFicheTicketCancel('${t.id}')" title="Annuler le ticket">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>` : ''}`;
+}
+
+function renderFcTickets(tickets) {
+  const tbody = document.getElementById('fc-tickets-tbody');
+  const empty = document.getElementById('fc-tickets-empty');
+  tbody.innerHTML = '';
+
+  if (tickets.length === 0) {
+    empty.style.display = 'block';
+    document.querySelector('#tab-fc-tickets .popup-table-wrapper').style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  document.querySelector('#tab-fc-tickets .popup-table-wrapper').style.display = 'block';
+
+  const sorted = fctSort.col === 'default'
+    ? TicketTable.defaultSort(tickets)
+    : TicketTable.sortBy(tickets, fctSort.col, fctSort.dir);
+
+  sorted.forEach(t => {
+    const title = generateTitle(t);
+    const sc = getStatusStyle(t.status);
+
+    const tr = document.createElement('tr');
+    if (t.status === 'Annulé') tr.classList.add('ticket-annule');
+    tr.onclick = () => TicketDetail.open(t.id, { role: 'manager', onChange: reload });
+
+    tr.innerHTML = `
+      <td class="col-id-cell">${xe(t.id)}</td>
+      <td class="col-date-cell"><div>${xe(t.date)}</div><span style="margin-top:2px;font-size:11px;">${xe(t.time)}</span></td>
+      <td class="col-titre-cell" title="${xe(title)}">${xe(title)}</td>
+      <td><span class="col-machine-tag">${xe(t.reference)}</span></td>
+      <td class="col-tech-cell">${TicketTable.renderTechCell(t.techs)}</td>
+      <td><span class="status-badge" style="background:${sc.bg};color:${sc.color};">${xe(t.status)}</span></td>
+      <td style="text-align:right;"><div style="display:inline-flex;gap:6px;">${ticketRowActions(t)}</div></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function openFicheMachine(clientId, machineId) {
+  currentFmMachineId = machineId;
+  const c = CLIENTS.find(x => x.id === clientId);
+  const m = c.machines.find(x => x.id_instance === machineId);
+
+  document.getElementById('fm-assign-badge').textContent = `${c.company} — ${c.phone}`;
+
+  document.getElementById('fm-id-instance').textContent = m.id_instance;
+  document.getElementById('fm-ref').textContent = m.reference;
+  document.getElementById('fm-pole').textContent = m.pole;
+  document.getElementById('fm-marque').textContent = m.marque;
+  document.getElementById('fm-cat').textContent = m.categorie;
+  document.getElementById('fm-last-usage').innerHTML = lastUsageHtml(m);
+
+  document.getElementById('search-fm-tickets').value = '';
+  switchTab('fm', 'tickets');
+  clearFilters('fmt');
+  loadFmReleves(machineId);
+
+  document.getElementById('fiche-machine-popup').classList.add('vis');
+}
+
+/* Onglet "Relevés d'usage" : historique complet (du plus récent au plus ancien),
+   chaque ligne renvoyant vers le ticket qui porte le relevé. */
+async function loadFmReleves(machineId){
+  const cont = document.getElementById('fm-releves-list');
+  cont.innerHTML = '<div style="padding:24px;text-align:center;color:var(--light-slate);">Chargement…</div>';
+  let entries = [];
+  try { entries = await API.usageTimeline(machineId); }
+  catch(e){ cont.innerHTML = `<div style="padding:24px;text-align:center;color:var(--danger);">Erreur : ${xe(e.message)}</div>`; return; }
+  if(!entries.length){
+    cont.innerHTML = '<div style="padding:24px;text-align:center;color:var(--light-slate);">Aucun relevé enregistré.</div>';
+    return;
+  }
+  entries.reverse(); // l'API renvoie chronologique -> on affiche le plus récent d'abord
+  cont.innerHTML = entries.map(e => {
+    const dt = new Date(e.date);
+    const dd = n => ('0'+n).slice(-2);
+    const dateStr = dd(dt.getDate())+'/'+dd(dt.getMonth()+1)+'/'+dt.getFullYear();
+    return `<div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--light-grey);font-size:13px;">
+      <span style="color:var(--light-slate);white-space:nowrap;">${dateStr}</span>
+      <span style="color:var(--light-grey);">·</span>
+      <span style="color:#4A5568;font-weight:600;">${xe(e.name)}</span>
+      <span style="color:var(--light-grey);">·</span>
+      <span style="color:#4A5568;">${xe(e.value)}${e.unit?' '+xe(e.unit):''}</span>
+      <span style="color:var(--light-grey);">·</span>
+      <a href="#" style="color:var(--steel-blue);font-weight:700;" onclick="event.preventDefault();TicketDetail.open('${e.ticket_id}',{role:'manager',onChange:reload})">${xe(e.ticket_id)}</a>
+    </div>`;
+  }).join('');
+}
+
+function closeFicheMachine() {
+  document.getElementById('fiche-machine-popup').classList.remove('vis');
+  currentFmMachineId = null;
+}
+
+function renderFmTickets(tickets) {
+  const tbody = document.getElementById('fm-tickets-tbody');
+  const empty = document.getElementById('fm-tickets-empty');
+  tbody.innerHTML = '';
+  
+  if (tickets.length === 0) {
+    empty.style.display = 'block';
+    document.getElementById('fmt-table').parentElement.style.display = 'none';
+    return;
+  }
+  
+  empty.style.display = 'none';
+  document.getElementById('fmt-table').parentElement.style.display = 'block';
+
+  const sorted = fmtSort.col === 'default'
+    ? TicketTable.defaultSort(tickets)
+    : TicketTable.sortBy(tickets, fmtSort.col, fmtSort.dir);
+
+  sorted.forEach(t => {
+    const title = generateTitle(t);
+    const sc = getStatusStyle(t.status);
+
+    const tr = document.createElement('tr');
+    if (t.status === 'Annulé') tr.classList.add('ticket-annule');
+    tr.onclick = () => TicketDetail.open(t.id, { role: 'manager', onChange: reload });
+
+    tr.innerHTML = `
+      <td class="col-id-cell">${xe(t.id)}</td>
+      <td class="col-date-cell"><div>${xe(t.date)}</div><span style="margin-top:2px;font-size:11px;">${xe(t.time)}</span></td>
+      <td class="col-titre-cell" title="${xe(title)}">${xe(title)}</td>
+      <td class="col-tech-cell">${TicketTable.renderTechCell(t.techs)}</td>
+      <td><span class="status-badge" style="background:${sc.bg};color:${sc.color};">${xe(t.status)}</span></td>
+      <td style="text-align:right;"><div style="display:inline-flex;gap:6px;">${ticketRowActions(t)}</div></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+document.addEventListener('mousedown', e => {
+  ['drop-fcm-marque', 'drop-fcm-categorie', 'drop-fcm-reference', 
+   'drop-fct-reference', 'drop-fct-tech_name', 'drop-fct-status',
+   'drop-fmt-tech_name', 'drop-fmt-status'].forEach(id => {
+      const drop = document.getElementById(id);
+      const wrap = document.getElementById(id.replace('drop-', 'wrap-'));
+      if (wrap && drop && !wrap.contains(e.target)) {
+          drop.classList.remove('open');
+      }
+  });
+
+  // Cascade closing for overlays
+  const fm = document.getElementById('fiche-machine-popup');
+  const fc = document.getElementById('fiche-client-popup');
+  const cm = document.getElementById('client-modal');
+
+  if (fm.classList.contains('vis')) {
+      if (e.target === fm) closeFicheMachine();
+      return; 
+  }
+  if (fc.classList.contains('vis')) {
+      if (e.target === fc) closeFicheClient();
+      return;
+  }
+  if (cm.classList.contains('vis')) {
+      if (e.target === cm) closeClientModal();
+      return;
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') {
+    const tdPopup = document.getElementById('td-popup-overlay');
+    if(tdPopup && tdPopup.classList.contains('open')) return;
+
+    if(document.getElementById('fiche-machine-popup').classList.contains('vis')) closeFicheMachine();
+    else if(document.getElementById('fiche-client-popup').classList.contains('vis')) closeFicheClient();
+    else if(document.getElementById('client-modal').classList.contains('vis')) closeClientModal();
+  }
+});
+
+/* ==========================================================================
+   INIT
+   ========================================================================== */
+document.getElementById('th-tickets').classList.add('sorted');
+document.getElementById('th-tickets').querySelector('.sort-icon').textContent = '↓';
+
+(async function init(){
+  const s = Session.require('manager');
+  if(!s) return;
+  const un=document.getElementById('sb-user-name'); if(un) un.textContent=s.user_name||'Manager';
+  const lo=document.getElementById('sb-logout'); if(lo) lo.addEventListener('click',e=>{e.preventDefault();Session.clear();window.location.href='/';});
+  try { await reload(); } catch(e){ showToast('Erreur de chargement : '+e.message,'error'); }
+})();
+</script>
+<script src="/static/js/responsive.js"></script>
+</body>
+</html>

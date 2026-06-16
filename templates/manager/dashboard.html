@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Stokvis Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/variables.css">
+<link rel="stylesheet" href="/static/css/sidebar.css">
+<link rel="stylesheet" href="/static/css/base.css">
+<link rel="stylesheet" href="/static/css/dashboard.css">
+<link rel="stylesheet" href="/static/css/responsive.css">
+</head>
+<body>
+
+{% set active_nav = 'dashboard' %}{% include 'partials/_sidebar_manager.html' %}
+
+<header class="topbar">
+  <div class="topbar-title">Dashboard</div>
+  <div class="topbar-right">
+    <div class="topbar-avatar" id="topbar-avatar">M</div>
+  </div>
+</header>
+
+<!-- TAB BAR -->
+<nav class="dash-tab-bar">
+  <button class="dash-tab" data-panel="overview">Vue d'ensemble</button>
+  <button class="dash-tab" data-panel="tickets">Tickets</button>
+  <button class="dash-tab" data-panel="techniciens">Techniciens</button>
+  <button class="dash-tab" data-panel="clients">Clients</button>
+  <button class="dash-tab" data-panel="machines">Machines</button>
+  <button class="dash-tab" data-panel="pieces">Pièces de Rechange</button>
+</nav>
+
+<main class="content">
+
+  <!-- ============================
+       UNIFIED FILTERS CARD
+       (sentinel + sticky bar live directly under <main> so the sticky bar
+        stays pinned for the WHOLE page scroll, not just the card's height)
+       ============================ -->
+  <div id="filter-sentinel" style="height:1px;margin-bottom:-1px;pointer-events:none;"></div>
+
+  <div class="filters-sticky-top" id="filters-sticky-bar">
+      <div class="filters-header">
+        Filtres de l'analyse
+        <button onclick="resetAllFilters()" class="filters-reset-btn" title="Réinitialiser les filtres">
+          <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+          Réinitialiser
+        </button>
+      </div>
+      <div class="filters-sticky-row">
+        <div class="filter-group">
+          <label class="filter-label">Client</label>
+          <div id="ms-client" class="ms-wrap"></div>
+        </div>
+        <div class="filter-group large">
+          <label class="filter-label">Période</label>
+          <div class="date-range-picker">
+            <select id="period-select">
+              <option value="today">Aujourd'hui</option>
+              <option value="7days">7 derniers jours</option>
+              <option value="week">Cette semaine</option>
+              <option value="month">Ce mois</option>
+              <option value="quarter">Ce trimestre</option>
+              <option value="year" selected>Cette année</option>
+              <option value="custom">Personnalisé</option>
+            </select>
+            <input type="date" id="date-start">
+            <span class="date-separator">→</span>
+            <input type="date" id="date-end">
+          </div>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Technicien</label>
+          <div id="ms-tech" class="ms-wrap"></div>
+        </div>
+      </div>
+      <!-- Balises actives : au bas de la zone sticky « Filtres de l'analyse »,
+           elles suivent donc le défilement avec la barre. -->
+      <div class="active-tags-bar" id="active-tags-bar"></div>
+    </div>
+
+    <!-- ============================
+         ADVANCED FILTERS (SCROLL BOTTOM)
+         ============================ -->
+    <div class="filters-scroll-bottom" id="filters-container">
+      <div class="filters-persistent">
+        <div class="filter-group"><label class="filter-label">Chemin / État</label><div id="ms-chemin" class="ms-wrap"></div></div>
+        <div class="filter-group"><label class="filter-label">Raison Annulation</label><div id="ms-annulation" class="ms-wrap"></div></div>
+        <div class="filter-group"><label class="filter-label">État du rapport</label><div id="ms-rapport" class="ms-wrap"></div></div>
+        <div class="filter-group"><label class="filter-label">Évaluation</label><div id="ms-eval" class="ms-wrap"></div></div>
+        <div class="filter-group"><label class="filter-label">Pôle</label><div id="ms-pole" class="ms-wrap"></div></div>
+        <div class="filter-group"><label class="filter-label">Marque</label><div id="ms-marque" class="ms-wrap"></div></div>
+        <div class="filter-group"><label class="filter-label">Catégorie</label><div id="ms-cat" class="ms-wrap"></div></div>
+        <div class="filter-group"><label class="filter-label">Référence</label><div id="ms-ref" class="ms-wrap"></div></div>
+        <div class="filter-group"><label class="filter-label">ID Instance</label><div id="ms-instance" class="ms-wrap"></div></div>
+        <div class="filter-group"><label class="filter-label">Pannes fréquentes</label><div id="ms-panne" class="ms-wrap"></div></div>
+      </div>
+    </div>
+
+
+  <!-- TAB PANELS - one Jinja partial per tab -->
+  {% include 'partials/dashboard/_tab_overview.html' %}
+  {% include 'partials/dashboard/_tab_tickets.html' %}
+  {% include 'partials/dashboard/_tab_techniciens.html' %}
+  {% include 'partials/dashboard/_tab_clients.html' %}
+  {% include 'partials/dashboard/_tab_machines.html' %}
+  {% include 'partials/dashboard/_tab_pieces.html' %}
+
+</main>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/ui.js"></script>
+<script src="/static/js/ticket_detail.js"></script>
+<script src="/static/js/dashboard.js"></script>
+<script src="/static/js/responsive.js"></script>
+</body>
+</html>

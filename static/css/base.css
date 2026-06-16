@@ -1,0 +1,58 @@
+/* =========================================================================
+ * base.css — Finitions transverses communes à tous les portails.
+ *
+ * Inclure APRÈS variables.css / sidebar.css et AVANT le <style> de la page
+ * (ainsi une page peut toujours surcharger un composant précis) :
+ *     <link rel="stylesheet" href="/static/css/base.css">
+ *
+ * POURQUOI : harmoniser les détails « finition » (barres de défilement,
+ * surlignage de sélection, anneau de focus clavier, lissage des polices)
+ * sur les 8 portails sans toucher au CSS spécifique de chaque page.
+ * Ne contient QUE des règles additives et neutres.
+ * ====================================================================== */
+
+/* Lissage des polices + défilement doux (cohérent partout). */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+/* Surlignage de sélection aux couleurs de la marque. */
+::selection { background: rgba(74, 127, 181, 0.22); color: var(--primary); }
+
+/* Légère profondeur sous la topbar (en accord avec la sidebar), en plus du
+   border-bottom défini par chaque page. Discret : ne change pas l'esprit. */
+.topbar { box-shadow: 0 1px 3px rgba(27, 58, 107, 0.04); }
+
+/* Barres de défilement discrètes et homogènes (la sidebar garde les siennes,
+   plus spécifiques). Firefox via scrollbar-color. */
+* { scrollbar-color: rgba(27, 58, 107, 0.22) transparent; scrollbar-width: thin; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(27, 58, 107, 0.20);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(27, 58, 107, 0.34);
+  background-clip: padding-box;
+}
+
+/* Accessibilité clavier : anneau de focus net sur liens et boutons.
+   Limité aux <a>/<button> pour ne pas doubler les anneaux déjà définis sur
+   les champs de formulaire. N'apparaît qu'à la navigation clavier. */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--steel-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Les liens de la sidebar (texte clair sur fond bleu) : anneau clair. */
+.sidebar-nav a:focus-visible {
+  outline-color: rgba(255, 255, 255, 0.7);
+  outline-offset: -2px;
+}

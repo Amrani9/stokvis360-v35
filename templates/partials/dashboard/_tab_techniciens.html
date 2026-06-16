@@ -1,0 +1,280 @@
+  <!-- ============================================================
+       PANEL: TECHNICIENS
+       Self-contained tab. Consumes _liveTechs + _pipTickets.
+       renderTechKPIs() is called from activateTab() and the live polls.
+       ============================================================ -->
+  <div class="dash-panel" id="panel-techniciens">
+
+    <!-- ROW 1 — KPI CARDS -->
+    <div class="tch-kpi-row">
+
+      <!-- Card 1: Effectif total -->
+      <div class="tch-kpi">
+        <div class="tch-kpi-top">
+          <span class="tch-kpi-label">Effectif opérationnel</span>
+        </div>
+        <span class="tch-kpi-val" id="tch-kpi-total">—</span>
+        <span class="tch-kpi-sub">Techniciens employés actifs</span>
+        <div class="tch-kpi-detail" id="tch-kpi-total-detail">
+          <span class="tch-detail-chip tch-chip-neutral" id="tch-kpi-archived-count">—</span>
+        </div>
+      </div>
+
+      <!-- Card 2: En service -->
+      <div class="tch-kpi">
+        <div class="tch-kpi-top">
+          <span class="tch-kpi-label">Disponibles en service</span>
+          <span class="ov-live-pill"><span class="dot"></span>LIVE</span>
+        </div>
+        <span class="tch-kpi-val" id="tch-kpi-enservice">—</span>
+        <span class="tch-kpi-sub" id="tch-kpi-enservice-sub">Sur — techniciens</span>
+        <div class="tch-kpi-detail">
+          <span class="tch-detail-chip tch-chip-pause" id="tch-chip-pause">— En pause</span>
+          <span class="tch-detail-chip tch-chip-hors" id="tch-chip-hors">— Hors service</span>
+        </div>
+      </div>
+
+      <!-- Card 3: En intervention -->
+      <div class="tch-kpi">
+        <div class="tch-kpi-top">
+          <span class="tch-kpi-label">En intervention active</span>
+          <span class="ov-live-pill"><span class="dot"></span>LIVE</span>
+        </div>
+        <span class="tch-kpi-val" id="tch-kpi-busy">—</span>
+        <span class="tch-kpi-sub">Techniciens avec ticket en cours</span>
+        <div class="tch-kpi-detail">
+          <span class="tch-detail-chip tch-chip-neutral" id="tch-kpi-busy-pct">—% de l'effectif en service</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Ratio de charge -->
+      <div class="tch-kpi">
+        <div class="tch-kpi-top">
+          <span class="tch-kpi-label">Charge par technicien</span>
+          <span class="ov-live-pill"><span class="dot"></span>LIVE</span>
+        </div>
+        <span class="tch-kpi-val" id="tch-kpi-ratio">—</span>
+        <span class="tch-kpi-sub">Tickets actifs / technicien en service</span>
+        <div class="tch-kpi-detail">
+          <span class="tch-detail-chip tch-chip-neutral" id="tch-kpi-active-total">— tickets actifs au total</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ROW 2 — CLASSEMENT MULTI-CRITÈRES (full width) -->
+    <div class="ov-card ov-card-full tch-table-card">
+      <div class="ov-card-header">
+        <div class="ov-card-hgroup">
+          <span class="ov-card-title">Classement multi-critères</span>
+          <span class="tch-info tch-title-info" tabindex="0" role="button" aria-label="Note sur les données">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+            <span class="tch-bubble tch-bubble-title">
+              Données <strong>adaptées aux filtres globaux</strong> (hors temps réel).<br>
+              Pour une lecture actuelle, choisissez une période relative au présent —
+              <em>7 derniers jours, ce mois, cette année…</em> — plutôt qu'une plage figée dans le passé.
+            </span>
+          </span>
+        </div>
+        <div class="tch-table-tools">
+          <div class="pip-metric-toggle tch-metric-toggle" id="tch-metric-toggle">
+            <button class="active" data-metric="mean">Moyenne</button>
+            <button data-metric="median">Médiane</button>
+            <button data-metric="trimmed">Moy. tronquée</button>
+          </div>
+          <div class="pip-trim-wrapper pip-hidden" id="tch-trim-wrap">
+            <label for="tch-trim-input">Exclure :</label>
+            <input type="number" id="tch-trim-input" value="10" min="0" max="49">
+            <span style="font-size:11px;color:var(--grey);">%</span>
+          </div>
+          <button class="ov-voir-tous-btn" id="tch-voir-tous">Voir le classement complet →</button>
+        </div>
+      </div>
+<div class="tch-table-wrap">
+        <table class="tch-table">
+          <thead><tr class="tch-thead-row">
+            <th data-sort="name"    class="tch-th-name">Technicien<span class="tch-arrow"></span></th>
+            <th data-sort="interv"  class="tch-th-num">Interv.<span class="tch-arrow"></span></th>
+            <th data-sort="resolus" class="tch-th-num">Résolus<span class="tch-arrow"></span></th>
+            <th data-sort="res"     class="tch-th-num">Tps résol.<span class="tch-arrow"></span></th>
+            <th data-sort="eval"    class="tch-th-num">Éval.<span class="tch-arrow"></span></th>
+            <th data-sort="active"  class="tch-th-num">Tickets actifs<span class="tch-arrow"></span></th>
+            <th data-sort="shift"   class="tch-th-shift">Shift moy./jour
+              <span class="tch-info" tabindex="0" role="button" aria-label="Comment est calculé le shift moyen par jour">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor" stroke="none"/></svg>
+                <span class="tch-bubble">
+                  <strong>Temps moyen en service par jour travaillé</strong><br>
+                  Durée moyenne réellement passée en statut <em>« En service »</em> chaque jour, <u>pauses exclues</u>.
+                  Seuls les jours avec une prise de service sont comptés — week-ends, congés, jours fériés et maladie sont ignorés.
+                  La 2ᵉ ligne indique l'heure moyenne de <em>début</em> et de <em>fin</em> de service.
+                </span>
+              </span>
+              <span class="tch-arrow"></span>
+            </th>
+            <th data-sort="reports" class="tch-th-num">Rapp. manq.<span class="tch-arrow"></span></th>
+          </tr></thead>
+          <tbody id="tch-table-tbody"></tbody>
+        </table>
+      </div>
+      <div class="tch-table-foot" id="tch-table-foot"></div>
+    </div>
+
+  </div><!-- end panel-techniciens -->
+
+  <!-- ============================================================
+       MODAL — CLASSEMENT COMPLET
+       Reuses .ov-modal-overlay / .ov-modal design from overview.
+       ============================================================ -->
+  <div class="ov-modal-overlay" id="tch-modal-overlay">
+    <div class="ov-modal">
+      <div class="ov-modal-head">
+        <h3>Classement complet des techniciens</h3>
+        <button class="ov-modal-close" id="tch-modal-close" title="Fermer">&#x2715;</button>
+      </div>
+      <div class="ov-modal-filters">
+        <input type="text" id="tch-modal-search" class="tch-modal-search" placeholder="Rechercher un technicien…" autocomplete="off">
+      </div>
+      <div class="ov-modal-body">
+        <table class="tch-table tch-table-modal" style="min-width:760px">
+          <thead><tr class="tch-thead-row tch-thead-modal">
+            <th data-sort="name"    class="tch-th-name">Technicien<span class="tch-arrow"></span></th>
+            <th data-sort="interv"  class="tch-th-num">Interv.<span class="tch-arrow"></span></th>
+            <th data-sort="resolus" class="tch-th-num">Résolus<span class="tch-arrow"></span></th>
+            <th data-sort="res"     class="tch-th-num">Tps résol.<span class="tch-arrow"></span></th>
+            <th data-sort="eval"    class="tch-th-num">Éval.<span class="tch-arrow"></span></th>
+            <th data-sort="active"  class="tch-th-num">Tickets actifs<span class="tch-arrow"></span></th>
+            <th data-sort="shift"   class="tch-th-shift">Shift moy./jour<span class="tch-arrow"></span></th>
+            <th data-sort="reports" class="tch-th-num">Rapp. manq.<span class="tch-arrow"></span></th>
+          </tr></thead>
+          <tbody id="tch-modal-tbody"></tbody>
+        </table>
+      </div>
+      <div class="ov-modal-footer" id="tch-modal-foot"></div>
+    </div>
+  </div>
+
+<style>
+/* ===== Techniciens tab — KPI cards ===== */
+#panel-techniciens .tch-kpi-row{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:var(--space-4);margin-bottom:var(--space-4);
+}
+#panel-techniciens .tch-kpi{
+  background:var(--white);border:1px solid var(--light-grey);
+  border-radius:var(--radius-lg);box-shadow:var(--shadow-card);
+  padding:16px 18px;display:flex;flex-direction:column;gap:5px;min-height:116px;
+}
+#panel-techniciens .tch-kpi-top{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+#panel-techniciens .tch-kpi-label{
+  font-size:12px;font-weight:600;color:var(--grey-soft);line-height:1.3;
+}
+#panel-techniciens .tch-kpi-val{
+  font-size:28px;font-weight:700;color:var(--ink);
+  letter-spacing:-0.5px;line-height:1;margin-top:2px;
+}
+#panel-techniciens .tch-kpi-sub{
+  font-size:11px;color:var(--light-slate);font-weight:500;
+}
+#panel-techniciens .tch-kpi-detail{
+  display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:4px;
+}
+#panel-techniciens .tch-detail-chip{
+  font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;
+}
+#panel-techniciens .tch-chip-neutral{background:var(--off-white);color:var(--grey-soft);}
+#panel-techniciens .tch-chip-pause{background:#FFF8E6;color:#B45309;}
+#panel-techniciens .tch-chip-hors{background:#FEF2F2;color:#B91C1C;}
+
+@media(max-width:900px){
+  #panel-techniciens .tch-kpi-row{grid-template-columns:repeat(2,1fr);}
+}
+
+/* ===== Classement multi-critères table ===== */
+.tch-table-card{width:100%;max-width:1120px;}
+.tch-table-card .tch-table-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.tch-metric-toggle button{font-size:11px;padding:4px 9px;}
+
+
+.tch-table-wrap{overflow-x:auto;}
+.tch-table{width:100%;border-collapse:collapse;font-size:13px;}
+.tch-table thead th{
+  text-align:right;font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;
+  color:var(--grey-soft);padding:6px 11px 12px;border-bottom:1px solid var(--light-grey);
+  white-space:nowrap;cursor:pointer;user-select:none;transition:color var(--transition);
+}
+.tch-table thead th.tch-th-name{text-align:left;}
+.tch-table thead th.tch-th-shift{text-align:right;}
+.tch-table thead th:hover{color:var(--primary);}
+.tch-table thead th.is-sorted{color:var(--primary);}
+.tch-table .tch-arrow{display:inline-block;width:10px;margin-left:3px;font-size:10px;color:var(--light-grey);}
+.tch-table thead th:hover .tch-arrow{color:var(--primary);}
+.tch-table thead th.is-sorted .tch-arrow{color:var(--primary);}
+
+.tch-table tbody td{padding:10px 11px;border-bottom:1px solid var(--off-white);text-align:right;color:var(--grey);white-space:nowrap;vertical-align:middle;}
+.tch-table tbody tr:last-child td{border-bottom:none;}
+.tch-table tbody tr:hover{background:rgba(74,127,181,0.04);}
+
+/* Summary (team central-tendency) row — visually separated */
+.tch-table tbody tr.tch-summary-row{background:linear-gradient(0deg,rgba(74,127,181,0.06),rgba(74,127,181,0.06));}
+.tch-table tbody tr.tch-summary-row:hover{background:rgba(74,127,181,0.09);}
+.tch-table tbody tr.tch-summary-row td{border-bottom:2px solid var(--light-grey);font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
+.tch-summary-label{text-align:left;display:flex !important;align-items:center;gap:10px;}
+.tch-summary-icon{flex-shrink:0;width:26px;height:26px;border-radius:7px;background:var(--primary);color:#fff;
+  font-size:14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;}
+.tch-summary-title{display:block;font-weight:700;color:var(--ink);font-size:12.5px;}
+.tch-summary-sub{display:block;font-size:10px;font-weight:500;color:var(--light-slate);text-transform:uppercase;letter-spacing:0.4px;}
+
+/* Name cell with rank + avatar + dispo dot */
+.tch-table td.tch-c-name{text-align:left;display:flex;align-items:center;gap:10px;}
+.tch-rank{flex-shrink:0;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;background:var(--off-white);color:var(--grey-soft);}
+.tch-rank-1{background:#FEF3C7;color:#B45309;}
+.tch-rank-2{background:#E5E7EB;color:#4B5563;}
+.tch-rank-3{background:#FCE7D9;color:#B45309;}
+.tch-avatar{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--primary);color:#fff;
+  font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;letter-spacing:0.3px;}
+.tch-name{font-weight:600;color:var(--ink);}
+.tch-dot{flex-shrink:0;width:8px;height:8px;border-radius:50%;display:inline-block;}
+.tch-muted{color:var(--light-slate);}
+.tch-rep-warn{font-weight:700;color:#B91C1C;}
+
+/* Shift cell (two lines) */
+.tch-table td.tch-c-shift{text-align:right;line-height:1.35;}
+.tch-shift-main{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;}
+.tch-shift-sub{font-size:11px;color:var(--light-slate);font-variant-numeric:tabular-nums;}
+
+.tch-table-foot{font-size:12px;color:var(--light-slate);padding:12px 14px 2px;font-weight:500;}
+
+/* Info icon + bubble (Shift header + card title) */
+.tch-info{position:relative;display:inline-flex;align-items:center;justify-content:center;
+  width:14px;height:14px;color:var(--light-slate);cursor:help;margin:0 2px 0 5px;vertical-align:middle;}
+.tch-info svg{width:14px;height:14px;}
+.tch-info:hover,.tch-info:focus{color:var(--primary);outline:none;}
+.tch-info .tch-bubble{
+  display:none;position:absolute;top:160%;right:-8px;width:280px;
+  background:var(--ink);color:#fff;font-size:11.5px;font-weight:400;line-height:1.55;
+  padding:11px 13px;border-radius:9px;box-shadow:var(--shadow-popup);z-index:60;
+  text-transform:none;letter-spacing:normal;text-align:left;white-space:normal;
+}
+.tch-info .tch-bubble strong{color:#fff;font-weight:700;}
+.tch-info .tch-bubble em{color:#A9C7E8;font-style:normal;font-weight:600;}
+.tch-info .tch-bubble::after{content:"";position:absolute;bottom:100%;right:12px;border:6px solid transparent;border-bottom-color:var(--ink);}
+.tch-info:hover .tch-bubble,.tch-info:focus .tch-bubble{display:block;}
+/* Title bubble — wider, anchored left instead of right */
+.tch-title-info{width:16px;height:16px;margin-left:7px;}
+.tch-title-info svg{width:16px;height:16px;}
+.tch-bubble-title{width:320px;right:auto;left:-8px;}
+.tch-bubble-title::after{right:auto;left:12px;}
+
+/* Modal search */
+.tch-modal-search{width:100%;max-width:320px;padding:8px 12px;border:1px solid var(--light-grey);
+  border-radius:var(--radius-md);font-size:13px;color:var(--grey);}
+.tch-modal-search:focus{border-color:var(--primary);}
+.tch-table-modal td.tch-c-name{gap:9px;}
+
+@media(max-width:900px){
+  .tch-table-card{max-width:100%;}
+}
+</style>

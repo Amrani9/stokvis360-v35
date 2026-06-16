@@ -1,0 +1,6572 @@
+{
+  "counters": {
+    "ticket": 1034,
+    "client": 4,
+    "technicien": 11
+  },
+  "catalogue": {
+    "hierarchy": {
+      "agri": [
+        "john_deere"
+      ],
+      "btp": [
+        "komatsu"
+      ],
+      "bull": [
+        "d155"
+      ],
+      "d155": [],
+      "excav": [
+        "pc200",
+        "pc360",
+        "hb365"
+      ],
+      "hb365": [],
+      "john_deere": [
+        "tract"
+      ],
+      "jp90": [],
+      "komatsu": [
+        "excav",
+        "bull"
+      ],
+      "node_1781224899358_5poru": [
+        "node_1781224994747_mc3s1"
+      ],
+      "node_1781224994747_mc3s1": [
+        "node_1781225014717_554hh"
+      ],
+      "node_1781225014717_554hh": [
+        "node_1781556720902_9vrfi",
+        "node_1781225025090_0766m"
+      ],
+      "node_1781225025090_0766m": [],
+      "pc200": [],
+      "pc360": [],
+      "root": [
+        "node_1781224899358_5poru",
+        "btp",
+        "agri"
+      ],
+      "tract": [
+        "jp90"
+      ],
+      "node_1781556720902_9vrfi": []
+    },
+    "nodes": {
+      "agri": {
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [],
+        "level": 1,
+        "name": "AGRI",
+        "pannes": [
+          {
+            "label": "Autre problème",
+            "required": false,
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "root",
+        "spareParts": []
+      },
+      "btp": {
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [
+          {
+            "id": "idx_1",
+            "name": "Heure d'utilisation",
+            "unit": "Hr"
+          }
+        ],
+        "level": 1,
+        "name": "BTP",
+        "pannes": [
+          {
+            "label": "Autre problème",
+            "required": false,
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "root",
+        "spareParts": []
+      },
+      "bull": {
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [
+          {
+            "id": "idx_1",
+            "name": "Heure d'utilisation",
+            "unit": "Hr"
+          }
+        ],
+        "level": 3,
+        "name": "Bulldozers",
+        "pannes": [
+          {
+            "label": "Autre problème",
+            "required": false,
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "komatsu",
+        "spareParts": []
+      },
+      "d155": {
+        "complete": false,
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [
+          {
+            "id": "idx_1",
+            "name": "Heure d'utilisation",
+            "unit": "Hr"
+          }
+        ],
+        "level": 4,
+        "missing": [
+          "Manuel Constructeur"
+        ],
+        "name": "D155AX-8",
+        "pannes": [
+          {
+            "label": "Code d'erreur tableau de bord",
+            "required": false,
+            "type": "champ"
+          },
+          {
+            "label": "Fuite hydraulique",
+            "type": "panne"
+          },
+          {
+            "label": "Surchauffe moteur",
+            "type": "panne"
+          },
+          {
+            "label": "Défaillance du circuit électrique",
+            "type": "panne"
+          },
+          {
+            "label": "Bras cassé ou déformé",
+            "type": "panne"
+          },
+          {
+            "label": "Problème de chenilles",
+            "type": "panne"
+          },
+          {
+            "label": "Excès de vibrations anormales",
+            "type": "panne"
+          },
+          {
+            "label": "Autre problème",
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "bull",
+        "spareParts": []
+      },
+      "excav": {
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [],
+        "level": 3,
+        "name": "Excavateurs",
+        "pannes": [
+          {
+            "label": "Heures d'utilisation",
+            "required": true,
+            "system": false,
+            "type": "champ"
+          },
+          {
+            "label": "Code d'erreur tableau de bord",
+            "required": false,
+            "system": false,
+            "type": "champ"
+          },
+          {
+            "label": "Fuite hydraulique",
+            "required": false,
+            "system": false,
+            "type": "panne"
+          },
+          {
+            "label": "Surchauffe moteur",
+            "required": false,
+            "system": false,
+            "type": "panne"
+          },
+          {
+            "label": "Défaillance du circuit électrique",
+            "required": false,
+            "system": false,
+            "type": "panne"
+          },
+          {
+            "label": "Bras cassé ou déformé",
+            "required": false,
+            "system": false,
+            "type": "panne"
+          },
+          {
+            "label": "Problème de chenilles",
+            "required": false,
+            "system": false,
+            "type": "panne"
+          },
+          {
+            "label": "Excès de vibrations anormales",
+            "required": false,
+            "system": false,
+            "type": "panne"
+          },
+          {
+            "label": "Autre problème",
+            "required": false,
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "komatsu",
+        "spareParts": []
+      },
+      "hb365": {
+        "complete": false,
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [
+          {
+            "id": "idx_1",
+            "name": "Heure d'utilisation",
+            "unit": "Hr"
+          }
+        ],
+        "level": 4,
+        "missing": [
+          "Manuel Constructeur"
+        ],
+        "name": "HB365-3",
+        "pannes": [
+          {
+            "label": "Code d'erreur tableau de bord",
+            "required": false,
+            "type": "champ"
+          },
+          {
+            "label": "Fuite hydraulique",
+            "type": "panne"
+          },
+          {
+            "label": "Surchauffe moteur",
+            "type": "panne"
+          },
+          {
+            "label": "Défaillance du circuit électrique",
+            "type": "panne"
+          },
+          {
+            "label": "Bras cassé ou déformé",
+            "type": "panne"
+          },
+          {
+            "label": "Problème de chenilles",
+            "type": "panne"
+          },
+          {
+            "label": "Excès de vibrations anormales",
+            "type": "panne"
+          },
+          {
+            "label": "Autre problème",
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "excav",
+        "spareParts": []
+      },
+      "john_deere": {
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [],
+        "level": 2,
+        "name": "John Deere",
+        "pannes": [
+          {
+            "label": "Autre problème",
+            "required": false,
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "agri",
+        "spareParts": []
+      },
+      "jp90": {
+        "complete": false,
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [
+          {
+            "id": "idx_4",
+            "name": "Heure d'utilisation",
+            "unit": "Hr"
+          }
+        ],
+        "level": 4,
+        "missing": [
+          "Manuel Constructeur"
+        ],
+        "name": "JP90",
+        "pannes": [
+          {
+            "label": "Problème de démarrage",
+            "type": "panne"
+          },
+          {
+            "label": "Perte de puissance moteur",
+            "type": "panne"
+          },
+          {
+            "label": "Surchauffe",
+            "type": "panne"
+          },
+          {
+            "label": "Problème de transmission",
+            "type": "panne"
+          },
+          {
+            "label": "Défaillance hydraulique direction",
+            "type": "panne"
+          },
+          {
+            "label": "Autre problème",
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "tract",
+        "spareParts": []
+      },
+      "komatsu": {
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [],
+        "level": 2,
+        "name": "Komatsu",
+        "pannes": [
+          {
+            "label": "Autre problème",
+            "required": false,
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "btp",
+        "spareParts": []
+      },
+      "node_1781224899358_5poru": {
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [],
+        "level": 1,
+        "name": "STOKVIS INDUSTRIES",
+        "pannes": [
+          {
+            "label": "Autre problème",
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "root",
+        "spareParts": []
+      },
+      "node_1781224994747_mc3s1": {
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [],
+        "level": 2,
+        "name": "Heli",
+        "pannes": [
+          {
+            "label": "Autre problème",
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "node_1781224899358_5poru",
+        "spareParts": []
+      },
+      "node_1781225014717_554hh": {
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [],
+        "level": 3,
+        "name": "Chariot élévateur",
+        "pannes": [
+          {
+            "label": "Autre problème",
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "node_1781224994747_mc3s1",
+        "spareParts": []
+      },
+      "node_1781225025090_0766m": {
+        "complete": true,
+        "docs": {
+          "custom": [
+            {
+              "fn": "h4-cpd15-38.pdf",
+              "id": "cdoc_1781225356936",
+              "name": "Brochure Constructeur",
+              "url": "/static/uploads/f5d7851444eb45.pdf"
+            }
+          ],
+          "lien": {
+            "ok": true,
+            "url": "https://helieurope.eu/catalogue/chariots-elevateurs/chariots-elevateurs-electriques/h4-1-5-3-8t/"
+          },
+          "manuel": {
+            "fn": "Heli CPCD15-CPCD16 Forklift Truck with Engine Service & Operation Manual.pdf",
+            "ok": true,
+            "url": "/static/uploads/082f4aef149b4a.pdf"
+          }
+        },
+        "indices": [
+          {
+            "id": "idx_1781225701249ybuon",
+            "name": "Heure d'utilisation",
+            "unit": "Hr"
+          }
+        ],
+        "level": 4,
+        "missing": [],
+        "name": "CPD 15-38",
+        "pannes": [
+          {
+            "label": "Code d'erreur tableau de bord",
+            "required": false,
+            "type": "champ"
+          },
+          {
+            "label": "Moteur / Démarrage",
+            "type": "panne"
+          },
+          {
+            "label": "Système hydraulique",
+            "type": "panne"
+          },
+          {
+            "label": "Transmission / Boîte de vitesses",
+            "type": "panne"
+          },
+          {
+            "label": "Système électrique / Batterie",
+            "type": "panne"
+          },
+          {
+            "label": "Autre problème",
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "node_1781225014717_554hh",
+        "spareParts": [
+          {
+            "id": "sp_1781258494861_s4nhk",
+            "name": "Transmission Filters",
+            "num": "456456616"
+          },
+          {
+            "id": "sp_1781258687635_wcuz0",
+            "name": "Air Filters",
+            "num": "422482614824"
+          },
+          {
+            "id": "sp_1781258726003_d8zjq",
+            "name": "Hydraulic Filters",
+            "num": "456484218411"
+          },
+          {
+            "id": "sp_1781258759249_g3hm1",
+            "name": "Water Filters",
+            "num": "18982922846"
+          },
+          {
+            "id": "sp_1781258781426_l3df9",
+            "name": "Oil Filters",
+            "num": "7578646465"
+          },
+          {
+            "id": "sp_1781258842700_tcr62",
+            "name": "Fuel Filters",
+            "num": "4548555"
+          },
+          {
+            "id": "sp_1781462127440_39spk",
+            "name": "Transmission Filters 2",
+            "num": "4564566166"
+          },
+          {
+            "id": "sp_1781462127440_9wl36",
+            "name": "Air Filters 2",
+            "num": "75174175478"
+          },
+          {
+            "id": "sp_1781462127440_gmapg",
+            "name": "Hydraulic Filters 2",
+            "num": "566561898"
+          },
+          {
+            "id": "sp_1781462127440_k7fff",
+            "name": "Oil Filters 2",
+            "num": "75786464656"
+          },
+          {
+            "id": "sp_1781462127440_t4otu",
+            "name": "Soil Filter",
+            "num": "45646665"
+          }
+        ]
+      },
+      "pc200": {
+        "complete": false,
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [
+          {
+            "id": "idx_1",
+            "name": "Heure d'utilisation",
+            "unit": "Hr"
+          },
+          {
+            "id": "idx_17810976127990p44g",
+            "name": "Nombre de Cycle",
+            "unit": "N° Cycle"
+          }
+        ],
+        "level": 4,
+        "missing": [
+          "Manuel Constructeur"
+        ],
+        "name": "PC200-10M0",
+        "pannes": [
+          {
+            "label": "Code d'erreur tableau de bord",
+            "required": false,
+            "type": "champ"
+          },
+          {
+            "label": "Fuite hydraulique",
+            "type": "panne"
+          },
+          {
+            "label": "Surchauffe moteur",
+            "type": "panne"
+          },
+          {
+            "label": "Défaillance du circuit électrique",
+            "type": "panne"
+          },
+          {
+            "label": "Bras cassé ou déformé",
+            "type": "panne"
+          },
+          {
+            "label": "Problème de chenilles",
+            "type": "panne"
+          },
+          {
+            "label": "Excès de vibrations anormales",
+            "type": "panne"
+          },
+          {
+            "label": "Autre problème",
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "excav",
+        "spareParts": []
+      },
+      "pc360": {
+        "complete": false,
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [
+          {
+            "id": "idx_1",
+            "name": "Heure d'utilisation",
+            "unit": "Hr"
+          }
+        ],
+        "level": 4,
+        "missing": [
+          "Manuel Constructeur"
+        ],
+        "name": "PC360-11",
+        "pannes": [
+          {
+            "label": "Code d'erreur tableau de bord",
+            "required": false,
+            "type": "champ"
+          },
+          {
+            "label": "Fuite hydraulique",
+            "type": "panne"
+          },
+          {
+            "label": "Surchauffe moteur",
+            "type": "panne"
+          },
+          {
+            "label": "Défaillance du circuit électrique",
+            "type": "panne"
+          },
+          {
+            "label": "Bras cassé ou déformé",
+            "type": "panne"
+          },
+          {
+            "label": "Problème de chenilles",
+            "type": "panne"
+          },
+          {
+            "label": "Excès de vibrations anormales",
+            "type": "panne"
+          },
+          {
+            "label": "Autre problème",
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "excav",
+        "spareParts": []
+      },
+      "tract": {
+        "docs": {
+          "custom": [],
+          "lien": {
+            "ok": false
+          },
+          "manuel": {
+            "ok": false
+          }
+        },
+        "indices": [],
+        "level": 3,
+        "name": "Tracteurs",
+        "pannes": [
+          {
+            "label": "Autre problème",
+            "required": false,
+            "system": true,
+            "type": "panne"
+          }
+        ],
+        "parent": "john_deere",
+        "spareParts": []
+      },
+      "node_1781556720902_9vrfi": {
+        "level": 4,
+        "name": "CPD 08-12 SQ",
+        "parent": "node_1781225014717_554hh",
+        "pannes": [
+          {
+            "type": "champ",
+            "label": "Code d'erreur tableau de bord",
+            "required": false
+          },
+          {
+            "type": "panne",
+            "label": "Moteur / Démarrage"
+          },
+          {
+            "type": "panne",
+            "label": "Système hydraulique"
+          },
+          {
+            "type": "panne",
+            "label": "Transmission / Boîte de vitesses"
+          },
+          {
+            "type": "panne",
+            "label": "Système électrique / Batterie"
+          },
+          {
+            "type": "panne",
+            "label": "Autre problème",
+            "system": true
+          }
+        ],
+        "docs": {
+          "manuel": {
+            "ok": false
+          },
+          "lien": {
+            "ok": false
+          },
+          "custom": []
+        },
+        "indices": [
+          {
+            "id": "idx_1781225701249ybuon",
+            "name": "Heure d'utilisation",
+            "unit": "Hr"
+          }
+        ],
+        "missing": [
+          "Manuel Constructeur"
+        ],
+        "complete": false
+      }
+    }
+  },
+  "clients": [
+    {
+      "id": "C-0001",
+      "raison_sociale": "Somaca SA",
+      "contact_prenom": "Younes",
+      "telephone": "05 22 67 89 10",
+      "email": "contact@somaca.ma",
+      "password": "Somaca@2024",
+      "archived": false
+    },
+    {
+      "id": "C-0002",
+      "raison_sociale": "Renault Maroc",
+      "contact_prenom": "Salma",
+      "telephone": "05 22 43 21 00",
+      "email": "sav@renault.ma",
+      "password": "Renault#2024",
+      "archived": false
+    },
+    {
+      "id": "C-0003",
+      "raison_sociale": "OCP",
+      "contact_prenom": "Réda",
+      "telephone": "05 23 30 11 22",
+      "email": "maintenance@ocpgroup.ma",
+      "password": "OCP@2024",
+      "archived": false
+    },
+    {
+      "id": "C-0004",
+      "raison_sociale": "TGCC",
+      "contact_prenom": "Mohamed",
+      "telephone": "0699481562",
+      "email": "b.mohamed@tgcc.ma",
+      "password": "Mohamed",
+      "archived": false
+    }
+  ],
+  "techniciens": [
+    {
+      "id": "TECH-0001",
+      "prenom": "Yassine",
+      "nom": "Benali",
+      "telephone": "06 11 22 33 44",
+      "email": "y.benali@stokvis.ma",
+      "password": "Yassine@2024",
+      "disponibilite": "En service",
+      "archived": false,
+      "shift_log": []
+    },
+    {
+      "id": "TECH-0002",
+      "prenom": "Karim",
+      "nom": "Safir",
+      "telephone": "06 22 33 44 55",
+      "email": "k.safir@stokvis.ma",
+      "password": "KarimPass!9",
+      "disponibilite": "En pause",
+      "archived": false,
+      "shift_log": []
+    },
+    {
+      "id": "TECH-0003",
+      "prenom": "Ahmed",
+      "nom": "Tahiri",
+      "telephone": "06 80 90 77 77",
+      "email": "a.tahiri@stokvis.ma",
+      "password": "Ahmed2024",
+      "disponibilite": "En service",
+      "archived": false,
+      "shift_log": []
+    },
+    {
+      "id": "TECH-0004",
+      "prenom": "Fatima",
+      "nom": "El Idrissi",
+      "telephone": "06 44 55 66 77",
+      "email": "f.elidrissi@stokvis.ma",
+      "password": "Fatima#2024",
+      "disponibilite": "En service",
+      "archived": false,
+      "shift_log": []
+    },
+    {
+      "id": "TECH-0005",
+      "prenom": "Omar",
+      "nom": "Cherkaoui",
+      "telephone": "06 33 22 11 00",
+      "email": "o.cherkaoui@stokvis.ma",
+      "password": "OmarC2024",
+      "disponibilite": "Hors service",
+      "archived": false,
+      "shift_log": []
+    },
+    {
+      "id": "TECH-0006",
+      "prenom": "Nadia",
+      "nom": "Berrada",
+      "telephone": "06 77 88 99 11",
+      "email": "n.berrada@stokvis.ma",
+      "password": "Nadia@123",
+      "disponibilite": "En service",
+      "archived": false,
+      "shift_log": [
+        {
+          "from": "Hors service",
+          "to": "En service",
+          "at": "2026-06-15T14:32:52"
+        }
+      ]
+    },
+    {
+      "id": "TECH-0007",
+      "prenom": "Mehdi",
+      "nom": "Alaoui",
+      "telephone": "06 12 34 56 78",
+      "email": "m.alaoui@stokvis.ma",
+      "password": "Mehdi2024!",
+      "disponibilite": "En pause",
+      "archived": false,
+      "shift_log": [
+        {
+          "from": "En service",
+          "to": "En pause",
+          "at": "2026-06-15T14:33:20"
+        }
+      ]
+    },
+    {
+      "id": "TECH-0008",
+      "prenom": "Sara",
+      "nom": "Bennani",
+      "telephone": "06 98 76 54 32",
+      "email": "s.bennani@stokvis.ma",
+      "password": "SaraB2024",
+      "disponibilite": "Archivé",
+      "archived": true,
+      "shift_log": []
+    },
+    {
+      "id": "TECH-0009",
+      "prenom": "Hamza",
+      "nom": "Fassi",
+      "telephone": "06 55 66 77 88",
+      "email": "h.fassi@stokvis.ma",
+      "password": "Hamza#9",
+      "disponibilite": "Archivé",
+      "archived": true,
+      "shift_log": []
+    },
+    {
+      "id": "TECH-0010",
+      "prenom": "amine",
+      "nom": "lamine",
+      "telephone": "07099552",
+      "email": "l@stokvis.com",
+      "password": "kkkkjh",
+      "disponibilite": "En service",
+      "archived": false,
+      "shift_log": []
+    },
+    {
+      "id": "TECH-0011",
+      "prenom": "Mehdi",
+      "nom": "Mdhi",
+      "telephone": "0678956234",
+      "email": "m.mdhi@stokvis.ma",
+      "password": "Mehdi Mdhi",
+      "disponibilite": "Hors service",
+      "archived": false,
+      "shift_log": []
+    }
+  ],
+  "parc": [
+    {
+      "instance_id": "PC200-10M0-01",
+      "assignation": "C-0001",
+      "node_id": "pc200",
+      "unit_seq": 1
+    },
+    {
+      "instance_id": "PC200-10M0-02",
+      "assignation": "C-0001",
+      "node_id": "pc200",
+      "unit_seq": 2
+    },
+    {
+      "instance_id": "PC360-11-01",
+      "assignation": "C-0003",
+      "node_id": "pc360",
+      "unit_seq": 1
+    },
+    {
+      "instance_id": "HB365-3-01",
+      "assignation": "C-0002",
+      "node_id": "hb365",
+      "unit_seq": 1
+    },
+    {
+      "instance_id": "D155AX-8-01",
+      "assignation": "En stock",
+      "node_id": "d155",
+      "unit_seq": 1
+    },
+    {
+      "instance_id": "D155AX-8-02",
+      "assignation": "Archivée",
+      "node_id": "d155",
+      "unit_seq": 2
+    },
+    {
+      "instance_id": "JP90-01",
+      "assignation": "C-0002",
+      "node_id": "jp90",
+      "unit_seq": 1
+    },
+    {
+      "instance_id": "JP90-02",
+      "assignation": "C-0003",
+      "node_id": "jp90",
+      "unit_seq": 2
+    },
+    {
+      "instance_id": "PC200-10M0-03",
+      "node_id": "pc200",
+      "assignation": "C-0002",
+      "unit_seq": 3
+    },
+    {
+      "instance_id": "PC200-10M0-04",
+      "node_id": "pc200",
+      "assignation": "C-0001",
+      "unit_seq": 4
+    },
+    {
+      "instance_id": "CPD 15-38-01",
+      "node_id": "node_1781225025090_0766m",
+      "assignation": "C-0004",
+      "unit_seq": 1
+    },
+    {
+      "instance_id": "CPD 08-12 SQ-01",
+      "node_id": "node_1781556720902_9vrfi",
+      "assignation": "C-0004",
+      "unit_seq": 1
+    }
+  ],
+  "tickets": [
+    {
+      "id": "T-1002",
+      "client_id": "C-0001",
+      "instance_id": "PC200-10M0-02",
+      "reference": "PC200-10M0",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Fuite hydraulique / Surchauffe moteur",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Heures d'utilisation",
+          "value": "1240"
+        },
+        {
+          "type": "champ",
+          "label": "Code d'erreur tableau de bord",
+          "value": ""
+        },
+        {
+          "type": "panne",
+          "label": "Fuite hydraulique",
+          "system": false,
+          "checked": true
+        },
+        {
+          "type": "panne",
+          "label": "Surchauffe moteur",
+          "system": false,
+          "checked": true
+        },
+        {
+          "type": "panne",
+          "label": "Défaillance du circuit électrique",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Bras cassé ou déformé",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Problème de chenilles",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Excès de vibrations anormales",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "system": true,
+          "checked": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "1240"
+        }
+      ],
+      "description": "La pelle perd de l'huile au niveau du vérin de flèche.",
+      "images": [],
+      "localisation": "https://maps.google.com/?q=33.5731,-7.5898",
+      "status": "Annulé",
+      "technicien_ids": [],
+      "created_at": "2026-06-01T14:30:00",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-01T14:30:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-09T23:07:16",
+          "actor": "Manager",
+          "unusual": false
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T13:48:05",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T13:48:36",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T13:55:33",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T13:55:48",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T13:55:51",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T13:57:50",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T14:14:17",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T14:17:19",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T14:34:29",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T14:35:07",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-11T14:39:43",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "Annulé",
+          "timestamp": "2026-06-12T03:22:31",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "cancellation": true
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": {
+        "raison": "Autre raison",
+        "commentaire": "",
+        "by_role": "manager",
+        "by_name": "Manager",
+        "by_id": "manager",
+        "at": "2026-06-12T03:22:31"
+      },
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-01T14:30:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-09T23:07:16"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T13:48:05"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T13:48:36"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T13:55:33"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T13:55:48"
+        },
+        {
+          "id": "m7",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T13:55:51"
+        },
+        {
+          "id": "m8",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T13:57:50"
+        },
+        {
+          "id": "m9",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T14:14:17"
+        },
+        {
+          "id": "m10",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T14:17:19"
+        },
+        {
+          "id": "m11",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T14:34:29"
+        },
+        {
+          "id": "m12",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T14:35:07"
+        },
+        {
+          "id": "m13",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En Réparation (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T14:39:43"
+        },
+        {
+          "id": "m14",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_cancel",
+          "color": "red",
+          "content": "Ticket annulé — Autre raison : (sans commentaire)",
+          "timestamp": "2026-06-12T03:22:31"
+        }
+      ],
+      "node_id": "pc200"
+    },
+    {
+      "id": "T-1005",
+      "client_id": "C-0002",
+      "instance_id": "JP90-01",
+      "reference": "JP90",
+      "pole": "AGRI",
+      "marque": "John Deere",
+      "categorie": "Tracteurs",
+      "titre": "Problème de démarrage",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Heures d'utilisation",
+          "value": "830"
+        },
+        {
+          "type": "panne",
+          "label": "Problème de démarrage",
+          "system": false,
+          "checked": true
+        },
+        {
+          "type": "panne",
+          "label": "Perte de puissance moteur",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Surchauffe",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Problème de transmission",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Défaillance hydraulique direction",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "system": true,
+          "checked": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "830"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "https://maps.google.com/?q=33.5731,-7.5898",
+      "status": "En route",
+      "technicien_ids": [
+        "TECH-0005"
+      ],
+      "created_at": "2026-06-03T08:15:00",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-03T08:15:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-09T23:07:14",
+          "actor": "Manager",
+          "unusual": false
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T13:48:12",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T13:49:07",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T13:56:31",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T13:56:37",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T13:56:41",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T14:03:54",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T14:04:04",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T14:05:20",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-11T14:40:13",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "En route",
+          "timestamp": "2026-06-15T14:32:22",
+          "actor": "Omar Cherkaoui",
+          "unusual": true,
+          "actor_id": "TECH-0005"
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-03T08:15:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-09T23:07:14"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T13:48:12"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T13:49:07"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T13:56:31"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T13:56:37"
+        },
+        {
+          "id": "m7",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T13:56:41"
+        },
+        {
+          "id": "m8",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T14:03:54"
+        },
+        {
+          "id": "m9",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T14:04:04"
+        },
+        {
+          "id": "m10",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T14:05:20"
+        },
+        {
+          "id": "m11",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En Réparation (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T14:40:13"
+        },
+        {
+          "id": "m12",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En route (par Omar Cherkaoui (Technicien))",
+          "timestamp": "2026-06-15T14:32:22"
+        }
+      ],
+      "node_id": "jp90"
+    },
+    {
+      "id": "T-1004",
+      "client_id": "C-0003",
+      "instance_id": "JP90-02",
+      "reference": "JP90",
+      "pole": "AGRI",
+      "marque": "John Deere",
+      "categorie": "Tracteurs",
+      "titre": "Perte de puissance moteur / Surchauffe",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Heures d'utilisation",
+          "value": "2100"
+        },
+        {
+          "type": "panne",
+          "label": "Problème de démarrage",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Perte de puissance moteur",
+          "system": false,
+          "checked": true
+        },
+        {
+          "type": "panne",
+          "label": "Surchauffe",
+          "system": false,
+          "checked": true
+        },
+        {
+          "type": "panne",
+          "label": "Problème de transmission",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Défaillance hydraulique direction",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "system": true,
+          "checked": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "2100"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "https://maps.google.com/?q=33.5731,-7.5898",
+      "status": "En route",
+      "technicien_ids": [
+        "TECH-0003"
+      ],
+      "created_at": "2026-06-02T16:00:00",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-02T16:00:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-02T20:00:00",
+          "actor": "Manager",
+          "unusual": false
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-11T03:28:44",
+          "actor": "Yassine Benali",
+          "unusual": false,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "En route",
+          "timestamp": "2026-06-11T04:06:00",
+          "actor": "Yassine Benali",
+          "unusual": false,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-11T04:06:02",
+          "actor": "Yassine Benali",
+          "unusual": false,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "En route",
+          "timestamp": "2026-06-11T13:49:34",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-02T16:00:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-02T20:00:00"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Attente pièce (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T03:28:44"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En route (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T04:06:00"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En Réparation (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T04:06:02"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En route (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T13:49:34"
+        }
+      ],
+      "node_id": "jp90"
+    },
+    {
+      "id": "T-1007",
+      "client_id": "C-0001",
+      "instance_id": "PC200-10M0-01",
+      "reference": "PC200-10M0",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Excès de vibrations anormales",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Heures d'utilisation",
+          "value": "560"
+        },
+        {
+          "type": "champ",
+          "label": "Code d'erreur tableau de bord",
+          "value": ""
+        },
+        {
+          "type": "panne",
+          "label": "Fuite hydraulique",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Surchauffe moteur",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Défaillance du circuit électrique",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Bras cassé ou déformé",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Problème de chenilles",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Excès de vibrations anormales",
+          "system": false,
+          "checked": true
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "system": true,
+          "checked": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "560"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "https://maps.google.com/?q=33.5731,-7.5898",
+      "status": "En Réparation",
+      "technicien_ids": [
+        "TECH-0007"
+      ],
+      "created_at": "2026-06-02T11:20:00",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-02T11:20:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-02T15:20:00",
+          "actor": "Manager",
+          "unusual": false
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-11T04:01:39",
+          "actor": "Fatima El Idrissi",
+          "unusual": false,
+          "actor_id": "TECH-0004"
+        },
+        {
+          "status": "Maintenance à distance",
+          "timestamp": "2026-06-11T04:01:48",
+          "actor": "Fatima El Idrissi",
+          "unusual": true,
+          "actor_id": "TECH-0004"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-13T00:17:44",
+          "actor": "Mehdi Alaoui",
+          "unusual": true,
+          "actor_id": "TECH-0007"
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-02T11:20:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-02T15:20:00"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Attente pièce (par Fatima El Idrissi (Technicien))",
+          "timestamp": "2026-06-11T04:01:39"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : Maintenance à distance (par Fatima El Idrissi (Technicien))",
+          "timestamp": "2026-06-11T04:01:48"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En Réparation (par Mehdi Alaoui (Technicien))",
+          "timestamp": "2026-06-13T00:17:44"
+        }
+      ],
+      "node_id": "pc200"
+    },
+    {
+      "id": "T-1008",
+      "client_id": "C-0002",
+      "instance_id": "HB365-3-01",
+      "reference": "HB365-3",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Autre problème",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "system": true,
+          "checked": true
+        }
+      ],
+      "usage_readings": [],
+      "description": "Bruit métallique non répertorié, pièce à commander.",
+      "images": [],
+      "localisation": "https://maps.google.com/?q=33.5731,-7.5898",
+      "status": "Terminé",
+      "technicien_ids": [
+        "TECH-0003"
+      ],
+      "created_at": "2026-05-29T10:00:00",
+      "resolution_time_ms": 1100563614,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-05-29T10:00:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-05-29T14:00:00",
+          "actor": "Manager",
+          "unusual": false
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-05-29T19:00:00",
+          "actor": "Ahmed Tahiri",
+          "unusual": false,
+          "actor_id": "TECH-0003"
+        },
+        {
+          "status": "Terminé",
+          "timestamp": "2026-06-11T03:42:43",
+          "actor": "Ahmed Tahiri",
+          "unusual": true,
+          "actor_id": "TECH-0003"
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-05-29T10:00:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-05-29T14:00:00"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Attente pièce (par Ahmed Tahiri (Technicien))",
+          "timestamp": "2026-05-29T19:00:00"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "green",
+          "content": "Statut mis à jour : Terminé (par Ahmed Tahiri (Technicien))",
+          "timestamp": "2026-06-11T03:42:43"
+        }
+      ],
+      "node_id": "hb365",
+      "termine_via": "terrain"
+    },
+    {
+      "id": "T-1010",
+      "client_id": "C-0003",
+      "instance_id": "PC360-11-01",
+      "reference": "PC360-11",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Fuite hydraulique",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Heures d'utilisation",
+          "value": "1500"
+        },
+        {
+          "type": "panne",
+          "label": "Fuite hydraulique",
+          "system": false,
+          "checked": true
+        },
+        {
+          "type": "panne",
+          "label": "Surchauffe moteur",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Bras cassé ou déformé",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "system": true,
+          "checked": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "1500"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "https://maps.google.com/?q=33.5731,-7.5898",
+      "status": "Maintenance à distance",
+      "technicien_ids": [
+        "TECH-0001"
+      ],
+      "created_at": "2026-06-03T07:30:00",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-03T07:30:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-03T11:30:00",
+          "actor": "Manager",
+          "unusual": false
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-03T16:30:00",
+          "actor": "Mehdi Alaoui",
+          "unusual": false,
+          "actor_id": "TECH-0007"
+        },
+        {
+          "status": "En route",
+          "timestamp": "2026-06-03T22:30:00",
+          "actor": "Mehdi Alaoui",
+          "unusual": false,
+          "actor_id": "TECH-0007"
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-11T14:40:07",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-11T14:52:06",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "Maintenance à distance",
+          "timestamp": "2026-06-12T19:15:04",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-03T07:30:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-03T11:30:00"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Attente pièce (par Mehdi Alaoui (Technicien))",
+          "timestamp": "2026-06-03T16:30:00"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En route (par Mehdi Alaoui (Technicien))",
+          "timestamp": "2026-06-03T22:30:00"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : Attente pièce (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T14:40:07"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En Réparation (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T14:52:06"
+        },
+        {
+          "id": "m7",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : Maintenance à distance (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-12T19:15:04"
+        }
+      ],
+      "node_id": "pc360"
+    },
+    {
+      "id": "T-1001",
+      "client_id": "C-0001",
+      "instance_id": "PC200-10M0-01",
+      "reference": "PC200-10M0",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Fuite hydraulique",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Heures d'utilisation",
+          "value": "1180"
+        },
+        {
+          "type": "champ",
+          "label": "Code d'erreur tableau de bord",
+          "value": "E-204"
+        },
+        {
+          "type": "panne",
+          "label": "Fuite hydraulique",
+          "system": false,
+          "checked": true
+        },
+        {
+          "type": "panne",
+          "label": "Surchauffe moteur",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Défaillance du circuit électrique",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Bras cassé ou déformé",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Problème de chenilles",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Excès de vibrations anormales",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "system": true,
+          "checked": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "1180"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "https://maps.google.com/?q=33.5731,-7.5898",
+      "status": "Terminé",
+      "technicien_ids": [
+        "TECH-0001"
+      ],
+      "created_at": "2026-06-02T10:15:00",
+      "resolution_time_ms": 755465820,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-02T10:15:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-02T14:15:00",
+          "actor": "Manager",
+          "unusual": false
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-02T19:15:00",
+          "actor": "Yassine Benali",
+          "unusual": false,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "En route",
+          "timestamp": "2026-06-03T01:15:00",
+          "actor": "Yassine Benali",
+          "unusual": false,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-03T08:15:00",
+          "actor": "Yassine Benali",
+          "unusual": false,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "Terminé",
+          "timestamp": "2026-06-11T04:06:05",
+          "actor": "Yassine Benali",
+          "unusual": false,
+          "actor_id": "TECH-0001"
+        }
+      ],
+      "report": {
+        "version": 2,
+        "titre_intervention": "Fuite hydraulique",
+        "situation": "dihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuih",
+        "travaux": "dihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuihdihbzihfiuhyzbfeuih",
+        "images": [
+          "/static/uploads/3cb1f4a4d76140.jpeg",
+          "/static/uploads/2505a1a9cf9a4b.jpeg",
+          "/static/uploads/8aac3124b33c46.jpeg"
+        ],
+        "submitted_by": "Yassine Benali",
+        "submitted_at": "2026-06-11T05:09:04"
+      },
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-02T10:15:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-02T14:15:00"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Attente pièce (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-02T19:15:00"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En route (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-03T01:15:00"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En Réparation (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-03T08:15:00"
+        },
+        {
+          "author_role": "client",
+          "author_name": "Somaca SA",
+          "type": "text",
+          "content": "Bonjour, à quelle heure prévoyez-vous d'intervenir ?",
+          "timestamp": "2026-06-02T13:00:00",
+          "id": "m6",
+          "author_id": "C-0001"
+        },
+        {
+          "author_role": "technicien",
+          "author_name": "Yassine Benali",
+          "type": "text",
+          "content": "Bonjour, je suis sur place, intervention en cours.",
+          "timestamp": "2026-06-02T13:20:00",
+          "id": "m7",
+          "author_id": "TECH-0001"
+        },
+        {
+          "id": "m8",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "green",
+          "content": "Statut mis à jour : Terminé (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T04:06:05"
+        },
+        {
+          "id": "m9",
+          "author_role": "technicien",
+          "author_name": "Yassine Benali",
+          "type": "pdf_card",
+          "color": "blue",
+          "content": "Rapport d'intervention · Version 1",
+          "version": 1,
+          "timestamp": "2026-06-11T04:14:45"
+        },
+        {
+          "id": "m10",
+          "author_role": "technicien",
+          "author_name": "Yassine Benali",
+          "type": "pdf_card",
+          "color": "blue",
+          "content": "Rapport d'intervention · Version 2",
+          "version": 2,
+          "timestamp": "2026-06-11T05:09:04"
+        },
+        {
+          "id": "m11",
+          "author_role": "manager",
+          "author_name": "Manager",
+          "type": "text",
+          "content": "hello",
+          "timestamp": "2026-06-11T16:35:03",
+          "author_id": "manager"
+        }
+      ],
+      "node_id": "pc200",
+      "termine_via": "terrain"
+    },
+    {
+      "id": "T-1012",
+      "client_id": "C-0003",
+      "instance_id": "PC360-11-01",
+      "reference": "PC360-11",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Autre problème",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Heures d'utilisation",
+          "value": ""
+        },
+        {
+          "type": "panne",
+          "label": "Fuite hydraulique",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Surchauffe moteur",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Bras cassé ou déformé",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "system": true,
+          "checked": true
+        }
+      ],
+      "usage_readings": [],
+      "description": "Mise à jour logicielle du calculateur à effectuer à distance.",
+      "images": [],
+      "localisation": "https://maps.google.com/?q=33.5731,-7.5898",
+      "status": "Terminé",
+      "technicien_ids": [
+        "TECH-0001"
+      ],
+      "created_at": "2026-06-02T16:30:00",
+      "resolution_time_ms": 685423526,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-02T16:30:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-02T20:30:00",
+          "actor": "Manager",
+          "unusual": false
+        },
+        {
+          "status": "Maintenance à distance",
+          "timestamp": "2026-06-03T01:30:00",
+          "actor": "Yassine Benali",
+          "unusual": false,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "Terminé",
+          "timestamp": "2026-06-10T14:53:43",
+          "actor": "Yassine Benali",
+          "unusual": false,
+          "actor_id": "TECH-0001"
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-02T16:30:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-02T20:30:00"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Maintenance à distance (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-03T01:30:00"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "green",
+          "content": "Statut mis à jour : Terminé (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-10T14:53:43"
+        }
+      ],
+      "node_id": "pc360",
+      "termine_via": "distance"
+    },
+    {
+      "id": "T-1003",
+      "client_id": "C-0002",
+      "instance_id": "JP90-01",
+      "reference": "JP90",
+      "pole": "AGRI",
+      "marque": "John Deere",
+      "categorie": "Tracteurs",
+      "titre": "Problème de transmission",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Heures d'utilisation",
+          "value": "1990"
+        },
+        {
+          "type": "panne",
+          "label": "Problème de démarrage",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Perte de puissance moteur",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Surchauffe",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Problème de transmission",
+          "system": false,
+          "checked": true
+        },
+        {
+          "type": "panne",
+          "label": "Défaillance hydraulique direction",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "system": true,
+          "checked": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "1990"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "https://maps.google.com/?q=33.5731,-7.5898",
+      "status": "Terminé",
+      "technicien_ids": [
+        "TECH-0002"
+      ],
+      "created_at": "2026-05-28T09:00:00",
+      "resolution_time_ms": 108000000,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-05-28T09:00:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-05-28T13:00:00",
+          "actor": "Manager",
+          "unusual": false
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-05-28T18:00:00",
+          "actor": "Karim Safir",
+          "unusual": false,
+          "actor_id": "TECH-0002"
+        },
+        {
+          "status": "En route",
+          "timestamp": "2026-05-29T00:00:00",
+          "actor": "Karim Safir",
+          "unusual": false,
+          "actor_id": "TECH-0002"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-05-29T07:00:00",
+          "actor": "Karim Safir",
+          "unusual": false,
+          "actor_id": "TECH-0002"
+        },
+        {
+          "status": "Terminé",
+          "timestamp": "2026-05-29T15:00:00",
+          "actor": "Karim Safir",
+          "unusual": false,
+          "actor_id": "TECH-0002"
+        }
+      ],
+      "report": {
+        "version": 1,
+        "titre_intervention": "Remplacement embrayage de transmission",
+        "situation": "Glissement de la transmission constaté en charge.",
+        "travaux": "Démontage du carter, remplacement du disque d'embrayage, essai en charge concluant.",
+        "images": [],
+        "submitted_by": "Karim Safir",
+        "submitted_at": "2026-05-29T12:00:00"
+      },
+      "evaluation": {
+        "note": 5,
+        "commentaire": "Intervention rapide et efficace, merci.",
+        "updated_at": "2026-05-29T15:00:00"
+      },
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-05-28T09:00:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-05-28T13:00:00"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Attente pièce (par Karim Safir (Technicien))",
+          "timestamp": "2026-05-28T18:00:00"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En route (par Karim Safir (Technicien))",
+          "timestamp": "2026-05-29T00:00:00"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En Réparation (par Karim Safir (Technicien))",
+          "timestamp": "2026-05-29T07:00:00"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "green",
+          "content": "Statut mis à jour : Terminé (par Karim Safir (Technicien))",
+          "timestamp": "2026-05-29T15:00:00"
+        }
+      ],
+      "node_id": "jp90",
+      "termine_via": "terrain"
+    },
+    {
+      "id": "T-1013",
+      "client_id": "C-0001",
+      "instance_id": "PC200-10M0-02",
+      "reference": "PC200-10M0",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Problème de chenilles",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Heures d'utilisation",
+          "value": "2230"
+        },
+        {
+          "type": "champ",
+          "label": "Code d'erreur tableau de bord",
+          "value": ""
+        },
+        {
+          "type": "panne",
+          "label": "Fuite hydraulique",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Surchauffe moteur",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Défaillance du circuit électrique",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Bras cassé ou déformé",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Problème de chenilles",
+          "system": false,
+          "checked": true
+        },
+        {
+          "type": "panne",
+          "label": "Excès de vibrations anormales",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "system": true,
+          "checked": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "2230"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "https://maps.google.com/?q=33.5731,-7.5898",
+      "status": "Terminé",
+      "technicien_ids": [],
+      "created_at": "2026-05-25T11:00:00",
+      "resolution_time_ms": 108000000,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-05-25T11:00:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-05-25T15:00:00",
+          "actor": "Manager",
+          "unusual": false
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-05-25T20:00:00",
+          "actor": "Ahmed Tahiri",
+          "unusual": false,
+          "actor_id": "TECH-0003"
+        },
+        {
+          "status": "En route",
+          "timestamp": "2026-05-26T02:00:00",
+          "actor": "Ahmed Tahiri",
+          "unusual": false,
+          "actor_id": "TECH-0003"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-05-26T09:00:00",
+          "actor": "Ahmed Tahiri",
+          "unusual": false,
+          "actor_id": "TECH-0003"
+        },
+        {
+          "status": "Terminé",
+          "timestamp": "2026-05-26T17:00:00",
+          "actor": "Ahmed Tahiri",
+          "unusual": false,
+          "actor_id": "TECH-0003"
+        }
+      ],
+      "report": {
+        "version": 1,
+        "titre_intervention": "Retension et alignement des chenilles",
+        "situation": "Chenille droite détendue, usure irrégulière.",
+        "travaux": "Retension hydraulique, contrôle des galets, graissage complet.",
+        "images": [],
+        "submitted_by": "Ahmed Tahiri",
+        "submitted_at": "2026-05-26T09:30:00"
+      },
+      "evaluation": {
+        "note": 2,
+        "commentaire": "",
+        "updated_at": "2026-06-10T15:19:59"
+      },
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-05-25T11:00:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-05-25T15:00:00"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Attente pièce (par Ahmed Tahiri (Technicien))",
+          "timestamp": "2026-05-25T20:00:00"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En route (par Ahmed Tahiri (Technicien))",
+          "timestamp": "2026-05-26T02:00:00"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En Réparation (par Ahmed Tahiri (Technicien))",
+          "timestamp": "2026-05-26T09:00:00"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "green",
+          "content": "Statut mis à jour : Terminé (par Ahmed Tahiri (Technicien))",
+          "timestamp": "2026-05-26T17:00:00"
+        },
+        {
+          "id": "m7",
+          "author_role": "client",
+          "author_name": "Client",
+          "type": "system_eval",
+          "color": "gold",
+          "content": "Évaluation reçue : 2/5 — (sans commentaire)",
+          "timestamp": "2026-06-10T15:19:59"
+        }
+      ],
+      "node_id": "pc200",
+      "termine_via": "terrain"
+    },
+    {
+      "id": "T-1014",
+      "client_id": "C-0003",
+      "instance_id": "PC360-11-01",
+      "reference": "PC360-11",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Surchauffe moteur",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Heures d'utilisation",
+          "value": "1760"
+        },
+        {
+          "type": "panne",
+          "label": "Fuite hydraulique",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Surchauffe moteur",
+          "system": false,
+          "checked": true
+        },
+        {
+          "type": "panne",
+          "label": "Bras cassé ou déformé",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "system": true,
+          "checked": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "1760"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "https://maps.google.com/?q=33.5731,-7.5898",
+      "status": "Terminé",
+      "technicien_ids": [
+        "TECH-0004"
+      ],
+      "created_at": "2026-05-26T10:15:00",
+      "resolution_time_ms": 108000000,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-05-26T10:15:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-05-26T14:15:00",
+          "actor": "Manager",
+          "unusual": false
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-05-26T19:15:00",
+          "actor": "Fatima El Idrissi",
+          "unusual": false,
+          "actor_id": "TECH-0004"
+        },
+        {
+          "status": "En route",
+          "timestamp": "2026-05-27T01:15:00",
+          "actor": "Fatima El Idrissi",
+          "unusual": false,
+          "actor_id": "TECH-0004"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-05-27T08:15:00",
+          "actor": "Fatima El Idrissi",
+          "unusual": false,
+          "actor_id": "TECH-0004"
+        },
+        {
+          "status": "Terminé",
+          "timestamp": "2026-05-27T16:15:00",
+          "actor": "Fatima El Idrissi",
+          "unusual": false,
+          "actor_id": "TECH-0004"
+        }
+      ],
+      "report": {
+        "version": 1,
+        "titre_intervention": "Surchauffe moteurdsqfqsdfqsdf",
+        "situation": "qdfqsdfqqsdfqsdfsqdfqsdf",
+        "travaux": "dqfqdfdqfdqsfqsdfqsdf",
+        "images": [
+          "/static/uploads/c58ebbea31774d.jpeg",
+          "/static/uploads/d1caff5addf44e.jpeg"
+        ],
+        "submitted_by": "Fatima El Idrissi",
+        "submitted_at": "2026-06-12T08:18:10"
+      },
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-05-26T10:15:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-05-26T14:15:00"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Attente pièce (par Fatima El Idrissi (Technicien))",
+          "timestamp": "2026-05-26T19:15:00"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En route (par Fatima El Idrissi (Technicien))",
+          "timestamp": "2026-05-27T01:15:00"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En Réparation (par Fatima El Idrissi (Technicien))",
+          "timestamp": "2026-05-27T08:15:00"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "green",
+          "content": "Statut mis à jour : Terminé (par Fatima El Idrissi (Technicien))",
+          "timestamp": "2026-05-27T16:15:00"
+        },
+        {
+          "id": "m7",
+          "author_role": "technicien",
+          "author_name": "Fatima El Idrissi",
+          "type": "pdf_card",
+          "color": "blue",
+          "content": "Rapport d'intervention · Version 1",
+          "version": 1,
+          "timestamp": "2026-06-12T08:18:10"
+        }
+      ],
+      "node_id": "pc360",
+      "termine_via": "terrain"
+    },
+    {
+      "id": "T-1015",
+      "client_id": "C-0001",
+      "instance_id": "PC200-10M0-01",
+      "reference": "PC200-10M0",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Autre problème",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Heures d'utilisation",
+          "value": ""
+        },
+        {
+          "type": "champ",
+          "label": "Code d'erreur tableau de bord",
+          "value": ""
+        },
+        {
+          "type": "panne",
+          "label": "Fuite hydraulique",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Surchauffe moteur",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Défaillance du circuit électrique",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Bras cassé ou déformé",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Problème de chenilles",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Excès de vibrations anormales",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "system": true,
+          "checked": true
+        }
+      ],
+      "usage_readings": [],
+      "description": "",
+      "images": [],
+      "localisation": "https://maps.google.com/?q=33.5731,-7.5898",
+      "status": "Annulé",
+      "technicien_ids": [],
+      "created_at": "2026-05-20T08:45:00",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-05-20T08:45:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Annulé",
+          "timestamp": "2026-05-20T10:45:00",
+          "actor": "Somaca SA",
+          "unusual": false,
+          "cancellation": true,
+          "actor_id": "C-0001",
+          "actor_type": "client"
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": {
+        "raison": "Problème résolu",
+        "commentaire": "Résolu en interne.",
+        "by_role": "client",
+        "by_name": "Somaca SA",
+        "at": "2026-05-20T10:45:00"
+      },
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-05-20T08:45:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_cancel",
+          "color": "red",
+          "content": "Ticket annulé — Problème résolu : Résolu en interne.",
+          "timestamp": "2026-05-20T10:45:00"
+        }
+      ],
+      "node_id": "pc200"
+    },
+    {
+      "id": "T-1016",
+      "client_id": "C-0002",
+      "instance_id": "JP90-01",
+      "reference": "JP90",
+      "pole": "AGRI",
+      "marque": "John Deere",
+      "categorie": "Tracteurs",
+      "titre": "Autre problème",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Heures d'utilisation",
+          "value": ""
+        },
+        {
+          "type": "panne",
+          "label": "Problème de démarrage",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Perte de puissance moteur",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Surchauffe",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Problème de transmission",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Défaillance hydraulique direction",
+          "system": false,
+          "checked": false
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "system": true,
+          "checked": true
+        }
+      ],
+      "usage_readings": [],
+      "description": "",
+      "images": [],
+      "localisation": "https://maps.google.com/?q=33.5731,-7.5898",
+      "status": "Annulé",
+      "technicien_ids": [],
+      "created_at": "2026-05-22T14:20:00",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-05-22T14:20:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Annulé",
+          "timestamp": "2026-05-22T16:20:00",
+          "actor": "Manager",
+          "unusual": false,
+          "cancellation": true
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": {
+        "raison": "Doublon",
+        "commentaire": "Doublon du T-1003.",
+        "by_role": "manager",
+        "by_name": "Manager",
+        "at": "2026-05-22T16:20:00"
+      },
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-05-22T14:20:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_cancel",
+          "color": "red",
+          "content": "Ticket annulé — Doublon : Doublon du T-1003.",
+          "timestamp": "2026-05-22T16:20:00"
+        }
+      ],
+      "node_id": "jp90"
+    },
+    {
+      "id": "T-1017",
+      "client_id": "C-0002",
+      "instance_id": "HB365-3-01",
+      "reference": "HB365-3",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Autre problème",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Code d'erreur tableau de bord",
+          "value": ""
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "checked": true,
+          "system": true
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "100"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "En Réparation",
+      "technicien_ids": [
+        "TECH-0001"
+      ],
+      "created_at": "2026-06-09T23:06:38",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-09T23:06:38",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-09T23:07:36",
+          "actor": "Manager",
+          "unusual": false
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T14:36:10",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T14:38:37",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-11T14:51:32",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-09T23:06:38"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-09T23:07:36"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T14:36:10"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T14:38:37"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En Réparation (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T14:51:32"
+        }
+      ],
+      "node_id": "hb365"
+    },
+    {
+      "id": "T-1018",
+      "client_id": "C-0001",
+      "instance_id": "PC200-10M0-04",
+      "node_id": "pc200",
+      "reference": "PC200-10M0",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Autre problème",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Code d'erreur tableau de bord",
+          "value": ""
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "checked": true,
+          "system": true
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "400"
+        },
+        {
+          "name": "Nombre de Cycle",
+          "unit": "N° Cycle",
+          "value": "6000"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Annulé",
+      "technicien_ids": [
+        "TECH-0004"
+      ],
+      "created_at": "2026-06-10T14:21:30",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-10T14:21:30",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-10T14:22:30",
+          "actor": "Manager",
+          "unusual": false
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-10T14:22:54",
+          "actor": "Fatima El Idrissi",
+          "unusual": false,
+          "actor_id": "TECH-0004"
+        },
+        {
+          "status": "Annulé",
+          "timestamp": "2026-06-10T14:55:14",
+          "actor": "Somaca SA",
+          "unusual": false,
+          "cancellation": true,
+          "actor_id": "C-0001",
+          "actor_type": "client"
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": {
+        "raison": "Autre raison",
+        "commentaire": "",
+        "by_role": "manager",
+        "by_name": "Somaca SA",
+        "at": "2026-06-10T14:55:14"
+      },
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-10T14:21:30"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-10T14:22:30"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Attente pièce (par Fatima El Idrissi (Technicien))",
+          "timestamp": "2026-06-10T14:22:54"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_cancel",
+          "color": "red",
+          "content": "Ticket annulé — Autre raison : (sans commentaire)",
+          "timestamp": "2026-06-10T14:55:14"
+        }
+      ]
+    },
+    {
+      "id": "T-1019",
+      "client_id": "C-0002",
+      "instance_id": "HB365-3-01",
+      "node_id": "hb365",
+      "reference": "HB365-3",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Autre problème",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "checked": true,
+          "system": true
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "5000"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Maintenance à distance",
+      "technicien_ids": [
+        "TECH-0004"
+      ],
+      "created_at": "2026-06-11T04:12:49",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T04:12:49",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T05:32:50",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-11T13:49:41",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-11T14:37:25",
+          "actor": "Ahmed Tahiri",
+          "unusual": true,
+          "actor_id": "TECH-0003"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-11T14:57:43",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-11T14:58:25",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-11T14:58:32",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-11T14:58:41",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-11T14:58:47",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "Maintenance à distance",
+          "timestamp": "2026-06-12T09:31:27",
+          "actor": "Fatima El Idrissi",
+          "unusual": true,
+          "actor_id": "TECH-0004"
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-11T04:12:49"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T05:32:50"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En Réparation (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T13:49:41"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : Attente pièce (par Ahmed Tahiri (Technicien))",
+          "timestamp": "2026-06-11T14:37:25"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En Réparation (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T14:57:43"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : Attente pièce (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T14:58:25"
+        },
+        {
+          "id": "m7",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En Réparation (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T14:58:32"
+        },
+        {
+          "id": "m8",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : Attente pièce (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T14:58:41"
+        },
+        {
+          "id": "m9",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En Réparation (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T14:58:47"
+        },
+        {
+          "id": "m10",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : Maintenance à distance (par Fatima El Idrissi (Technicien))",
+          "timestamp": "2026-06-12T09:31:27"
+        }
+      ]
+    },
+    {
+      "id": "T-1020",
+      "client_id": "C-0001",
+      "instance_id": "PC200-10M0-01",
+      "node_id": "pc200",
+      "reference": "PC200-10M0",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Autre problème",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "checked": true,
+          "system": true
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "9000"
+        },
+        {
+          "name": "Nombre de Cycle",
+          "unit": "N° Cycle",
+          "value": "500"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Attente pièce",
+      "technicien_ids": [
+        "TECH-0010"
+      ],
+      "created_at": "2026-06-11T04:18:38",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T04:18:38",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T04:18:57",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T14:17:34",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T14:17:47",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T14:35:49",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T14:38:42",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-11T14:51:50",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-11T14:51:58",
+          "actor": "Yassine Benali",
+          "unusual": true,
+          "actor_id": "TECH-0001"
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T09:55:33",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien ajouté : Fatima El Idrissi (Technicien)",
+          "assigned_to_ids": [
+            "TECH-0004"
+          ]
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T09:55:43",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien retiré : Fatima El Idrissi (Technicien)",
+          "assigned_to_ids": [
+            "TECH-0004"
+          ]
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-11T04:18:38"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T04:18:57"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T14:17:34"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T14:17:47"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T14:35:49"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T14:38:42"
+        },
+        {
+          "id": "m7",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En Réparation (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T14:51:50"
+        },
+        {
+          "id": "m8",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : Attente pièce (par Yassine Benali (Technicien))",
+          "timestamp": "2026-06-11T14:51:58"
+        },
+        {
+          "id": "m9",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien ajouté : amine lamine (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T08:18:38"
+        },
+        {
+          "id": "m10",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien ajouté : Fatima El Idrissi (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:55:33"
+        },
+        {
+          "id": "m11",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien retiré : Fatima El Idrissi (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:55:43"
+        }
+      ]
+    },
+    {
+      "id": "T-1021",
+      "client_id": "C-0001",
+      "instance_id": "PC200-10M0-02",
+      "node_id": "pc200",
+      "reference": "PC200-10M0",
+      "pole": "BTP",
+      "marque": "Komatsu",
+      "categorie": "Excavateurs",
+      "titre": "Problème de chenilles",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Problème de chenilles",
+          "checked": true,
+          "system": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "44"
+        },
+        {
+          "name": "Nombre de Cycle",
+          "unit": "N° Cycle",
+          "value": "300"
+        }
+      ],
+      "description": "",
+      "images": [
+        "/static/uploads/d5d5cbce165742.jpeg"
+      ],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Assigné",
+      "technicien_ids": [
+        "TECH-0006",
+        "TECH-0010"
+      ],
+      "created_at": "2026-06-11T05:01:14",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T05:01:14",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T13:45:44",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T13:45:50",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T13:45:59",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T13:46:03",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T13:48:46",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T14:34:53",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-11T14:38:49",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-11T15:01:06",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T08:18:58",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0006"
+          ]
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-14T19:42:58",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T19:42:58",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien retiré : Nadia Berrada (Technicien)"
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T19:43:01",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0006"
+          ]
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T20:51:28",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien ajouté : amine lamine (Technicien)",
+          "assigned_to_ids": [
+            "TECH-0010"
+          ]
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-11T05:01:14"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T13:45:44"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T13:45:50"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T13:45:59"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T13:46:03"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T13:48:46"
+        },
+        {
+          "id": "m7",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T14:34:53"
+        },
+        {
+          "id": "m8",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-11T14:38:49"
+        },
+        {
+          "id": "m9",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-11T15:01:06"
+        },
+        {
+          "id": "m10",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Nadia Berrada (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T08:18:58"
+        },
+        {
+          "id": "m11",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-14T19:42:58"
+        },
+        {
+          "id": "m12",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien retiré : Nadia Berrada (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T19:42:58"
+        },
+        {
+          "id": "m13",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Nadia Berrada (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T19:43:01"
+        },
+        {
+          "id": "m14",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien ajouté : amine lamine (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T20:51:28"
+        }
+      ]
+    },
+    {
+      "id": "T-1022",
+      "client_id": "C-0004",
+      "instance_id": "CPD 15-38-01",
+      "node_id": "node_1781225025090_0766m",
+      "reference": "CPD 15-38",
+      "pole": "STOKVIS INDUSTRIES",
+      "marque": "Heli",
+      "categorie": "Chariot élévateur",
+      "titre": "Moteur / Démarrage / Transmission / Boîte de vitesses",
+      "items": [
+        {
+          "type": "champ",
+          "label": "Code d'erreur tableau de bord",
+          "value": "CV900"
+        },
+        {
+          "type": "panne",
+          "label": "Moteur / Démarrage",
+          "checked": true,
+          "system": false
+        },
+        {
+          "type": "panne",
+          "label": "Transmission / Boîte de vitesses",
+          "checked": true,
+          "system": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "250"
+        }
+      ],
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec mollis urna. Morbi ut elit rhoncus, finibus sapien vel, aliquet risus. Proin viverra nisi ut tortor mattis, eleifend aliquam sem bibendum. Interdum et malesuada fames ac ante ipsum primis in faucibus. Cras finibus aliquam tellus vitae bibendum. Nam vehicula feugiat pretium. Suspendisse rutrum turpis augue, ac tincidunt velit dignissim sed. Praesent blandit leo sit amet tincidunt ultricies. Mauris ultricies erat ac mauris semper vulputate. Nulla ultrices metus ut tortor semper, at finibus quam hendrerit. Suspendisse potenti. Donec tristique volutpat imperdiet. Duis vitae blandit arcu. Curabitur diam erat, feugiat et justo at, dapibus congue dui. Etiam pretium porta semper.",
+      "images": [
+        "/static/uploads/f8f22acc05f044.jpeg",
+        "/static/uploads/3d3fc5ad907d4f.jpeg",
+        "/static/uploads/2e087be3211a43.jpeg",
+        "/static/uploads/22080ba4ec2b46.jpeg"
+      ],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Terminé",
+      "technicien_ids": [
+        "TECH-0011"
+      ],
+      "created_at": "2026-06-12T02:06:55",
+      "resolution_time_ms": 186609,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-12T02:06:55",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T02:07:57",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager"
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-12T02:09:40",
+          "actor": "Mehdi Mdhi",
+          "unusual": false,
+          "actor_id": "TECH-0011"
+        },
+        {
+          "status": "Maintenance à distance",
+          "timestamp": "2026-06-12T02:09:46",
+          "actor": "Mehdi Mdhi",
+          "unusual": true,
+          "actor_id": "TECH-0011"
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-12T02:09:51",
+          "actor": "Mehdi Mdhi",
+          "unusual": true,
+          "actor_id": "TECH-0011"
+        },
+        {
+          "status": "En route",
+          "timestamp": "2026-06-12T02:09:53",
+          "actor": "Mehdi Mdhi",
+          "unusual": false,
+          "actor_id": "TECH-0011"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-12T02:09:56",
+          "actor": "Mehdi Mdhi",
+          "unusual": false,
+          "actor_id": "TECH-0011"
+        },
+        {
+          "status": "Terminé",
+          "timestamp": "2026-06-12T02:10:01",
+          "actor": "Mehdi Mdhi",
+          "unusual": false,
+          "actor_id": "TECH-0011"
+        }
+      ],
+      "report": {
+        "version": 1,
+        "titre_intervention": "Moteur / Démarrage",
+        "situation": "Mauris congue tincidunt ex, ut maximus justo ullamcorper ac. Nulla viverra quis nulla vitae semper. Nullam nec lorem ullamcorper, ullamcorper purus et, tincidunt mauris. Praesent erat nunc, vulputate ac elit eu, maximus condimentum lacus. Morbi viverra lectus eros, id pellentesque metus volutpat a. Phasellus congue, purus et fringilla mattis, magna quam gravida orci, et vulputate lacus leo sed ligula. Suspendisse potenti. Etiam at leo a massa faucibus fermentum quis eget neque. Curabitur sem nisl, sagittis ac lectus eget, venenatis laoreet dolor. Quisque interdum facilisis scelerisque. Integer vehicula ornare velit, nec venenatis erat pulvinar vel. Maecenas gravida odio eget eros dapibus eleifend.",
+        "travaux": "Fusce hendrerit pellentesque leo non semper. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras congue nibh quis nisl rhoncus pulvinar. Donec pellentesque luctus massa in malesuada. Vestibulum a lacus eget ex malesuada eleifend et et nisl. Pellentesque convallis, nunc interdum faucibus molestie, nulla ante auctor erat, vitae imperdiet ipsum justo et metus. Donec felis massa, consequat nec felis sed, pharetra fermentum dui. Pellentesque elementum felis at quam malesuada dictum. Vivamus molestie et nisl in fringilla. Sed interdum quam lorem, sit amet efficitur est auctor et. Duis diam purus, vulputate ut velit ut, viverra venenatis nibh. Nullam pellentesque odio eget diam suscipit interdum. Ut felis metus, porttitor eu ipsum ac, dapibus ultricies ipsum.",
+        "images": [
+          "/static/uploads/2d16fc78317e4d.jpeg",
+          "/static/uploads/5fa1ad1b66234e.jpeg",
+          "/static/uploads/1addefa831de42.jpeg"
+        ],
+        "submitted_by": "Mehdi Mdhi",
+        "submitted_at": "2026-06-12T02:12:53"
+      },
+      "evaluation": {
+        "note": 4,
+        "commentaire": "Nulla mattis finibus neque, quis lacinia mauris facilisis at. Integer ut faucibus nibh. Pellentesque consequat rutrum egestas. Vestibulum id commodo felis. Suspendisse mollis, augue quis laoreet euismod, turpis ante varius tellus, pulvinar ultrices elit lorem id metus. In hac habitasse platea dictumst. Phasellus auctor justo dui, at efficitur purus aliquam id. Etiam a massa eu tellus aliquet tincidunt. Phasellus posuere nisi eget egestas imperdiet.",
+        "updated_at": "2026-06-12T02:28:29"
+      },
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-12T02:06:55"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T02:07:57"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Attente pièce (par Mehdi Mdhi (Technicien))",
+          "timestamp": "2026-06-12T02:09:40"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : Maintenance à distance (par Mehdi Mdhi (Technicien))",
+          "timestamp": "2026-06-12T02:09:46"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : Attente pièce (par Mehdi Mdhi (Technicien))",
+          "timestamp": "2026-06-12T02:09:51"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En route (par Mehdi Mdhi (Technicien))",
+          "timestamp": "2026-06-12T02:09:53"
+        },
+        {
+          "id": "m7",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En Réparation (par Mehdi Mdhi (Technicien))",
+          "timestamp": "2026-06-12T02:09:56"
+        },
+        {
+          "id": "m8",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "green",
+          "content": "Statut mis à jour : Terminé (par Mehdi Mdhi (Technicien))",
+          "timestamp": "2026-06-12T02:10:01"
+        },
+        {
+          "id": "m9",
+          "author_role": "technicien",
+          "author_name": "Mehdi Mdhi",
+          "type": "pdf_card",
+          "color": "blue",
+          "content": "Rapport d'intervention · Version 1",
+          "version": 1,
+          "timestamp": "2026-06-12T02:12:53"
+        },
+        {
+          "id": "m10",
+          "author_role": "technicien",
+          "author_name": "Mehdi Mdhi",
+          "type": "text",
+          "content": "Competitive Intelligence.pdf",
+          "timestamp": "2026-06-12T02:13:37",
+          "author_id": "TECH-0011",
+          "file_url": "/static/uploads/f036aae3e1b54a.pdf",
+          "file_name": "Competitive Intelligence.pdf",
+          "file_type": "file"
+        },
+        {
+          "id": "m11",
+          "author_role": "technicien",
+          "author_name": "Mehdi Mdhi",
+          "type": "text",
+          "content": "hello",
+          "timestamp": "2026-06-12T02:14:00",
+          "author_id": "TECH-0011"
+        },
+        {
+          "id": "m12",
+          "author_role": "technicien",
+          "author_name": "Mehdi Mdhi",
+          "type": "audio",
+          "content": "Mémo vocal",
+          "timestamp": "2026-06-12T02:14:49",
+          "author_id": "TECH-0011",
+          "file_url": "/static/uploads/19bffc549d744e.webm",
+          "file_name": "voice_1781226889126.webm",
+          "file_type": "audio"
+        },
+        {
+          "id": "m13",
+          "author_role": "manager",
+          "author_name": "Manager",
+          "type": "text",
+          "content": "good job",
+          "timestamp": "2026-06-12T02:23:08",
+          "author_id": "manager"
+        },
+        {
+          "id": "m14",
+          "author_role": "manager",
+          "author_name": "Manager",
+          "type": "text",
+          "content": "CDG-Invest-Confirmation-of-Extracurricular-Activites-Copy.png",
+          "timestamp": "2026-06-12T02:23:35",
+          "author_id": "manager",
+          "file_url": "/static/uploads/38150b4e697e41.png",
+          "file_name": "CDG-Invest-Confirmation-of-Extracurricular-Activites-Copy.png",
+          "file_type": "image"
+        },
+        {
+          "id": "m15",
+          "author_role": "manager",
+          "author_name": "Manager",
+          "type": "audio",
+          "content": "Mémo vocal",
+          "timestamp": "2026-06-12T02:23:48",
+          "author_id": "manager",
+          "file_url": "/static/uploads/5728f18f6cb743.webm",
+          "file_name": "voice_1781227428304.webm",
+          "file_type": "audio"
+        },
+        {
+          "id": "m16",
+          "author_role": "client",
+          "author_name": "Client",
+          "type": "system_eval",
+          "color": "gold",
+          "content": "Évaluation reçue : 5/5 — Donec placerat pellentesque lacus sed sollicitudin. Aenean eu mattis turpis, et pharetra arcu. Praesent pulvinar varius rutrum. Pellentesque sapien nulla, ullamcorper ac faucibus quis, auctor in eros. Quisque sed suscipit arcu. Aenean auctor eget diam consequat bibendum. Quisque id est sed lectus pulvinar consectetur feugiat eu augue. Cras posuere mi eu risus egestas, quis luctus tortor pharetra. Quisque eu tortor in augue dictum tincidunt.",
+          "timestamp": "2026-06-12T02:24:34"
+        },
+        {
+          "id": "m17",
+          "author_role": "client",
+          "author_name": "TGCC",
+          "type": "text",
+          "content": "job good",
+          "timestamp": "2026-06-12T02:24:43",
+          "author_id": "C-0004"
+        },
+        {
+          "id": "m18",
+          "author_role": "client",
+          "author_name": "Client",
+          "type": "system_eval",
+          "color": "gold",
+          "content": "Évaluation mise à jour : 4/5 — Nulla mattis finibus neque, quis lacinia mauris facilisis at. Integer ut faucibus nibh. Pellentesque consequat rutrum egestas. Vestibulum id commodo felis. Suspendisse mollis, augue quis laoreet euismod, turpis ante varius tellus, pulvinar ultrices elit lorem id metus. In hac habitasse platea dictumst. Phasellus auctor justo dui, at efficitur purus aliquam id. Etiam a massa eu tellus aliquet tincidunt. Phasellus posuere nisi eget egestas imperdiet.",
+          "timestamp": "2026-06-12T02:28:29"
+        }
+      ],
+      "termine_via": "distance"
+    },
+    {
+      "id": "T-1023",
+      "client_id": "C-0004",
+      "instance_id": "CPD 15-38-01",
+      "node_id": "node_1781225025090_0766m",
+      "reference": "CPD 15-38",
+      "pole": "STOKVIS INDUSTRIES",
+      "marque": "Heli",
+      "categorie": "Chariot élévateur",
+      "titre": "Moteur / Démarrage",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Moteur / Démarrage",
+          "checked": true,
+          "system": false
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "checked": true,
+          "system": true
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "300"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Annulé",
+      "technicien_ids": [],
+      "created_at": "2026-06-12T03:22:00",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-12T03:22:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Annulé",
+          "timestamp": "2026-06-12T03:22:20",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "cancellation": true
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": {
+        "raison": "Autre raison",
+        "commentaire": "",
+        "by_role": "manager",
+        "by_name": "Manager",
+        "by_id": "manager",
+        "at": "2026-06-12T03:22:20"
+      },
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-12T03:22:00"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_cancel",
+          "color": "red",
+          "content": "Ticket annulé — Autre raison : (sans commentaire)",
+          "timestamp": "2026-06-12T03:22:20"
+        }
+      ]
+    },
+    {
+      "id": "T-1024",
+      "client_id": "C-0004",
+      "instance_id": "CPD 15-38-01",
+      "node_id": "node_1781225025090_0766m",
+      "reference": "CPD 15-38",
+      "pole": "STOKVIS INDUSTRIES",
+      "marque": "Heli",
+      "categorie": "Chariot élévateur",
+      "titre": "Autre problème",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "checked": true,
+          "system": true
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "350"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Annulé",
+      "technicien_ids": [
+        "TECH-0011"
+      ],
+      "created_at": "2026-06-12T03:24:33",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-12T03:24:33",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T08:19:17",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0011"
+          ]
+        },
+        {
+          "status": "Annulé",
+          "timestamp": "2026-06-14T19:59:32",
+          "actor": "Mehdi Mdhi",
+          "unusual": false,
+          "actor_id": "TECH-0011",
+          "cancellation": true
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": {
+        "raison": "Autre raison",
+        "commentaire": "",
+        "by_role": "technicien",
+        "by_name": "Mehdi Mdhi",
+        "by_id": "TECH-0011",
+        "at": "2026-06-14T19:59:32"
+      },
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-12T03:24:33"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Mehdi Mdhi (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T08:19:17"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_cancel",
+          "color": "red",
+          "content": "Ticket annulé — Autre raison : (sans commentaire)",
+          "timestamp": "2026-06-14T19:59:32"
+        }
+      ]
+    },
+    {
+      "id": "T-1025",
+      "client_id": "C-0004",
+      "instance_id": "CPD 15-38-01",
+      "node_id": "node_1781225025090_0766m",
+      "reference": "CPD 15-38",
+      "pole": "STOKVIS INDUSTRIES",
+      "marque": "Heli",
+      "categorie": "Chariot élévateur",
+      "titre": "Système électrique / Batterie",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Système électrique / Batterie",
+          "checked": true,
+          "system": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "400"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Assigné",
+      "technicien_ids": [
+        "TECH-0002"
+      ],
+      "created_at": "2026-06-12T03:24:51",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-12T03:24:51",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T09:14:29",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0004"
+          ]
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-12T09:14:43",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T09:15:00",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0002"
+          ]
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-12T03:24:51"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Fatima El Idrissi (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:14:29"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-12T09:14:43"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien retiré : Fatima El Idrissi (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:14:43"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Karim Safir (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:15:00"
+        }
+      ]
+    },
+    {
+      "id": "T-1026",
+      "client_id": "C-0004",
+      "instance_id": "CPD 15-38-01",
+      "node_id": "node_1781225025090_0766m",
+      "reference": "CPD 15-38",
+      "pole": "STOKVIS INDUSTRIES",
+      "marque": "Heli",
+      "categorie": "Chariot élévateur",
+      "titre": "Système électrique / Batterie",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Système électrique / Batterie",
+          "checked": true,
+          "system": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "450"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Annulé",
+      "technicien_ids": [
+        "TECH-0011"
+      ],
+      "created_at": "2026-06-12T03:26:05",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-12T03:26:05",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T09:35:07",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0011"
+          ]
+        },
+        {
+          "status": "Annulé",
+          "timestamp": "2026-06-15T15:09:48",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "cancellation": true
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": {
+        "raison": "Envoi par erreur",
+        "commentaire": "",
+        "by_role": "manager",
+        "by_name": "Manager",
+        "by_id": "manager",
+        "at": "2026-06-15T15:09:48"
+      },
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-12T03:26:05"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Mehdi Mdhi (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:35:07"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_cancel",
+          "color": "red",
+          "content": "Ticket annulé — Envoi par erreur : (sans commentaire)",
+          "timestamp": "2026-06-15T15:09:48"
+        }
+      ]
+    },
+    {
+      "id": "T-1027",
+      "client_id": "C-0004",
+      "instance_id": "CPD 15-38-01",
+      "node_id": "node_1781225025090_0766m",
+      "reference": "CPD 15-38",
+      "pole": "STOKVIS INDUSTRIES",
+      "marque": "Heli",
+      "categorie": "Chariot élévateur",
+      "titre": "Système hydraulique / Transmission / Boîte de vitesses",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Système hydraulique",
+          "checked": true,
+          "system": false
+        },
+        {
+          "type": "panne",
+          "label": "Transmission / Boîte de vitesses",
+          "checked": true,
+          "system": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "500"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Annulé",
+      "technicien_ids": [
+        "TECH-0002"
+      ],
+      "created_at": "2026-06-12T03:27:47",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-12T03:27:47",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T08:19:25",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0007"
+          ]
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-12T09:59:37",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T09:59:37",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien retiré : Mehdi Alaoui (Technicien)"
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T09:59:45",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0002"
+          ]
+        },
+        {
+          "status": "Annulé",
+          "timestamp": "2026-06-15T15:10:08",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "cancellation": true
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": {
+        "raison": "Doublon",
+        "commentaire": "",
+        "by_role": "manager",
+        "by_name": "Manager",
+        "by_id": "manager",
+        "at": "2026-06-15T15:10:08"
+      },
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-12T03:27:47"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Mehdi Alaoui (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T08:19:25"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-12T09:59:37"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien retiré : Mehdi Alaoui (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:59:37"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Karim Safir (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:59:45"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_cancel",
+          "color": "red",
+          "content": "Ticket annulé — Doublon : (sans commentaire)",
+          "timestamp": "2026-06-15T15:10:08"
+        }
+      ]
+    },
+    {
+      "id": "T-1028",
+      "client_id": "C-0004",
+      "instance_id": "CPD 15-38-01",
+      "node_id": "node_1781225025090_0766m",
+      "reference": "CPD 15-38",
+      "pole": "STOKVIS INDUSTRIES",
+      "marque": "Heli",
+      "categorie": "Chariot élévateur",
+      "titre": "Transmission / Boîte de vitesses",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Transmission / Boîte de vitesses",
+          "checked": true,
+          "system": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "550"
+        }
+      ],
+      "description": "fhfzeuhg uheguihz giughz hguizheriu gh",
+      "images": [],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Assigné",
+      "technicien_ids": [
+        "TECH-0003",
+        "TECH-0004"
+      ],
+      "created_at": "2026-06-12T09:34:14",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-12T09:34:14",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T09:35:49",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0011"
+          ]
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T09:55:04",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien ajouté : Fatima El Idrissi (Technicien)",
+          "assigned_to_ids": [
+            "TECH-0004"
+          ]
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T09:55:08",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien retiré : Fatima El Idrissi (Technicien)",
+          "assigned_to_ids": [
+            "TECH-0004"
+          ]
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-12T09:59:27",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien ajouté : Fatima El Idrissi (Technicien)",
+          "assigned_to_ids": [
+            "TECH-0004"
+          ]
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-12T09:34:14"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Mehdi Mdhi (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:35:49"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien ajouté : Ahmed Tahiri (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:36:47"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien retiré : Mehdi Mdhi (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:37:49"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien ajouté : Fatima El Idrissi (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:55:04"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien retiré : Fatima El Idrissi (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:55:08"
+        },
+        {
+          "id": "m7",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien ajouté : Fatima El Idrissi (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-12T09:59:27"
+        }
+      ]
+    },
+    {
+      "id": "T-1029",
+      "client_id": "C-0004",
+      "instance_id": "CPD 15-38-01",
+      "node_id": "node_1781225025090_0766m",
+      "reference": "CPD 15-38",
+      "pole": "STOKVIS INDUSTRIES",
+      "marque": "Heli",
+      "categorie": "Chariot élévateur",
+      "titre": "Transmission / Boîte de vitesses",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Transmission / Boîte de vitesses",
+          "checked": true,
+          "system": false
+        },
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "checked": true,
+          "system": true
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "600"
+        }
+      ],
+      "description": "",
+      "images": [],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Terminé",
+      "technicien_ids": [
+        "TECH-0007"
+      ],
+      "created_at": "2026-06-13T00:14:57",
+      "resolution_time_ms": 172365,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-13T00:14:57",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-13T00:15:43",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0007"
+          ]
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-13T00:15:51",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-13T00:15:51",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien retiré : Mehdi Alaoui (Technicien)"
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-13T00:15:56",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0007"
+          ]
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-13T00:17:06",
+          "actor": "Mehdi Alaoui",
+          "unusual": false,
+          "actor_id": "TECH-0007"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-13T00:17:18",
+          "actor": "Mehdi Alaoui",
+          "unusual": true,
+          "actor_id": "TECH-0007"
+        },
+        {
+          "status": "Terminé",
+          "timestamp": "2026-06-13T00:17:49",
+          "actor": "Mehdi Alaoui",
+          "unusual": false,
+          "actor_id": "TECH-0007",
+          "via": "terrain"
+        }
+      ],
+      "report": {
+        "version": 2,
+        "titre_intervention": "Transmission / Boîte de vitesses",
+        "situation": "vzfergzeze",
+        "travaux": "zrgzergzegreg",
+        "images": [
+          "/static/uploads/1517ff0877b246.jpeg"
+        ],
+        "submitted_by": "Mehdi Alaoui",
+        "submitted_at": "2026-06-13T00:18:21"
+      },
+      "evaluation": {
+        "note": 3,
+        "commentaire": "not \ngoood",
+        "updated_at": "2026-06-13T00:19:09"
+      },
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-13T00:14:57"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Mehdi Alaoui (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-13T00:15:43"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-13T00:15:51"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien retiré : Mehdi Alaoui (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-13T00:15:51"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Mehdi Alaoui (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-13T00:15:56"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Attente pièce (par Mehdi Alaoui (Technicien))",
+          "timestamp": "2026-06-13T00:17:06"
+        },
+        {
+          "id": "m7",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En Réparation (par Mehdi Alaoui (Technicien))",
+          "timestamp": "2026-06-13T00:17:18"
+        },
+        {
+          "id": "m8",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "green",
+          "content": "Statut mis à jour : Terminé (Terrain) (par Mehdi Alaoui (Technicien))",
+          "timestamp": "2026-06-13T00:17:49"
+        },
+        {
+          "id": "m9",
+          "author_role": "technicien",
+          "author_name": "Mehdi Alaoui",
+          "type": "pdf_card",
+          "color": "blue",
+          "content": "Rapport d'intervention · Version 1",
+          "version": 1,
+          "timestamp": "2026-06-13T00:18:01"
+        },
+        {
+          "id": "m10",
+          "author_role": "technicien",
+          "author_name": "Mehdi Alaoui",
+          "type": "text",
+          "content": "jkjkzfbkze",
+          "timestamp": "2026-06-13T00:18:11",
+          "author_id": "TECH-0007"
+        },
+        {
+          "id": "m11",
+          "author_role": "technicien",
+          "author_name": "Mehdi Alaoui",
+          "type": "audio",
+          "content": "Mémo vocal",
+          "timestamp": "2026-06-13T00:18:14",
+          "author_id": "TECH-0007",
+          "file_url": "/static/uploads/c4114612522b42.webm",
+          "file_name": "voice_1781306294256.webm",
+          "file_type": "audio"
+        },
+        {
+          "id": "m12",
+          "author_role": "technicien",
+          "author_name": "Mehdi Alaoui",
+          "type": "pdf_card",
+          "color": "blue",
+          "content": "Rapport d'intervention · Version 2",
+          "version": 2,
+          "timestamp": "2026-06-13T00:18:21"
+        },
+        {
+          "id": "m13",
+          "author_role": "client",
+          "author_name": "Client",
+          "type": "system_eval",
+          "color": "gold",
+          "content": "Évaluation reçue : 4/5 — goood",
+          "timestamp": "2026-06-13T00:18:58"
+        },
+        {
+          "id": "m14",
+          "author_role": "client",
+          "author_name": "Client",
+          "type": "system_eval",
+          "color": "gold",
+          "content": "Évaluation mise à jour : 3/5 — not \ngoood",
+          "timestamp": "2026-06-13T00:19:09"
+        }
+      ],
+      "termine_via": "terrain"
+    },
+    {
+      "id": "T-1030",
+      "client_id": "C-0004",
+      "instance_id": "CPD 15-38-01",
+      "node_id": "node_1781225025090_0766m",
+      "reference": "CPD 15-38",
+      "pole": "STOKVIS INDUSTRIES",
+      "marque": "Heli",
+      "categorie": "Chariot élévateur",
+      "titre": "Autre problème",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "checked": true,
+          "system": true
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "700"
+        }
+      ],
+      "description": "biqbhfqfhkqfnheqq",
+      "images": [
+        "/static/uploads/5a131ae37b1b45.jpeg"
+      ],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Annulé",
+      "technicien_ids": [
+        "TECH-0005",
+        "TECH-0011"
+      ],
+      "created_at": "2026-06-14T19:44:59",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-14T19:44:59",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T19:45:55",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0007"
+          ]
+        },
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-14T19:46:00",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T19:46:00",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien retiré : Mehdi Alaoui (Technicien)"
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T19:46:04",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0005"
+          ]
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T19:46:10",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien ajouté : Mehdi Mdhi (Technicien)",
+          "assigned_to_ids": [
+            "TECH-0011"
+          ]
+        },
+        {
+          "status": "Annulé",
+          "timestamp": "2026-06-14T19:59:37",
+          "actor": "Mehdi Mdhi",
+          "unusual": false,
+          "actor_id": "TECH-0011",
+          "cancellation": true
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": {
+        "raison": "Autre raison",
+        "commentaire": "",
+        "by_role": "technicien",
+        "by_name": "Mehdi Mdhi",
+        "by_id": "TECH-0011",
+        "at": "2026-06-14T19:59:37"
+      },
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-14T19:44:59"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Mehdi Alaoui (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T19:45:55"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-14T19:46:00"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien retiré : Mehdi Alaoui (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T19:46:00"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Omar Cherkaoui (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T19:46:04"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien ajouté : Mehdi Mdhi (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T19:46:10"
+        },
+        {
+          "id": "m7",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_cancel",
+          "color": "red",
+          "content": "Ticket annulé — Autre raison : (sans commentaire)",
+          "timestamp": "2026-06-14T19:59:37"
+        }
+      ]
+    },
+    {
+      "id": "T-1031",
+      "client_id": "C-0004",
+      "instance_id": "CPD 15-38-01",
+      "node_id": "node_1781225025090_0766m",
+      "reference": "CPD 15-38",
+      "pole": "STOKVIS INDUSTRIES",
+      "marque": "Heli",
+      "categorie": "Chariot élévateur",
+      "titre": "Autre problème",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Autre problème",
+          "checked": true,
+          "system": true
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "750"
+        }
+      ],
+      "description": "The standard chunk of Lorem Ipsum used since 1966 is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.",
+      "images": [
+        "/static/uploads/c4b1843eb93f41.jpeg"
+      ],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Terminé",
+      "technicien_ids": [
+        "TECH-0010",
+        "TECH-0007"
+      ],
+      "created_at": "2026-06-14T20:00:17",
+      "resolution_time_ms": 191472,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-14T20:00:17",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T20:00:35",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0007",
+            "TECH-0011"
+          ]
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T20:00:49",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien retiré : Mehdi Mdhi (Technicien)"
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T20:00:52",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien retiré : Mehdi Alaoui (Technicien)"
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T20:00:58",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0010"
+          ]
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T20:02:08",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien retiré : amine lamine (Technicien)"
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T20:02:14",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0010"
+          ]
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-14T20:03:07",
+          "actor": "amine lamine",
+          "unusual": false,
+          "actor_id": "TECH-0010"
+        },
+        {
+          "status": "En route",
+          "timestamp": "2026-06-14T20:03:14",
+          "actor": "amine lamine",
+          "unusual": false,
+          "actor_id": "TECH-0010"
+        },
+        {
+          "status": "Maintenance à distance",
+          "timestamp": "2026-06-14T20:03:17",
+          "actor": "amine lamine",
+          "unusual": true,
+          "actor_id": "TECH-0010"
+        },
+        {
+          "status": "En route",
+          "timestamp": "2026-06-14T20:03:24",
+          "actor": "amine lamine",
+          "unusual": true,
+          "actor_id": "TECH-0010"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-14T20:03:25",
+          "actor": "amine lamine",
+          "unusual": false,
+          "actor_id": "TECH-0010"
+        },
+        {
+          "status": "Terminé",
+          "timestamp": "2026-06-14T20:03:28",
+          "actor": "amine lamine",
+          "unusual": false,
+          "actor_id": "TECH-0010",
+          "via": "terrain"
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T20:07:42",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien ajouté : Mehdi Alaoui (Technicien)",
+          "assigned_to_ids": [
+            "TECH-0007"
+          ]
+        }
+      ],
+      "report": {
+        "version": 2,
+        "titre_intervention": "Autre problème",
+        "situation": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam tempor iaculis tortor, non dapibus quam finibus at. Nunc in purus interdum, aliquet arcu eget, pulvinar dolor. Phasellus molestie scelerisque pretium. Nam facilisis tristique ante quis ultricies. Proin rhoncus purus ac sapien ornare, sit amet aliquet dui bibendum. Nullam nec ligula vitae leo semper aliquam at a velit. Aenean aliquam in quam in fermentum. Aliquam sit amet dui finibus, ultricies felis non, tristique lacus. Aenean vitae augue orci. Proin id arcu laoreet, tincidunt felis eget, tincidunt massa. Donec sed neque tellus. Nulla viverra viverra ante quis malesuada. Vestibulum egestas congue libero eu imperdiet.",
+        "travaux": "Sed bibendum, arcu non auctor tincidunt, libero diam sagittis quam, eget tempor diam leo convallis metus. Maecenas in suscipit risus, in feugiat urna. Donec nunc neque, pretium non arcu a, vestibulum luctus lectus. Etiam consequat lacus et porta ultrices. Mauris non semper nunc. Nam eget convallis libero, non rutrum diam. Nunc semper vestibulum varius. Proin venenatis mattis dolor. Sed tortor est, rutrum posuere vestibulum rutrum, hendrerit at nisl. Fusce accumsan nulla sit amet ipsum posuere, eget euismod lorem pharetra. Pellentesque vehicula erat vel ornare dignissim. In sem ipsum, auctor quis iaculis et, aliquet vel velit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.",
+        "images": [
+          "/static/uploads/7b4e111218824d.jpeg",
+          "/static/uploads/e8bbcd56057043.jpeg"
+        ],
+        "submitted_by": "Mehdi Alaoui",
+        "submitted_at": "2026-06-14T20:08:25"
+      },
+      "evaluation": {
+        "note": 5,
+        "commentaire": "",
+        "updated_at": "2026-06-15T11:55:00"
+      },
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-14T20:00:17"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Mehdi Alaoui (Technicien), Mehdi Mdhi (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T20:00:35"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien retiré : Mehdi Mdhi (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T20:00:49"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-14T20:00:52"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien retiré : Mehdi Alaoui (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T20:00:52"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à amine lamine (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T20:00:58"
+        },
+        {
+          "id": "m7",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Tous les techniciens retirés — retour au statut Envoyé",
+          "timestamp": "2026-06-14T20:02:08"
+        },
+        {
+          "id": "m8",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien retiré : amine lamine (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T20:02:08"
+        },
+        {
+          "id": "m9",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à amine lamine (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T20:02:14"
+        },
+        {
+          "id": "m10",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Attente pièce (par amine lamine (Technicien))",
+          "timestamp": "2026-06-14T20:03:07"
+        },
+        {
+          "id": "m11",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En route (par amine lamine (Technicien))",
+          "timestamp": "2026-06-14T20:03:14"
+        },
+        {
+          "id": "m12",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : Maintenance à distance (par amine lamine (Technicien))",
+          "timestamp": "2026-06-14T20:03:17"
+        },
+        {
+          "id": "m13",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "⚠ Statut mis à jour : En route (par amine lamine (Technicien))",
+          "timestamp": "2026-06-14T20:03:24"
+        },
+        {
+          "id": "m14",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En Réparation (par amine lamine (Technicien))",
+          "timestamp": "2026-06-14T20:03:25"
+        },
+        {
+          "id": "m15",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "green",
+          "content": "Statut mis à jour : Terminé (Terrain) (par amine lamine (Technicien))",
+          "timestamp": "2026-06-14T20:03:28"
+        },
+        {
+          "id": "m16",
+          "author_role": "technicien",
+          "author_name": "amine lamine",
+          "type": "text",
+          "content": "hello",
+          "timestamp": "2026-06-14T20:03:50",
+          "author_id": "TECH-0010"
+        },
+        {
+          "id": "m17",
+          "author_role": "client",
+          "author_name": "TGCC",
+          "type": "text",
+          "content": "hello",
+          "timestamp": "2026-06-14T20:04:06",
+          "author_id": "C-0004"
+        },
+        {
+          "id": "m18",
+          "author_role": "manager",
+          "author_name": "Manager",
+          "type": "text",
+          "content": "hello",
+          "timestamp": "2026-06-14T20:04:24",
+          "author_id": "manager"
+        },
+        {
+          "id": "m19",
+          "author_role": "technicien",
+          "author_name": "amine lamine",
+          "type": "pdf_card",
+          "color": "blue",
+          "content": "Rapport d'intervention · Version 1",
+          "version": 1,
+          "timestamp": "2026-06-14T20:07:16"
+        },
+        {
+          "id": "m20",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien ajouté : Mehdi Alaoui (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T20:07:42"
+        },
+        {
+          "id": "m21",
+          "author_role": "technicien",
+          "author_name": "Mehdi Alaoui",
+          "type": "pdf_card",
+          "color": "blue",
+          "content": "Rapport d'intervention · Version 2",
+          "version": 2,
+          "timestamp": "2026-06-14T20:08:25"
+        },
+        {
+          "id": "m22",
+          "author_role": "technicien",
+          "author_name": "Mehdi Alaoui",
+          "type": "text",
+          "content": "hello",
+          "timestamp": "2026-06-14T20:09:04",
+          "author_id": "TECH-0007"
+        },
+        {
+          "id": "m23",
+          "author_role": "client",
+          "author_name": "Client",
+          "type": "system_eval",
+          "color": "gold",
+          "content": "Évaluation reçue : 5/5 — (sans commentaire)",
+          "timestamp": "2026-06-15T11:55:00"
+        }
+      ],
+      "termine_via": "terrain"
+    },
+    {
+      "id": "T-1032",
+      "client_id": "C-0004",
+      "instance_id": "CPD 15-38-01",
+      "node_id": "node_1781225025090_0766m",
+      "reference": "CPD 15-38",
+      "pole": "STOKVIS INDUSTRIES",
+      "marque": "Heli",
+      "categorie": "Chariot élévateur",
+      "titre": "Système hydraulique",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Système hydraulique",
+          "checked": true,
+          "system": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "800"
+        }
+      ],
+      "description": "Phasellus dignissim eget risus a accumsan. Integer bibendum efficitur tincidunt. Cras in sapien id sapien pharetra dictum eu ac tellus. Aliquam non nisi porta enim aliquam pulvinar. Nullam congue nulla a justo laoreet iaculis. Nam non rhoncus dui, a consequat dolor. Morbi dapibus, justo mollis vehicula luctus, orci ligula tincidunt velit, nec blandit leo arcu quis nisl. Phasellus tincidunt, massa vitae finibus luctus, quam lorem scelerisque arcu, in venenatis urna sapien et arcu.",
+      "images": [
+        "/static/uploads/4216e578f8ef45.jpeg"
+      ],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Terminé",
+      "technicien_ids": [
+        "TECH-0006",
+        "TECH-0007"
+      ],
+      "created_at": "2026-06-14T20:46:10",
+      "resolution_time_ms": 33350,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-14T20:46:10",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T20:46:19",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0006"
+          ]
+        },
+        {
+          "status": "Attente pièce",
+          "timestamp": "2026-06-14T20:46:38",
+          "actor": "Nadia Berrada",
+          "unusual": false,
+          "actor_id": "TECH-0006"
+        },
+        {
+          "status": "En route",
+          "timestamp": "2026-06-14T20:46:40",
+          "actor": "Nadia Berrada",
+          "unusual": false,
+          "actor_id": "TECH-0006"
+        },
+        {
+          "status": "En Réparation",
+          "timestamp": "2026-06-14T20:46:41",
+          "actor": "Nadia Berrada",
+          "unusual": false,
+          "actor_id": "TECH-0006"
+        },
+        {
+          "status": "Terminé",
+          "timestamp": "2026-06-14T20:46:43",
+          "actor": "Nadia Berrada",
+          "unusual": false,
+          "actor_id": "TECH-0006",
+          "via": "terrain"
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-14T20:53:02",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "status_label": "Technicien ajouté : Mehdi Alaoui (Technicien)",
+          "assigned_to_ids": [
+            "TECH-0007"
+          ]
+        }
+      ],
+      "report": {
+        "version": 3,
+        "titre_intervention": "Filtre Filtré et Système hydraulique",
+        "situation": "Aliquam metus erat, ultrices non ipsum non, facilisis venenatis dolor. Praesent non neque accumsan, scelerisque lorem a, viverra felis. Donec molestie nibh feugiat turpis finibus, a sagittis erat egestas. Curabitur efficitur elementum justo nec mattis. Nullam aliquet dolor nec lectus vulputate elementum et sit amet libero. Ut tortor dolor, faucibus quis nisi gravida, finibus gravida felis. Sed a sagittis libero. Nullam ipsum justo, efficitur nec porta quis, tincidunt vitae mi. Nulla non tristique ex, id scelerisque risus. Phasellus tempor pretium commodo. Nullam laoreet mi a arcu consectetur, porttitor fringilla lectus varius. Integer sollicitudin nunc dui, tempus tristique leo lacinia ac. Nam porttitor rhoncus diam at sodales. Quisque posuere arcu nec nunc faucibus tincidunt. Nulla facilisi.",
+        "travaux": "Morbi a elit magna. Duis a viverra quam, eget sagittis risus. Nunc augue elit, scelerisque eu orci sed, tempor tristique enim. Donec et velit lacinia, pretium magna sed, rutrum mauris. Fusce feugiat nunc eget rhoncus hendrerit. Praesent vitae rutrum ante. Mauris sed sagittis arcu. Donec turpis purus, malesuada vel aliquet ut, malesuada ac elit. Etiam non imperdiet eros, ut faucibus metus. Fusce bibendum augue eu elit maximus auctor. Aenean id est consequat, tincidunt leo id, faucibus massa. Aenean non fringilla felis, et egestas justo.",
+        "used_parts": [
+          {
+            "piece_id": "sp_1781462127440_9wl36"
+          },
+          {
+            "piece_id": "sp_1781258842700_tcr62"
+          },
+          {
+            "piece_id": "sp_1781258759249_g3hm1"
+          }
+        ],
+        "images": [
+          "/static/uploads/6f5179299bdc42.jpeg",
+          "/static/uploads/71e25dd362144b.jpeg"
+        ],
+        "submitted_by": "Mehdi Alaoui",
+        "submitted_at": "2026-06-14T21:14:40"
+      },
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-14T20:46:10"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Nadia Berrada (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T20:46:19"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Attente pièce (par Nadia Berrada (Technicien))",
+          "timestamp": "2026-06-14T20:46:38"
+        },
+        {
+          "id": "m4",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En route (par Nadia Berrada (Technicien))",
+          "timestamp": "2026-06-14T20:46:40"
+        },
+        {
+          "id": "m5",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : En Réparation (par Nadia Berrada (Technicien))",
+          "timestamp": "2026-06-14T20:46:41"
+        },
+        {
+          "id": "m6",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "green",
+          "content": "Statut mis à jour : Terminé (Terrain) (par Nadia Berrada (Technicien))",
+          "timestamp": "2026-06-14T20:46:43"
+        },
+        {
+          "id": "m7",
+          "author_role": "technicien",
+          "author_name": "Nadia Berrada",
+          "type": "pdf_card",
+          "color": "blue",
+          "content": "Rapport d'intervention · Version 1",
+          "version": 1,
+          "timestamp": "2026-06-14T20:48:52"
+        },
+        {
+          "id": "m8",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Technicien ajouté : Mehdi Alaoui (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-14T20:53:02"
+        },
+        {
+          "id": "m9",
+          "author_role": "technicien",
+          "author_name": "Mehdi Alaoui",
+          "type": "pdf_card",
+          "color": "blue",
+          "content": "Rapport d'intervention · Version 2",
+          "version": 2,
+          "timestamp": "2026-06-14T21:14:29"
+        },
+        {
+          "id": "m10",
+          "author_role": "technicien",
+          "author_name": "Mehdi Alaoui",
+          "type": "pdf_card",
+          "color": "blue",
+          "content": "Rapport d'intervention · Version 3",
+          "version": 3,
+          "timestamp": "2026-06-14T21:14:40"
+        }
+      ],
+      "termine_via": "terrain"
+    },
+    {
+      "id": "T-1033",
+      "client_id": "C-0004",
+      "instance_id": "CPD 15-38-01",
+      "node_id": "node_1781225025090_0766m",
+      "reference": "CPD 15-38",
+      "pole": "STOKVIS INDUSTRIES",
+      "marque": "Heli",
+      "categorie": "Chariot élévateur",
+      "titre": "Moteur / Démarrage",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Moteur / Démarrage",
+          "checked": true,
+          "system": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "860"
+        }
+      ],
+      "description": "Aenean a ultricies ligula, ut laoreet risus. Nulla facilisi. Sed facilisis fermentum ipsum nec tincidunt. Proin augue lacus, tincidunt et quam nec, dignissim tincidunt ante. Morbi tristique luctus ante, at fringilla lectus sollicitudin vitae. Ut feugiat, nisl nec cursus consectetur, ante diam iaculis lacus, non blandit justo ante non mi. Aenean ut sapien cursus, cursus dui ac, feugiat massa. Donec elementum vel ex id porttitor. Etiam iaculis quam sit amet condimentum malesuada. Nunc neque quam, dictum sed est eu, vehicula sodales urna. Aenean vestibulum gravida placerat. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      "images": [
+        "/static/uploads/afcac282fe9d49.png"
+      ],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Annulé",
+      "technicien_ids": [
+        "TECH-0007"
+      ],
+      "created_at": "2026-06-15T12:29:01",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-15T12:29:01",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-15T12:30:22",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0007"
+          ]
+        },
+        {
+          "status": "Annulé",
+          "timestamp": "2026-06-15T15:10:00",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "cancellation": true
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": {
+        "raison": "Problème résolu",
+        "commentaire": "",
+        "by_role": "manager",
+        "by_name": "Manager",
+        "by_id": "manager",
+        "at": "2026-06-15T15:10:00"
+      },
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-15T12:29:01"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Mehdi Alaoui (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-15T12:30:22"
+        },
+        {
+          "id": "m3",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_cancel",
+          "color": "red",
+          "content": "Ticket annulé — Problème résolu : (sans commentaire)",
+          "timestamp": "2026-06-15T15:10:00"
+        }
+      ]
+    },
+    {
+      "id": "T-1034",
+      "client_id": "C-0004",
+      "instance_id": "CPD 08-12 SQ-01",
+      "node_id": "node_1781556720902_9vrfi",
+      "reference": "CPD 08-12 SQ",
+      "pole": "STOKVIS INDUSTRIES",
+      "marque": "Heli",
+      "categorie": "Chariot élévateur",
+      "titre": "Moteur / Démarrage",
+      "items": [
+        {
+          "type": "panne",
+          "label": "Moteur / Démarrage",
+          "checked": true,
+          "system": false
+        }
+      ],
+      "usage_readings": [
+        {
+          "name": "Heure d'utilisation",
+          "unit": "Hr",
+          "value": "100"
+        }
+      ],
+      "description": "",
+      "images": [
+        "/static/uploads/29b100c0684441.png"
+      ],
+      "localisation": "Zone Industrielle TFZ, Lot 45, Tanger (35.75°N, 5.83°W)",
+      "status": "Assigné",
+      "technicien_ids": [
+        "TECH-0011"
+      ],
+      "created_at": "2026-06-15T21:52:53",
+      "resolution_time_ms": null,
+      "timeline": [
+        {
+          "status": "Envoyé",
+          "timestamp": "2026-06-15T21:52:53",
+          "actor": "Système",
+          "unusual": false
+        },
+        {
+          "status": "Assigné",
+          "timestamp": "2026-06-16T22:37:21",
+          "actor": "Manager",
+          "unusual": false,
+          "actor_id": "manager",
+          "assigned_to_ids": [
+            "TECH-0011"
+          ]
+        }
+      ],
+      "report": null,
+      "evaluation": null,
+      "cancellation": null,
+      "messages": [
+        {
+          "id": "m1",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system",
+          "content": "Ticket créé",
+          "timestamp": "2026-06-15T21:52:53"
+        },
+        {
+          "id": "m2",
+          "author_role": "system",
+          "author_name": "Système",
+          "type": "system_status",
+          "color": "blue",
+          "content": "Statut mis à jour : Assigné à Mehdi Mdhi (Technicien) (par Faouzi Lakjaa (Manager))",
+          "timestamp": "2026-06-16T22:37:21"
+        }
+      ]
+    }
+  ]
+}
